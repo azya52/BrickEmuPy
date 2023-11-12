@@ -1,0 +1,59 @@
+{
+	"face_path": "./assets/E23PlusMarkII96in1.svg",
+	"clock": 1000000,
+	
+	"buttons": {
+		"btnStart": {
+			"port": "PS",
+			"pin_mask": 1,
+			"hot_keys": [49]
+		},
+		"btnOnOff": {
+			"port": "PS",
+			"pin_mask": 4,
+			"hot_keys": [50]
+		},
+		"btnMute": {
+			"port": "PS",
+			"pin_mask": 2,
+			"hot_keys": [51]
+		},
+		"btnLeft": {
+			"port": "PP",
+			"pin_mask": 8,
+			"hot_keys": [65, 16777234]
+		},
+		"btnDown": {
+			"port": "PP",
+			"pin_mask": 2,
+			"hot_keys": [83, 16777237]
+		},
+		"btnRight": {
+			"port": "PP",
+			"pin_mask": 4,
+			"hot_keys": [68, 16777236]
+		},
+		"btnRotate": {
+			"port": "PP",
+			"pin_mask": 1,
+			"hot_keys": [32, 16777235]
+		}
+	},
+	
+	"mask_options": {
+		"rom_path": "./assets/E23PlusMarkII96in1.bin",
+		"port_pullup": {
+			"PP": 15,
+			"PM": 15,
+			"PS": 15
+		},
+		"port_wakeup": {
+			"PP": 0,
+			"PM": 0,
+			"PS": 4
+		},
+		"PA_open_drain": 0,
+		"timer_clock_div": 16,
+		"sound_clock_div": 16
+	}
+}
