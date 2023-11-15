@@ -121,14 +121,12 @@ class Brick(QObject):
         lastDisplayUpdate = lastTick
         while not(thread.isInterruptionRequested() or self._debug):
             ns = time.perf_counter_ns()
-            while (ns > lastTick and ns < lastDisplayUpdate and ns < lastExamine):                
+            while (ns > lastTick and ns < lastDisplayUpdate and ns < lastExamine and not self._debug):                
                 lastTick += self._mcycleTimeNs
-                self._CPU.mclock()
-
-                if (self._CPU.PC() in self._breakpoints):
-                    self.examineSignal.emit({"DEBUG": True})
-                    self._pause()
-                    continue
+                if (self._CPU.mclock() == 0):
+                    if (self._CPU.PC() in self._breakpoints):
+                        self.examineSignal.emit({"DEBUG": True})
+                        self._pause()
 
                 ns = time.perf_counter_ns()
             
@@ -156,8 +154,8 @@ class Brick(QObject):
 
     @pyqtSlot()
     def _step(self):
-        if (self._CPU.mclock() > 1):
-            self._CPU.mclock()
+        while (self._CPU.mclock()):
+            pass
         self._uiDisplayUpdate()
         self._uiExamineUpdate()
 

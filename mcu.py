@@ -254,7 +254,6 @@ class MCU():
                 if (self._TC == 0):
                     self._TF = 1
             
-            self._execution_counter -= 1
             if (self._execution_counter <= 0):
                 self._HALT = 0
                 if (self._EI and self._STACK == 0):
@@ -265,8 +264,9 @@ class MCU():
 
                 opcode = self._ROM.getByte(self._PC)
                 self._execution_counter = self._execute[opcode](self, opcode)
-                self._mcycles_counter += self._execution_counter
-        
+
+            self._mcycles_counter += 1
+            self._execution_counter -= 1
             return self._execution_counter
         
         return 0
