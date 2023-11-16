@@ -2077,9 +2077,9 @@ BEF:    jc BE7                          ;C3E7
 BF1:    mov R1R0, 0x52                  ;5205
 BF3:    mov A, [R1R0]                   ;04
 BF4:    ja1 BFF                         ;8BFF
-BF6:    mov R3R2, 0x74                  ;64F7
-BF8:    jnz R1, 9E4                     ;A9E4
-BFA:                                    ;BD
+BF6:    mov A, 0x04                     ;74
+BF7:    call 7A9                        ;F7A9
+BF9:    jmp 4BD                         ;E4BD
 BFB:    mov R1R0, 0x00                  ;5000
 BFD:    call E0C                        ;FE0C
 BFF:    mov R1R0, 0x00                  ;5000
