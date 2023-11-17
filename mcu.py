@@ -231,15 +231,10 @@ class MCU():
     def PC(self):
         return self._PC & 0xFFF
     
-    def get_pixels(self):
-        pixels = []
-        for seg in range(40):
-            ram = (self._RAM[255 - seg * 2] << 4) | self._RAM[254 - seg * 2]
-            for com in range(8):
-                pixels.append((com, seg, (ram >> com) & (self._HALT ^ 1)))
-        return tuple(pixels)
+    def get_RAM(self):
+        return tuple(self._RAM)
     
-    def get_rom(self):
+    def get_ROM(self):
         return self._ROM
     
     def mcycles(self):

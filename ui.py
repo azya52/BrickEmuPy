@@ -559,21 +559,21 @@ class BrickUI(QtWidgets.QGraphicsView):
         body.setElementId("body")
         self.scene().addItem(body)  
 
-        self._pixels = []
-        for com in range(8):
-            self._pixels.append([])
-            for seg in range(40):
-                nextId = "com" + str(com) + "seg" + str(seg)
-                self._pixels[com].append(QtSvgWidgets.QGraphicsSvgItem())
+        self._segments = []
+        for ramBit in range(4):
+            for ramNibble in range(256):
+                nextId = str(ramNibble) + "_" + str(ramBit)
                 if (faceRenderer.elementExists(nextId)):
-                    self._pixels[com][seg].setSharedRenderer(faceRenderer)
-                    self._pixels[com][seg].setElementId(nextId)
-                    self._pixels[com][seg].setPos(faceRenderer.boundsOnElement(nextId).topLeft())
-                    self.scene().addItem(self._pixels[com][seg])
-        
+                    segment = QtSvgWidgets.QGraphicsSvgItem()
+                    segment.setSharedRenderer(faceRenderer)
+                    segment.setElementId(nextId)
+                    segment.setPos(faceRenderer.boundsOnElement(nextId).topLeft())
+                    self.scene().addItem(segment)
+                    self._segments.append((ramNibble, ramBit, segment))
+     
         for name, value in self._config["buttons"].items():
             if (faceRenderer.elementExists(name)):
-                btn = QtWidgets.QPushButton(objectName="brickButton")
+                btn = QtWidgets.QPushButton(objectName = "brickButton")
                 btn.setGeometry(faceRenderer.boundsOnElement(name).toRect())
                 shortcuts = "Shortcuts: "
                 for shortcut in value["hot_keys"]:
@@ -586,9 +586,9 @@ class BrickUI(QtWidgets.QGraphicsView):
                 self.scene().addWidget(btn)
 
     @pyqtSlot(tuple)
-    def render(self, pixels):
-        for value in pixels:
-            self._pixels[value[0]][value[1]].setOpacity(0.40 * value[2] + 0.60 * self._pixels[value[0]][value[1]].opacity())
+    def render(self, RAM):
+        for nibble, bit, segment in self._segments:
+            segment.setOpacity(0.40 * ((RAM[nibble] >> bit) & 0x1) + 0.60 * segment.opacity())
 
     @pyqtSlot(dict)
     def examineSlot(self, info):

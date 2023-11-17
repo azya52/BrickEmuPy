@@ -57,7 +57,7 @@ class Brick(QObject):
         self._uiDisplayUpdate()
         self._uiExamineUpdate()
 
-        self.examineSignal.emit(Disassembler().disassemble(self._CPU.get_rom()))
+        self.examineSignal.emit(Disassembler().disassemble(self._CPU.get_ROM()))
 
         self._clock()
 
@@ -177,10 +177,10 @@ class Brick(QObject):
     @pyqtSlot(dict)
     def _setConfig(self, config):
         self._CPU = MCU(config['mask_options'], self._beeper)
-        self.examineSignal.emit(Disassembler().disassemble(self._CPU.get_rom()))
+        self.examineSignal.emit(Disassembler().disassemble(self._CPU.get_ROM()))
 
     def _uiDisplayUpdate(self):
-        self.uiDisplayUpdateSignal.emit(self._CPU.get_pixels()) 
+        self.uiDisplayUpdateSignal.emit(self._CPU.get_RAM()) 
 
     def _uiExamineUpdate(self):
         self.examineSignal.emit({
