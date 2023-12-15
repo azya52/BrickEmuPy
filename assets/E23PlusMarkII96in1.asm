@@ -856,7 +856,7 @@
 4FB:    mov [R1R0], A                   ;05
 4FC:    mov R3R2, 0x43                  ;6304
 4FE:    mov A, [R3R2]                   ;06
-4FF:    ja1 50C                         ;8D0C
+4FF:    ja1 504                         ;8D04
 501:    mov A, [R1R0]                   ;04
 502:    call 9E5                        ;F9E5
 504:    call 0F2                        ;F0F2
