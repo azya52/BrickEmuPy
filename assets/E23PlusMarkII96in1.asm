@@ -323,7 +323,7 @@
 1BE:    mov A, 0x3                      ;73
 1BF:    add A, [R1R0]                   ;09
 1C0:    jz A, 1CB                       ;B1CB
-1C2:    mov R3R2, 0x08                  ;6840
+1C2:    mov R3R2, 0x08                  ;6800
 1C4:    inc A                           ;31
 1C5:    jnz A, 1CB                      ;B9CB
 1C7:    jmp 2FE                         ;E2FE
@@ -2128,7 +2128,7 @@ C4A:    call E07                        ;FE07
 C4C:    jmp C30                         ;EC30
 C4E:    call 858                        ;F858
 C50:    jnc C54                         ;CC54
-C52:    jmp CF5                         ;ECF5
+C52:    jmp 4F5                         ;E4F5
 C54:    mov A, 0xE                      ;7E
 C55:    call 7BC                        ;F7BC
 C57:    jmp C68                         ;EC68
