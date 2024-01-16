@@ -120,6 +120,15 @@ class Disassembler():
         else:
             return {}
     
+    def disassemble2text(self, rom: ROM):
+        listing = self.disassemble(rom)["LISTING"]
+        result = ""
+        for i, line in enumerate(listing):
+            if (i > 0 and listing[i - 1][0] < 2):
+                result += (self._addrbase % i) + ":\t" + (line[2] + "\t;" + '%0.2X' % line[1]).expandtabs(30) + "\n"
+        with open('./assets/asm.asm', 'w') as f:
+            f.write(result)
+    
     def _disassemble(self, pc, listing, rom: ROM):
         while (pc < len(listing) and listing[pc] is None):
             opcode = rom.getWord(pc)
