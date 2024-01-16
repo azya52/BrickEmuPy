@@ -180,7 +180,7 @@ class Brick(QObject):
         self.examineSignal.emit(Disassembler().disassemble(self._CPU.get_ROM()))
 
     def _uiDisplayUpdate(self):
-        self.uiDisplayUpdateSignal.emit(self._CPU.get_RAM()) 
+        self.uiDisplayUpdateSignal.emit(self._CPU.get_VRAM()) 
 
     def _uiExamineUpdate(self):
         self.examineSignal.emit({
