@@ -437,8 +437,6 @@ class BrickUI(QtWidgets.QGraphicsView):
 
         self._loadSettings()
         
-        self.setScene(QGraphicsScene())
-        
         self.setViewportUpdateMode(QtWidgets.QGraphicsView.ViewportUpdateMode.MinimalViewportUpdate)
         self.setTransformationAnchor(QtWidgets.QGraphicsView.ViewportAnchor.AnchorUnderMouse)
         self.setResizeAnchor(QtWidgets.QGraphicsView.ViewportAnchor.AnchorUnderMouse)
@@ -483,7 +481,7 @@ class BrickUI(QtWidgets.QGraphicsView):
         self._config = self._loadConfig(path)
         self._brick.setConfig(self._config)
         self._draw(self._config["face_path"])
-        self._scene_rect = self.scene().sceneRect()
+        self._scene_rect = None
         self._fitBrickInView()
 
     def step(self):
@@ -551,7 +549,7 @@ class BrickUI(QtWidgets.QGraphicsView):
         return super().mouseMoveEvent(event)
 
     def _draw(self, faceSVG):
-        self.scene().clear()
+        self.setScene(QGraphicsScene())
         self.scene().setItemIndexMethod(QGraphicsScene.ItemIndexMethod.NoIndex)
         faceRenderer = QtSvg.QSvgRenderer(faceSVG)
         
