@@ -3,6 +3,8 @@ from sound import Sound
 
 TIMER_INT_LOCATION = 4
 EXTERNAL_INT_LOCATION = 8
+EMPTY_VRAM = tuple([0] * 256)
+FUULL_VRAM = tuple([255] * 256)
 
 class MCU():
     def __init__(self, mask, sound: Sound):
@@ -22,6 +24,7 @@ class MCU():
         self._TF = 0
         self._EF = 0
         self._HALT = 0
+        self._RESET = 0
         
         self._PP = mask['port_pullup']['PP']
         self._PS = mask['port_pullup']['PS']
@@ -216,6 +219,9 @@ class MCU():
             self._PS &= ~pin_mask
             if (self._HALT):
                 self._EF = (self._PS_wakeup_mask & pin_mask) > 0
+        elif (port == 'RES'):
+            self._RESET = 1
+            self._reset()
 
     def pin_release(self, port, pin_mask):
         if (port == 'PP'):
@@ -227,11 +233,17 @@ class MCU():
         elif (port == 'PS'):
             self._PS &= ~pin_mask
             self._PS |= self._PS_pullup_mask & pin_mask
+        elif (port == 'RES'):
+            self._RESET = 0
 
     def PC(self):
         return self._PC & 0xFFF
     
-    def get_RAM(self):
+    def get_VRAM(self):
+        if (self._HALT):
+            return EMPTY_VRAM
+        elif (self._RESET):
+            return FUULL_VRAM
         return tuple(self._RAM)
     
     def get_ROM(self):
@@ -241,7 +253,7 @@ class MCU():
         return self._mcycles_counter
             
     def mclock(self):
-        if ((not self._HALT) | self._EF):
+        if ((not self._HALT | self._RESET) | self._EF):
             self._timer_clock_counter -= 4
             if (self._timer_clock_counter <= 0):
                 self._timer_clock_counter = self._timer_div
@@ -265,6 +277,16 @@ class MCU():
             return self._execution_counter
         
         return 0
+
+    def _reset(self):
+        self._PC = 0
+        self._IE = 0
+        self._TF = 0
+        self._timer_clock_counter = 0
+        self._CF = 0
+        self._sound.stop()
+        self._sound.setOneCycle()
+        self._PA = 0
 
     def _timer_int(self):
         self._TF = 0
