@@ -398,9 +398,9 @@ class Window(QtWidgets.QMainWindow):
         if ("LISTING" in info):
             if self.asmTable.state() != QtWidgets.QAbstractItemView.State.EditingState:
                 self.asmTable.blockSignals(True)
-                if (self.asmTable.rowCount() <= len(info["LISTING"])):
-                    self.asmTable.clear()
-                    self.asmTable.setRowCount(len(info["LISTING"]))
+                self.asmTable.clear()
+                self.asmTable.clearContents()
+                self.asmTable.setRowCount(1)
                 
                 itemAdr = QtWidgets.QTableWidgetItem()
                 itemAdr.setForeground(QtGui.QBrush(QtGui.QColor(128, 128, 128)))
@@ -415,14 +415,15 @@ class Window(QtWidgets.QMainWindow):
                     item.setText('0x%0.3X:' % i)
                     self.asmTable.setItem(i, 0, item)
                     itemOpcode = QtWidgets.QTableWidgetItem(' %0.2X ' % instr[1])
-                    itemOpcode.setFlags(itemOpcode.flags() | QtCore.Qt.ItemFlag.ItemIsEditable)
+                    itemOpcode.setFlags(itemOpcode.flags() & ~QtCore.Qt.ItemFlag.ItemIsEditable)
                     self.asmTable.setItem(i, 1, itemOpcode)
                     itemAsm = QtWidgets.QTableWidgetItem(instr[2])
                     itemAsm.setFlags(itemAsm.flags() & ~QtCore.Qt.ItemFlag.ItemIsEditable)
                     self.asmTable.setItem(i, 2, itemAsm)
                     if (i == 0):
                         self.asmTable.resizeRowsToContents()
-                        self.asmTable.resizeColumnsToContents() 
+                        self.asmTable.resizeColumnsToContents()
+                        self.asmTable.setRowCount(len(info["LISTING"]))
                 self.asmTable.blockSignals(False)
 
 
