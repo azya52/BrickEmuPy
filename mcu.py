@@ -556,6 +556,7 @@ class MCU():
         self._PC += 2
         self._HALT = 1
         self._EF = 0
+        self._sound.set_sound_off()
 
         return 2
 
