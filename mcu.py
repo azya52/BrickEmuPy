@@ -254,6 +254,7 @@ class MCU():
             
     def mclock(self):
         if ((not self._HALT | self._RESET) | self._EF):
+            self._sound.clock()
             self._timer_clock_counter -= 4
             if (self._timer_clock_counter <= 0):
                 self._timer_clock_counter = self._timer_div
@@ -284,8 +285,8 @@ class MCU():
         self._TF = 0
         self._timer_clock_counter = 0
         self._CF = 0
-        self._sound.stop()
-        self._sound.setOneCycle()
+        self._sound.set_sound_off()
+        self._sound.set_one_cycle()
         self._PA = 0
 
     def _timer_int(self):
@@ -640,7 +641,7 @@ class MCU():
         return 2
 
     def _sound_n(self, opcode):
-        self._sound.setSoundChannel(self._ROM.getByte(self._PC + 1) & 0xF)
+        self._sound.set_sound_channel(self._ROM.getByte(self._PC + 1) & 0xF)
         self._PC += 2
 
         return 2
@@ -658,25 +659,25 @@ class MCU():
         return 2
 
     def _sound_one(self, opcode):
-        self._sound.setOneCycle()
+        self._sound.set_one_cycle()
         self._PC += 1
 
         return 1
 
     def _sound_loop(self, opcode):
-        self._sound.setRepeatCycle()
+        self._sound.set_repeat_cycle()
         self._PC += 1
 
         return 1
 
     def _sound_off(self, opcode):
-        self._sound.stop()
+        self._sound.set_sound_off()
         self._PC += 1
 
         return 1
 
     def _sound_a(self, opcode):
-        self._sound.setSoundChannel(self._ACC)
+        self._sound.set_sound_channel(self._ACC)
         self._PC += 1
 
         return 1

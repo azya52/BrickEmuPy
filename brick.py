@@ -43,8 +43,8 @@ class Brick(QObject):
 
     @pyqtSlot()
     def run(self):
-        self._beeper = Sound()
-        self._CPU = MCU(self._config['mask_options'], self._beeper)
+        self._sound = Sound(self._config['mask_options'], self._config['clock'])
+        self._CPU = MCU(self._config['mask_options'], self._sound)
 
         self._breakpoints = {}
         self._debug = False
@@ -74,7 +74,7 @@ class Brick(QObject):
         self.stopSignal.disconnect()
         self.setConfigSignal.disconnect()
         self.setSpeedSignal.disconnect()
-        self._beeper.stop()
+        self._sound.stop()
 
     @pyqtSlot(dict)
     def editState(self, state):
@@ -162,7 +162,8 @@ class Brick(QObject):
     @pyqtSlot()
     def _stop(self):
         self._debug = True
-        self._CPU = MCU(self._config['mask_options'], self._beeper)
+        self._sound = Sound(self._config['mask_options'], self._config['clock'])
+        self._CPU = MCU(self._config['mask_options'], self._sound)
         self._uiDisplayUpdate()
         self._uiExamineUpdate()
             
@@ -176,7 +177,8 @@ class Brick(QObject):
 
     @pyqtSlot(dict)
     def _setConfig(self, config):
-        self._CPU = MCU(config['mask_options'], self._beeper)
+        self._sound = Sound(self._config['mask_options'], self._config['clock'])
+        self._CPU = MCU(config['mask_options'], self._sound)
         self.examineSignal.emit(Disassembler().disassemble(self._CPU.get_ROM()))
 
     def _uiDisplayUpdate(self):
