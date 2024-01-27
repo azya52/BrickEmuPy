@@ -177,7 +177,7 @@ class Brick(QObject):
 
     @pyqtSlot(dict)
     def _setConfig(self, config):
-        self._sound = Sound(self._config['mask_options'], self._config['clock'])
+        self._sound = Sound(config['mask_options'], self._config['clock'])
         self._CPU = MCU(config['mask_options'], self._sound)
         self.examineSignal.emit(Disassembler().disassemble(self._CPU.get_ROM()))
 
