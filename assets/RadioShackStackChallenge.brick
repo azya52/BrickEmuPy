@@ -1,0 +1,60 @@
+{
+	"id": "6087bc43-6847-4ecd-8166-dc27848d0747",
+	"core": "E0C6200",
+	"face_path": "./assets/RadioShackStackChallenge.svg",
+	"clock": 2000000,
+	
+	"buttons": {
+		"btnPause": {
+			"port": "K1",
+			"pin": 1,
+			"level": 0,
+			"hot_keys": [49]
+		},
+		"btnSound": {
+			"port": "K1",
+			"pin": 2,
+			"level": 0,
+			"hot_keys": [50]
+		},
+		"btnOnOff": {
+			"port": "K1",
+			"pin": 0,
+			"level": 0,
+			"hot_keys": [51]
+		},
+		"btnLeft": {
+			"port": "K0",
+			"pin": 0,
+			"level": 0,
+			"hot_keys": [65, 16777234]
+		},
+		"btnDown": {
+			"port": "K0",
+			"pin": 1,
+			"level": 0,
+			"hot_keys": [83, 16777237]
+		},
+		"btnRight": {
+			"port": "K0",
+			"pin": 2,
+			"level": 0,
+			"hot_keys": [68, 16777236]
+		},
+		"btnRotate": {
+			"port": "K0",
+			"pin": 3,
+			"level": 0,
+			"hot_keys": [32, 16777235, 16777220]
+		}
+	},
+	
+	"mask_options": {
+		"rom_path": "./assets/RadioShackStackChallenge.bin",
+		"port_pullup": {
+			"K0": 15,
+			"K1": 15
+		},
+		"p3_dedicated": 0
+	}
+}

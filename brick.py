@@ -2,9 +2,7 @@ from PyQt6 import QtCore
 from PyQt6.QtCore import QObject, pyqtSignal, pyqtSlot
 import time
 
-from mcu import MCU
-from disassembler import Disassembler
-from sound import Sound
+from cores import *
 
 FPS = 60
 EXAMINE_RATE = 30
@@ -13,7 +11,7 @@ DISPLAY_UPDTE_NS = 1000000000 / FPS
 EXAMINE_UPDTE_NS = 1000000000 / EXAMINE_RATE
 
 class Brick(QObject):
-    btnPressSignal = pyqtSignal(str, int)
+    btnPressSignal = pyqtSignal(str, int, int)
     btnReleaseSignal = pyqtSignal(str, int)
     stepSignal = pyqtSignal()
     pauseSignal = pyqtSignal()
@@ -22,13 +20,13 @@ class Brick(QObject):
     setSpeedSignal = pyqtSignal(float)
     setBreakpointSignal = pyqtSignal(int, bool)
     examineSignal = pyqtSignal(dict)
+    editStateSignal = pyqtSignal(dict)
     uiDisplayUpdateSignal = pyqtSignal(tuple)
     setConfigSignal = pyqtSignal(dict)
 
     def __init__(self, config, ui):
         super().__init__()
         self._config = config
-        self._ui = ui
 
         self.btnPressSignal.connect(self._btnPressed)
         self.btnReleaseSignal.connect(self._btnReleased)
@@ -36,35 +34,29 @@ class Brick(QObject):
         self.runSignal.connect(self._run)
         self.pauseSignal.connect(self._pause)
         self.stepSignal.connect(self._step)
-        self.stopSignal.connect(self._stop)
         self.setConfigSignal.connect(self._setConfig)
         self.stopSignal.connect(self._stop)
         self.setSpeedSignal.connect(self._setSpeed)
+        self.editStateSignal.connect(self._editState)
+        self.uiDisplayUpdateSignal.connect(ui.render)
+        self.examineSignal.connect(ui.examineSlot)
 
     @pyqtSlot()
     def run(self):
-        self._sound = Sound(self._config['mask_options'], self._config['clock'])
-        self._CPU = MCU(self._config['mask_options'], self._sound)
-
         self._breakpoints = {}
         self._debug = False
-        self._mcycleTimeNs = self._getMCicleTimeNs()
-        self._mcyclesOnStop = 0
+        self._cycleTimeNs = self._getMCicleTimeNs()
+        self._icounterOnStop = 0
 
-        self.uiDisplayUpdateSignal.connect(self._ui.render)
-        self.examineSignal.connect(self._ui.examineSlot)
+        self._setConfig(self._config)
 
         self._uiDisplayUpdate()
         self._uiExamineUpdate()
-
-        self.examineSignal.emit(Disassembler().disassemble(self._CPU.get_ROM()))
-
+        
         self._clock()
 
     @pyqtSlot()
     def finish(self):
-        self.examineSignal.disconnect()
-        self.uiDisplayUpdateSignal.disconnect()
         self.btnPressSignal.disconnect()
         self.btnReleaseSignal.disconnect()
         self.setBreakpointSignal.disconnect()
@@ -74,43 +66,16 @@ class Brick(QObject):
         self.stopSignal.disconnect()
         self.setConfigSignal.disconnect()
         self.setSpeedSignal.disconnect()
-        self._sound.stop()
-
+        self.editStateSignal.disconnect()
+        self.examineSignal.disconnect()
+        self.uiDisplayUpdateSignal.disconnect()
+        del self._CPU
+    
     @pyqtSlot(dict)
-    def editState(self, state):
-        if ("PC" in state):
-            self._CPU.setPC(state["PC"])
-        if ("ST" in state):
-            self._CPU.setSTACK(state["ST"])
-        if ("CF" in state):
-            self._CPU.setCF(state["CF"])
-        if ("EF" in state):
-            self._CPU.setEF(state["EF"])
-        if ("TF" in state):
-            self._CPU.setTF(state["TF"])
-        if ("EI" in state):
-            self._CPU.setEI(state["EI"])
-        if ("HALT" in state):
-            self._CPU.setHALT(state["HALT"])
-        if ("WR" in state):
-            for i, value in state["WR"].items():
-                self._CPU.setWR(i, value)
-        if ("TC" in state):
-            self._CPU.setTC(state["TC"])
-        if ("PA" in state):
-            self._CPU.setPA(state["PA"])
-        if ("PP" in state):
-            self._CPU.setPP(state["PP"])
-        if ("PM" in state):
-            self._CPU.setPM(state["PM"])
-        if ("PS" in state):
-            self._CPU.setPS(state["PS"])
-        if ("RAM" in state):
-            for i, value in state["RAM"].items():
-                self._CPU.setRAM(i, value)
-        if ("MEMORY" in state):
-            self._ROM.writeWord(state["MEMORY"][0], state["MEMORY"][1])
-        
+    def _editState(self, state):
+        if ("BRKPT" in state):
+            self._setBreakpoint(state["BRKPT"][0], state["BRKPT"][1])
+        self._CPU.edit_state(state)
         self._uiDisplayUpdate()
         self._uiExamineUpdate()
 
@@ -121,12 +86,11 @@ class Brick(QObject):
         lastDisplayUpdate = lastTick
         while not(thread.isInterruptionRequested() or self._debug):
             ns = time.perf_counter_ns()
-            while (ns > lastTick and ns < lastDisplayUpdate and ns < lastExamine and not self._debug):                
-                lastTick += self._mcycleTimeNs
-                if (self._CPU.mclock() == 0):
-                    if (self._CPU.PC() in self._breakpoints):
-                        self.examineSignal.emit({"DEBUG": True})
-                        self._pause()
+            while (ns > lastTick and ns < lastDisplayUpdate and ns < lastExamine and not self._debug):     
+                lastTick += self._CPU.clock() * self._cycleTimeNs
+                if (self._CPU.pc() in self._breakpoints):
+                    self.examineSignal.emit({"DEBUG": True})
+                    self._pause()
 
                 ns = time.perf_counter_ns()
             
@@ -138,8 +102,7 @@ class Brick(QObject):
                 self._uiExamineUpdate()
 
             QtCore.QCoreApplication.processEvents()
-            
-            
+
     @pyqtSlot()
     def _run(self):
         self._debug = False
@@ -150,20 +113,18 @@ class Brick(QObject):
         self._debug = True
         self._uiDisplayUpdate()
         self._uiExamineUpdate()
-        self._mcyclesOnStop = self._CPU.mcycles()
+        self._icounterOnStop = self._CPU.istr_counter()
 
     @pyqtSlot()
     def _step(self):
-        while (self._CPU.mclock()):
-            pass
+        self._CPU.clock()
         self._uiDisplayUpdate()
         self._uiExamineUpdate()
 
     @pyqtSlot()
     def _stop(self):
         self._debug = True
-        self._sound = Sound(self._config['mask_options'], self._config['clock'])
-        self._CPU = MCU(self._config['mask_options'], self._sound)
+        self._CPU.reset()
         self._uiDisplayUpdate()
         self._uiExamineUpdate()
             
@@ -177,9 +138,11 @@ class Brick(QObject):
 
     @pyqtSlot(dict)
     def _setConfig(self, config):
-        self._sound = Sound(config['mask_options'], self._config['clock'])
-        self._CPU = MCU(config['mask_options'], self._sound)
-        self.examineSignal.emit(Disassembler().disassemble(self._CPU.get_ROM()))
+        self._config = config
+        core = self._config["core"]
+        if (core in cores_map):
+            self._CPU = cores_map[core]["core"](config['mask_options'], config["clock"])
+            self.examineSignal.emit(cores_map[core]["dasm"]().disassemble(self._CPU.get_ROM()))
 
     def _uiDisplayUpdate(self):
         self.uiDisplayUpdateSignal.emit(self._CPU.get_VRAM()) 
@@ -187,23 +150,23 @@ class Brick(QObject):
     def _uiExamineUpdate(self):
         self.examineSignal.emit({
             **self._CPU.examine(),
-            **{"MC": self._CPU.mcycles() - self._mcyclesOnStop}
+            **{"ICTR": self._CPU.istr_counter() - self._icounterOnStop}
         })
 
-    @pyqtSlot(str, int)
-    def _btnPressed(self, port, pinMask):
-        self._CPU.pin_ground(port, pinMask)
+    @pyqtSlot(str, int, int)
+    def _btnPressed(self, port, pin, level):
+        self._CPU.pin_set(port, pin, level)
 
     @pyqtSlot(str, int)
-    def _btnReleased(self, port, pinMask):
-        self._CPU.pin_release(port, pinMask)
+    def _btnReleased(self, port, pin):
+        self._CPU.pin_release(port, pin)
 
     @pyqtSlot(float)
     def _setSpeed(self, speed):
-        self._mcycleTimeNs = int(self._getMCicleTimeNs() * speed)
+        self._cycleTimeNs = int(self._getMCicleTimeNs() * speed)
 
     def _getMCicleTimeNs(self):
-        return 1000000000 / self._config["clock"] * 4
+        return 1000000000 / self._config["clock"]
 
     def debugRun(self):
         self.runSignal.emit()
@@ -217,11 +180,8 @@ class Brick(QObject):
     def debugStop(self):
         self.stopSignal.emit()
 
-    def debugSetBreakpoint(self, pc, checked):
-        self.setBreakpointSignal.emit(pc, checked)
-
-    def btnPressed(self, port, pinMask):
-        self.btnPressSignal.emit(port, pinMask)
+    def btnPressed(self, port, pin, level):
+        self.btnPressSignal.emit(port, pin, level)
 
     def btnReleased(self, port, pinMask):
         self.btnReleaseSignal.emit(port, pinMask)
@@ -231,3 +191,9 @@ class Brick(QObject):
 
     def setSpeed(self, speed):
         self.setSpeedSignal.emit(speed)
+
+    def editState(self, state):
+        self.editStateSignal.emit(state)
+
+    def setBreakpoint(self, pc, add):
+        self.setBreakpointSignal.emit(pc, add)

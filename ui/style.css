@@ -7,7 +7,6 @@ QPushButton#brickButton:pressed {
 }
 
 QPushButton#brickButton {
-	border-radius : 50%;
 	background: transparent;
 }
 
@@ -23,26 +22,26 @@ QTableView {
 	font-family: Menlo, Consolas, 'Courier New', monospace;
 }
 
-QTableView#asmTable::indicator {
+QTableView#listingTable::indicator {
 	margin:3px;
 	width: 10px;
 	height: 10px;
 	border-radius: 5px;
 }
 
-QTableView#asmTable::item:selected {
+QTableView#listingTable::item:selected {
 	background: #cce8ff;              
 }
 
-QTableView#asmTable::indicator:unchecked {
+QTableView#listingTable::indicator:unchecked {
 	background-color: transparent;
 }
 
-QTableView#asmTable::indicator:unchecked:hover {
+QTableView#listingTable::indicator:unchecked:hover {
 	background-color: rgba(255,80,80,128);
 }
 
-QTableView#asmTable::indicator:checked {
+QTableView#listingTable::indicator:checked {
 	background-color: rgb(255,80,80);
 }
 

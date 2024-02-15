@@ -1,41 +1,50 @@
 {
+	"id": "519b91a2-ca63-42ae-be76-fdec6a159481",
+	"core": "HT943",
 	"face_path": "./assets/SpaceIntruderTK150I.svg",
 	"clock": 950000,
 	
 	"buttons": {
 		"btnPause": {
 			"port": "PP",
-			"pin_mask": 1,
+			"pin": 0,
+			"level": 0,
 			"hot_keys": [49]
 		},
 		"btnOnOff": {
 			"port": "PP",
-			"pin_mask": 2,
+			"pin": 1,
+			"level": 0,
 			"hot_keys": [50]
 		},
 		"btnSound": {
 			"port": "PP",
-			"pin_mask": 4,
+			"pin": 2,
+			"level": 0,
 			"hot_keys": [51]
 		},
 		"btnLeft": {
 			"port": "PS",
-			"pin_mask": 1,
+			"pin": 0,
+			"level": 0,
 			"hot_keys": [65, 16777234]
 		},
 		"btnDown": {
 			"port": "PS",
-			"pin_mask": 4,
+			"pin": 2,
+			"level": 0,
 			"hot_keys": [83, 16777237]
 		},
 		"btnRight": {
 			"port": "PS",
-			"pin_mask": 2,
+			"pin": 1,
+			"level": 0,
 			"hot_keys": [68, 16777236]
 		},
 		"btnFire": {
 			"port": "PP",
-			"pin_mask": 8,
+			"pin": 3,
+			"level": 0,
 			"hot_keys": [32, 16777235, 16777220]
 		}
 	},

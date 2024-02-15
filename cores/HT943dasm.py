@@ -1,6 +1,4 @@
-from rom import ROM
-
-class Disassembler():
+class HT943dasm():
 
     def __init__(self):
         self._base = '0x%X'
@@ -8,103 +6,103 @@ class Disassembler():
         self._addrbase = '%0.3X'
 
         self._instructions = (
-            Disassembler._rr_a,                          #0 0 0 0 0 0 0 0
-            Disassembler._rl_a,                          #0 0 0 0 0 0 0 1
-            Disassembler._rrc_a,                         #0 0 0 0 0 0 1 0
-            Disassembler._rlc_a,                         #0 0 0 0 0 0 1 1
-            Disassembler._mov_a_r1r0,                    #0 0 0 0 0 1 0 0
-            Disassembler._mov_r1r0_a,                    #0 0 0 0 0 1 0 1
-            Disassembler._mov_a_r3r2,                    #0 0 0 0 0 1 1 0
-            Disassembler._mov_r3r2_a,                    #0 0 0 0 0 1 1 1
-            Disassembler._adc_a_r1r0,                    #0 0 0 0 1 0 0 0
-            Disassembler._add_a_r1r0,                    #0 0 0 0 1 0 0 1
-            Disassembler._sbc_a_r1r0,                    #0 0 0 0 1 0 1 0
-            Disassembler._sub_a_r1r0,                    #0 0 0 0 1 0 1 1
-            Disassembler._inc_r1r0,                      #0 0 0 0 1 1 0 0
-            Disassembler._dec_r1r0,                      #0 0 0 0 1 1 0 1
-            Disassembler._inc_r3r2,                      #0 0 0 0 1 1 1 0
-            Disassembler._dec_r3r2,                      #0 0 0 0 1 1 1 1
-            Disassembler._inc_rn,                        #0 0 0 1 0 0 0 0
-            Disassembler._dec_rn,                        #0 0 0 1 0 0 0 1
-            Disassembler._inc_rn,                        #0 0 0 1 0 0 1 0
-            Disassembler._dec_rn,                        #0 0 0 1 0 0 1 1
-            Disassembler._inc_rn,                        #0 0 0 1 0 1 0 0
-            Disassembler._dec_rn,                        #0 0 0 1 0 1 0 1
-            Disassembler._inc_rn,                        #0 0 0 1 0 1 1 0
-            Disassembler._dec_rn,                        #0 0 0 1 0 1 1 1
-            Disassembler._inc_rn,                        #0 0 0 1 1 0 0 0
-            Disassembler._dec_rn,                        #0 0 0 1 1 0 0 1
-            Disassembler._and_a_r1r0,                    #0 0 0 1 1 0 1 0
-            Disassembler._xor_a_r1r0,                    #0 0 0 1 1 0 1 1
-            Disassembler._or_a_r1r0,                     #0 0 0 1 1 1 0 0
-            Disassembler._and_r1r0_a,                    #0 0 0 1 1 1 0 1
-            Disassembler._xor_r1r0_a,                    #0 0 0 1 1 1 1 0
-            Disassembler._or_r1r0_a,                     #0 0 0 1 1 1 1 1
-            Disassembler._mov_rn_a,                      #0 0 1 0 0 0 0 0
-            Disassembler._mov_a_rn,                      #0 0 1 0 0 0 0 1
-            Disassembler._mov_rn_a,                      #0 0 1 0 0 0 1 0
-            Disassembler._mov_a_rn,                      #0 0 1 0 0 0 1 1
-            Disassembler._mov_rn_a,                      #0 0 1 0 0 1 0 0
-            Disassembler._mov_a_rn,                      #0 0 1 0 0 1 0 1
-            Disassembler._mov_rn_a,                      #0 0 1 0 0 1 1 0
-            Disassembler._mov_a_rn,                      #0 0 1 0 0 1 1 1
-            Disassembler._mov_rn_a,                      #0 0 1 0 1 0 0 0
-            Disassembler._mov_a_rn,                      #0 0 1 0 1 0 0 1
-            Disassembler._clc,                           #0 0 1 0 1 0 1 0
-            Disassembler._stc,                           #0 0 1 0 1 0 1 1
-            Disassembler._ei,                            #0 0 1 0 1 1 0 0
-            Disassembler._di,                            #0 0 1 0 1 1 0 1
-            Disassembler._ret,                           #0 0 1 0 1 1 1 0
-            Disassembler._reti,                          #0 0 1 0 1 1 1 1
-            Disassembler._out_pa_a,                      #0 0 1 1 0 0 0 0
-            Disassembler._inc_a,                         #0 0 1 1 0 0 0 1
-            Disassembler._in_a_pm,                       #0 0 1 1 0 0 1 0
-            Disassembler._in_a_ps,                       #0 0 1 1 0 0 1 1
-            Disassembler._in_a_pp,                       #0 0 1 1 0 1 0 0
-            Disassembler._dummy,                         #0 0 1 1 0 1 0 1
-            Disassembler._daa,                           #0 0 1 1 0 1 1 0
-            Disassembler._halt,                          #0 0 1 1 0 1 1 1  0 0 1 1 1 1 1 0
-            Disassembler._timer_on,                      #0 0 1 1 1 0 0 0
-            Disassembler._timer_off,                     #0 0 1 1 1 0 0 1
-            Disassembler._mov_a_tmrl,                    #0 0 1 1 1 0 1 0
-            Disassembler._mov_a_tmrh,                    #0 0 1 1 1 0 1 1
-            Disassembler._mov_tmrl_a,                    #0 0 1 1 1 1 0 0
-            Disassembler._mov_tmrh_a,                    #0 0 1 1 1 1 0 1
-            Disassembler._nop,                           #0 0 1 1 1 1 1 0
-            Disassembler._dec_a,                         #0 0 1 1 1 1 1 1
-            Disassembler._add_a_x,                       #0 1 0 0 0 0 0 0  0 0 0 0 d d d d
-            Disassembler._sub_a_x,                       #0 1 0 0 0 0 0 1  0 0 0 0 d d d d
-            Disassembler._and_a_x,                       #0 1 0 0 0 0 1 0  0 0 0 0 d d d d
-            Disassembler._xor_a_x,                       #0 1 0 0 0 0 1 1  0 0 0 0 d d d d
-            Disassembler._or_a_x,                        #0 1 0 0 0 1 0 0  0 0 0 0 d d d d
-            Disassembler._sound_n,                       #0 1 0 0 0 1 0 1  0 0 0 0 n n n n
-            Disassembler._mov_r4_x,                      #0 1 0 0 0 1 1 0  0 0 0 0 d d d d
-            Disassembler._timer_xx,                      #0 1 0 0 0 1 1 1  d d d d d d d d
-            Disassembler._sound_one,                     #0 1 0 0 1 0 0 0
-            Disassembler._sound_loop,                    #0 1 0 0 1 0 0 1
-            Disassembler._sound_off,                     #0 1 0 0 1 0 1 0
-            Disassembler._sound_a,                       #0 1 0 0 1 0 1 1
-            Disassembler._read_r4a,                      #0 1 0 0 1 1 0 0
-            Disassembler._readf_r4a,                     #0 1 0 0 1 1 0 1
-            Disassembler._read_mr0a,                     #0 1 0 0 1 1 1 0
-            Disassembler._readf_mr0a,                    #0 1 0 0 1 1 1 1
-            *([Disassembler._mov_r1r0_xx] * 16),         #0 1 0 1 d d d d  0 0 0 0 d d d d
-            *([Disassembler._mov_r3r2_xx] * 16),         #0 1 1 0 d d d d  0 0 0 0 d d d d
-            *([Disassembler._mov_a_x] * 16),             #0 1 1 1 d d d d
-            *([Disassembler._jan_address] * 32),         #1 0 0 n n a a a  a a a a a a a a
-            *([Disassembler._jnz_R0_address] * 8),       #1 0 1 0 0 a a a  a a a a a a a a
-            *([Disassembler._jnz_R1_address] * 8),       #1 0 1 0 1 a a a  a a a a a a a a
-            *([Disassembler._jz_a_address] * 8),         #1 0 1 1 0 a a a  a a a a a a a a
-            *([Disassembler._jnz_a_address] * 8),        #1 0 1 1 1 a a a  a a a a a a a a
-            *([Disassembler._jc_address] * 8),           #1 1 0 0 0 a a a  a a a a a a a a
-            *([Disassembler._jnc_address] * 8),          #1 1 0 0 1 a a a  a a a a a a a a
-            *([Disassembler._jtmr_address] * 8),         #1 1 0 1 0 a a a  a a a a a a a a
-            *([Disassembler._jnz_R4_address] * 8),       #1 1 0 1 1 a a a  a a a a a a a a
-            *([Disassembler._jmp_address] * 16),         #1 1 1 0 a a a a  a a a a a a a a
-            *([Disassembler._call_address] * 16),        #1 1 1 1 a a a a  a a a a a a a a
+            HT943dasm._rr_a,                          #0 0 0 0 0 0 0 0
+            HT943dasm._rl_a,                          #0 0 0 0 0 0 0 1
+            HT943dasm._rrc_a,                         #0 0 0 0 0 0 1 0
+            HT943dasm._rlc_a,                         #0 0 0 0 0 0 1 1
+            HT943dasm._mov_a_r1r0,                    #0 0 0 0 0 1 0 0
+            HT943dasm._mov_r1r0_a,                    #0 0 0 0 0 1 0 1
+            HT943dasm._mov_a_r3r2,                    #0 0 0 0 0 1 1 0
+            HT943dasm._mov_r3r2_a,                    #0 0 0 0 0 1 1 1
+            HT943dasm._adc_a_r1r0,                    #0 0 0 0 1 0 0 0
+            HT943dasm._add_a_r1r0,                    #0 0 0 0 1 0 0 1
+            HT943dasm._sbc_a_r1r0,                    #0 0 0 0 1 0 1 0
+            HT943dasm._sub_a_r1r0,                    #0 0 0 0 1 0 1 1
+            HT943dasm._inc_r1r0,                      #0 0 0 0 1 1 0 0
+            HT943dasm._dec_r1r0,                      #0 0 0 0 1 1 0 1
+            HT943dasm._inc_r3r2,                      #0 0 0 0 1 1 1 0
+            HT943dasm._dec_r3r2,                      #0 0 0 0 1 1 1 1
+            HT943dasm._inc_rn,                        #0 0 0 1 0 0 0 0
+            HT943dasm._dec_rn,                        #0 0 0 1 0 0 0 1
+            HT943dasm._inc_rn,                        #0 0 0 1 0 0 1 0
+            HT943dasm._dec_rn,                        #0 0 0 1 0 0 1 1
+            HT943dasm._inc_rn,                        #0 0 0 1 0 1 0 0
+            HT943dasm._dec_rn,                        #0 0 0 1 0 1 0 1
+            HT943dasm._inc_rn,                        #0 0 0 1 0 1 1 0
+            HT943dasm._dec_rn,                        #0 0 0 1 0 1 1 1
+            HT943dasm._inc_rn,                        #0 0 0 1 1 0 0 0
+            HT943dasm._dec_rn,                        #0 0 0 1 1 0 0 1
+            HT943dasm._and_a_r1r0,                    #0 0 0 1 1 0 1 0
+            HT943dasm._xor_a_r1r0,                    #0 0 0 1 1 0 1 1
+            HT943dasm._or_a_r1r0,                     #0 0 0 1 1 1 0 0
+            HT943dasm._and_r1r0_a,                    #0 0 0 1 1 1 0 1
+            HT943dasm._xor_r1r0_a,                    #0 0 0 1 1 1 1 0
+            HT943dasm._or_r1r0_a,                     #0 0 0 1 1 1 1 1
+            HT943dasm._mov_rn_a,                      #0 0 1 0 0 0 0 0
+            HT943dasm._mov_a_rn,                      #0 0 1 0 0 0 0 1
+            HT943dasm._mov_rn_a,                      #0 0 1 0 0 0 1 0
+            HT943dasm._mov_a_rn,                      #0 0 1 0 0 0 1 1
+            HT943dasm._mov_rn_a,                      #0 0 1 0 0 1 0 0
+            HT943dasm._mov_a_rn,                      #0 0 1 0 0 1 0 1
+            HT943dasm._mov_rn_a,                      #0 0 1 0 0 1 1 0
+            HT943dasm._mov_a_rn,                      #0 0 1 0 0 1 1 1
+            HT943dasm._mov_rn_a,                      #0 0 1 0 1 0 0 0
+            HT943dasm._mov_a_rn,                      #0 0 1 0 1 0 0 1
+            HT943dasm._clc,                           #0 0 1 0 1 0 1 0
+            HT943dasm._stc,                           #0 0 1 0 1 0 1 1
+            HT943dasm._ei,                            #0 0 1 0 1 1 0 0
+            HT943dasm._di,                            #0 0 1 0 1 1 0 1
+            HT943dasm._ret,                           #0 0 1 0 1 1 1 0
+            HT943dasm._reti,                          #0 0 1 0 1 1 1 1
+            HT943dasm._out_pa_a,                      #0 0 1 1 0 0 0 0
+            HT943dasm._inc_a,                         #0 0 1 1 0 0 0 1
+            HT943dasm._in_a_pm,                       #0 0 1 1 0 0 1 0
+            HT943dasm._in_a_ps,                       #0 0 1 1 0 0 1 1
+            HT943dasm._in_a_pp,                       #0 0 1 1 0 1 0 0
+            HT943dasm._dummy,                         #0 0 1 1 0 1 0 1
+            HT943dasm._daa,                           #0 0 1 1 0 1 1 0
+            HT943dasm._halt,                          #0 0 1 1 0 1 1 1  0 0 1 1 1 1 1 0
+            HT943dasm._timer_on,                      #0 0 1 1 1 0 0 0
+            HT943dasm._timer_off,                     #0 0 1 1 1 0 0 1
+            HT943dasm._mov_a_tmrl,                    #0 0 1 1 1 0 1 0
+            HT943dasm._mov_a_tmrh,                    #0 0 1 1 1 0 1 1
+            HT943dasm._mov_tmrl_a,                    #0 0 1 1 1 1 0 0
+            HT943dasm._mov_tmrh_a,                    #0 0 1 1 1 1 0 1
+            HT943dasm._nop,                           #0 0 1 1 1 1 1 0
+            HT943dasm._dec_a,                         #0 0 1 1 1 1 1 1
+            HT943dasm._add_a_x,                       #0 1 0 0 0 0 0 0  0 0 0 0 d d d d
+            HT943dasm._sub_a_x,                       #0 1 0 0 0 0 0 1  0 0 0 0 d d d d
+            HT943dasm._and_a_x,                       #0 1 0 0 0 0 1 0  0 0 0 0 d d d d
+            HT943dasm._xor_a_x,                       #0 1 0 0 0 0 1 1  0 0 0 0 d d d d
+            HT943dasm._or_a_x,                        #0 1 0 0 0 1 0 0  0 0 0 0 d d d d
+            HT943dasm._sound_n,                       #0 1 0 0 0 1 0 1  0 0 0 0 n n n n
+            HT943dasm._mov_r4_x,                      #0 1 0 0 0 1 1 0  0 0 0 0 d d d d
+            HT943dasm._timer_xx,                      #0 1 0 0 0 1 1 1  d d d d d d d d
+            HT943dasm._sound_one,                     #0 1 0 0 1 0 0 0
+            HT943dasm._sound_loop,                    #0 1 0 0 1 0 0 1
+            HT943dasm._sound_off,                     #0 1 0 0 1 0 1 0
+            HT943dasm._sound_a,                       #0 1 0 0 1 0 1 1
+            HT943dasm._read_r4a,                      #0 1 0 0 1 1 0 0
+            HT943dasm._readf_r4a,                     #0 1 0 0 1 1 0 1
+            HT943dasm._read_mr0a,                     #0 1 0 0 1 1 1 0
+            HT943dasm._readf_mr0a,                    #0 1 0 0 1 1 1 1
+            *([HT943dasm._mov_r1r0_xx] * 16),         #0 1 0 1 d d d d  0 0 0 0 d d d d
+            *([HT943dasm._mov_r3r2_xx] * 16),         #0 1 1 0 d d d d  0 0 0 0 d d d d
+            *([HT943dasm._mov_a_x] * 16),             #0 1 1 1 d d d d
+            *([HT943dasm._jan_address] * 32),         #1 0 0 n n a a a  a a a a a a a a
+            *([HT943dasm._jnz_R0_address] * 8),       #1 0 1 0 0 a a a  a a a a a a a a
+            *([HT943dasm._jnz_R1_address] * 8),       #1 0 1 0 1 a a a  a a a a a a a a
+            *([HT943dasm._jz_a_address] * 8),         #1 0 1 1 0 a a a  a a a a a a a a
+            *([HT943dasm._jnz_a_address] * 8),        #1 0 1 1 1 a a a  a a a a a a a a
+            *([HT943dasm._jc_address] * 8),           #1 1 0 0 0 a a a  a a a a a a a a
+            *([HT943dasm._jnc_address] * 8),          #1 1 0 0 1 a a a  a a a a a a a a
+            *([HT943dasm._jtmr_address] * 8),         #1 1 0 1 0 a a a  a a a a a a a a
+            *([HT943dasm._jnz_R4_address] * 8),       #1 1 0 1 1 a a a  a a a a a a a a
+            *([HT943dasm._jmp_address] * 16),         #1 1 1 0 a a a a  a a a a a a a a
+            *([HT943dasm._call_address] * 16),        #1 1 1 1 a a a a  a a a a a a a a
         )
 
-    def disassemble(self, rom: ROM):
+    def disassemble(self, rom):
         if (rom.size() > 0):
             listing = [None] * rom.size()
             listing = self._disassemble(0, listing, rom)
@@ -115,12 +113,13 @@ class Disassembler():
                 if (listing[i] is None):
                     byte = rom.getByte(i)
                     listing[i] = (1, byte, 'db ' + self._bytebase % byte)
+                listing[i] = listing[i][1:] 
             
             return {"LISTING": tuple(listing)}
         else:
             return {}
     
-    def disassemble2text(self, rom: ROM):
+    def disassemble2text(self, rom):
         listing = self.disassemble(rom)["LISTING"]
         result = ""
         for i, line in enumerate(listing):
@@ -129,7 +128,7 @@ class Disassembler():
         with open('./assets/asm.asm', 'w') as f:
             f.write(result)
     
-    def _disassemble(self, pc, listing, rom: ROM):
+    def _disassemble(self, pc, listing, rom):
         while (pc < len(listing) and listing[pc] is None):
             opcode = rom.getWord(pc)
             next_pcs, listing[pc] = self._instructions[opcode >> 8](self, pc, opcode)

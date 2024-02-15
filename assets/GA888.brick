@@ -1,36 +1,44 @@
 {
+	"id": "f982de89-1ab2-4d34-8914-e90fe198d865",
+	"core": "HT943",
 	"face_path": "./assets/GA888.svg",
 	"clock": 1000000,
 	
 	"buttons": {
 		"btnPause": {
 			"port": "PS",
-			"pin_mask": 1,
+			"pin": 0,
+			"level": 0,
 			"hot_keys": [49, 80]
 		},
 		"btnReset": {
 			"port": "RES",
-			"pin_mask": 1,
+			"pin": 0,
+			"level": 0,
 			"hot_keys": [50, 82]
 		},
 		"btnLeft": {
 			"port": "PM",
-			"pin_mask": 8,
+			"pin": 3,
+			"level": 0,
 			"hot_keys": [65, 16777234]
 		},
 		"btnRight": {
 			"port": "PM",
-			"pin_mask": 4,
+			"pin": 2,
+			"level": 0,
 			"hot_keys": [68, 16777236]
 		},
 		"btnDown": {
 			"port": "PM",
-			"pin_mask": 2,
+			"pin": 1,
+			"level": 0,
 			"hot_keys": [83, 16777237]
 		},
 		"btnRotate": {
 			"port": "PM",
-			"pin_mask": 1,
+			"pin": 0,
+			"level": 0,
 			"hot_keys": [32, 16777220]
 		}
 	},

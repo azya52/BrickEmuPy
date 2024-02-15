@@ -1,41 +1,50 @@
 {
+	"id": "5309350f-016e-420a-b04d-38dca5d5a303",
+	"core": "HT943",
 	"face_path": "./assets/E23PlusMarkII96in1.svg",
 	"clock": 1000000,
 	
 	"buttons": {
 		"btnStart": {
 			"port": "PS",
-			"pin_mask": 1,
+			"pin": 0,
+			"level": 0,
 			"hot_keys": [49]
 		},
 		"btnOnOff": {
 			"port": "PS",
-			"pin_mask": 4,
+			"pin": 2,
+			"level": 0,
 			"hot_keys": [50]
 		},
 		"btnMute": {
 			"port": "PS",
-			"pin_mask": 2,
+			"pin": 1,
+			"level": 0,
 			"hot_keys": [51]
 		},
 		"btnLeft": {
 			"port": "PP",
-			"pin_mask": 8,
+			"pin": 3,
+			"level": 0,
 			"hot_keys": [65, 16777234]
 		},
 		"btnDown": {
 			"port": "PP",
-			"pin_mask": 2,
+			"pin": 1,
+			"level": 0,
 			"hot_keys": [83, 16777237]
 		},
 		"btnRight": {
 			"port": "PP",
-			"pin_mask": 4,
+			"pin": 2,
+			"level": 0,
 			"hot_keys": [68, 16777236]
 		},
 		"btnRotate": {
 			"port": "PP",
-			"pin_mask": 1,
+			"pin": 0,
+			"level": 0,
 			"hot_keys": [32, 16777235, 16777220]
 		}
 	},

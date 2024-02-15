@@ -1,0 +1,2900 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+<class>DebugWidget</class>
+<widget class="QWidget" name="sideWidget">
+<layout class="QHBoxLayout" name="horizontalLayout">
+  <property name="leftMargin">
+  <number>0</number>
+  </property>
+  <item>
+  <widget class="QSplitter" name="sideSplitter">
+    <property name="sizePolicy">
+    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+      <horstretch>0</horstretch>
+      <verstretch>0</verstretch>
+    </sizepolicy>
+    </property>
+    <property name="orientation">
+    <enum>Qt::Vertical</enum>
+    </property>
+    <widget class="QTabWidget" name="debugTabWidget">
+    <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+      <horstretch>0</horstretch>
+      <verstretch>0</verstretch>
+      </sizepolicy>
+    </property>
+    <property name="currentIndex">
+      <number>0</number>
+    </property>
+    <property name="tabBarAutoHide">
+      <bool>true</bool>
+    </property>
+    <widget class="QWidget" name="CPUTab">
+      <attribute name="title">
+      <string>CPU</string>
+      </attribute>
+      <layout class="QGridLayout" name="gridLayout">
+      <item row="1" column="0">
+        <widget class="QGroupBox" name="groupBox_3">
+        <property name="title">
+          <string> Registers </string>
+        </property>
+        <layout class="QVBoxLayout" name="regLayout">
+          <item>
+            <layout class="QHBoxLayout" name="regLine1Layout" stretch="1,10,1,10,1,10">
+              <property name="spacing">
+                <number>4</number>
+              </property>
+              <item>
+                <widget class="QLabel" name="labelPC">
+                <property name="toolTip">
+                  <string>Program counter</string>
+                </property>
+                <property name="text">
+                  <string>PC</string>
+                </property>
+                <property name="alignment">
+                  <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                </property>
+                </widget>
+              </item>
+              <item>
+                <widget class="QLineEdit" name="pcEdit">
+                <property name="sizePolicy">
+                  <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                  </sizepolicy>
+                </property>
+                <property name="toolTip">
+                  <string>Program counter (PCB + PCP + PCS)</string>
+                </property>
+                <property name="key" stdset="0">
+                  <string>PC</string>
+                </property>
+                <property name="type" stdset="0">
+                  <string>integer</string>
+                </property>
+                <property name="mask" stdset="0">
+                  <string>0x%0.4X</string>
+                </property>
+                </widget>
+              </item>
+              <item>
+                <widget class="QLabel" name="npcLabel">
+                <property name="toolTip">
+                  <string>New bank and page pointer (NBP + NPP)</string>
+                </property>
+                <property name="text">
+                  <string>NPC</string>
+                </property>
+                </widget>
+              </item>
+              <item>
+                <widget class="QLineEdit" name="npcEdit">
+                <property name="sizePolicy">
+                  <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                  </sizepolicy>
+                </property>
+                <property name="toolTip">
+                  <string>New bank and page pointer (NBP + NPP)</string>
+                </property>
+                <property name="key" stdset="0">
+                  <string>NPC</string>
+                </property>
+                <property name="type" stdset="0">
+                  <string>integer</string>
+                </property>
+                <property name="mask" stdset="0">
+                  <string>0x%0.4X</string>
+                </property>
+                </widget>
+              </item>
+              <item>
+                <widget class="QLabel" name="spLabel">
+                <property name="toolTip">
+                  <string>Stack pointer</string>
+                </property>
+                <property name="text">
+                  <string>SP</string>
+                </property>
+                </widget>
+              </item>
+              <item>
+                <widget class="QLineEdit" name="spEdit">
+                <property name="sizePolicy">
+                  <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                  </sizepolicy>
+                </property>
+                <property name="toolTip">
+                  <string>Stack pointer</string>
+                </property>
+                <property name="key" stdset="0">
+                  <string>SP</string>
+                </property>
+                <property name="type" stdset="0">
+                  <string>integer</string>
+                </property>
+                <property name="mask" stdset="0">
+                  <string>0x%0.2X</string>
+                </property>
+                </widget>
+              </item>
+            </layout>
+          </item>
+
+          <item>
+            <layout class="QHBoxLayout" name="regLine2Layout" stretch="1,10,1,10,1,10,1,10">
+              <property name="spacing">
+                <number>4</number>
+              </property>
+              <item>
+                <widget class="QLabel" name="aLabel">
+                <property name="toolTip">
+                  <string>A register</string>
+                </property>
+                <property name="text">
+                  <string>A</string>
+                </property>
+                </widget>
+              </item>
+              <item>
+                <widget class="QLineEdit" name="aEdit">
+                <property name="sizePolicy">
+                  <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                  </sizepolicy>
+                </property>
+                <property name="toolTip">
+                  <string>A register</string>
+                </property>
+                <property name="key" stdset="0">
+                  <string>A</string>
+                </property>
+                <property name="type" stdset="0">
+                  <string>integer</string>
+                </property>
+                <property name="mask" stdset="0">
+                  <string>0x%0.1X</string>
+                </property>
+                </widget>
+              </item>
+              <item>
+                <widget class="QLabel" name="bLabel">
+                <property name="toolTip">
+                  <string>B register</string>
+                </property>
+                <property name="text">
+                  <string>B</string>
+                </property>
+                </widget>
+              </item>
+              <item>
+                <widget class="QLineEdit" name="bEdit">
+                <property name="sizePolicy">
+                  <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                  </sizepolicy>
+                </property>
+                <property name="toolTip">
+                  <string>B register</string>
+                </property>
+                <property name="key" stdset="0">
+                  <string>B</string>
+                </property>
+                <property name="type" stdset="0">
+                  <string>integer</string>
+                </property>
+                <property name="mask" stdset="0">
+                  <string>0x%0.1X</string>
+                </property>
+                </widget>
+              </item>
+              <item>
+                <widget class="QLabel" name="ixLabel">
+                <property name="toolTip">
+                  <string>IX Index register (XP + X)</string>
+                </property>
+                <property name="text">
+                  <string>IX</string>
+                </property>
+                </widget>
+              </item>
+              <item>
+                <widget class="QLineEdit" name="ixEdit">
+                <property name="sizePolicy">
+                  <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                  </sizepolicy>
+                </property>
+                <property name="toolTip">
+                  <string>IX Index register (XP + X)</string>
+                </property>
+                <property name="key" stdset="0">
+                  <string>IX</string>
+                </property>
+                <property name="type" stdset="0">
+                  <string>integer</string>
+                </property>
+                <property name="mask" stdset="0">
+                  <string>0x%0.3X</string>
+                </property>
+                </widget>
+              </item>
+              <item>
+                <widget class="QLabel" name="iyLabel">
+                <property name="toolTip">
+                  <string>IY Index register (YP + Y)</string>
+                </property>
+                <property name="text">
+                  <string>IY</string>
+                </property>
+                </widget>
+              </item>
+              <item>
+                <widget class="QLineEdit" name="iyEdit">
+                <property name="sizePolicy">
+                  <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                  </sizepolicy>
+                </property>
+                <property name="toolTip">
+                  <string>IY Index register (YP + Y)</string>
+                </property>
+                <property name="key" stdset="0">
+                  <string>IY</string>
+                </property>
+                <property name="type" stdset="0">
+                  <string>integer</string>
+                </property>
+                <property name="mask" stdset="0">
+                  <string>0x%0.3X</string>
+                </property>
+                </widget>
+              </item>
+            </layout>
+          </item>
+        </layout>
+        </widget>
+      </item>
+      <item row="2" column="0">
+        <widget class="QTabWidget" name="memTabWidget">
+          <property name="geometry">
+            <rect>
+              <x>15</x>
+              <y>27</y>
+              <width>285</width>
+              <height>184</height>
+            </rect>
+          </property>
+          <property name="currentIndex">
+            <number>0</number>
+          </property>
+          <widget class="QWidget" name="tabRAM0">
+            <attribute name="title">
+              <string>RAM Page 0</string>
+            </attribute>
+            <layout class="QVBoxLayout" name="ram0Layout">
+              <item>
+                <widget class="QTableWidget" name="ram0DataTable">
+                  <property name="alternatingRowColors">
+                  <bool>true</bool>
+                  </property>
+                  <property name="selectionMode">
+                  <enum>QAbstractItemView::NoSelection</enum>
+                  </property>
+                  <property name="columnCount">
+                  <number>16</number>
+                  </property>
+                  <property name="rowCount">
+                  <number>16</number>
+                  </property>
+                  <property name="key" stdset="0">
+                  <string>RAM0</string>
+                  </property>
+                  <property name="type" stdset="0">
+                  <string>table</string>
+                  </property>
+                  <property name="mask" stdset="0">
+                  <string>0x%0.1X</string>
+                  </property>
+                  <attribute name="horizontalHeaderMinimumSectionSize">
+                  <number>0</number>
+                  </attribute>
+                  <attribute name="verticalHeaderMinimumSectionSize">
+                  <number>0</number>
+                  </attribute>
+                  <row>
+                  <property name="text">
+                    <string>00</string>
+                  </property>
+                  </row>
+                  <row>
+                  <property name="text">
+                    <string>10</string>
+                  </property>
+                  </row>
+                  <row>
+                  <property name="text">
+                    <string>20</string>
+                  </property>
+                  </row>
+                  <row>
+                  <property name="text">
+                    <string>30</string>
+                  </property>
+                  </row>
+                  <row>
+                  <property name="text">
+                    <string>40</string>
+                  </property>
+                  </row>
+                  <row>
+                  <property name="text">
+                    <string>50</string>
+                  </property>
+                  </row>
+                  <row>
+                  <property name="text">
+                    <string>60</string>
+                  </property>
+                  </row>
+                  <row>
+                  <property name="text">
+                    <string>70</string>
+                  </property>
+                  </row>
+                  <row>
+                  <property name="text">
+                    <string>80</string>
+                  </property>
+                  </row>
+                  <row>
+                  <property name="text">
+                    <string>90</string>
+                  </property>
+                  </row>
+                  <row>
+                  <property name="text">
+                    <string>A0</string>
+                  </property>
+                  </row>
+                  <row>
+                  <property name="text">
+                    <string>B0</string>
+                  </property>
+                  </row>
+                  <row>
+                  <property name="text">
+                    <string>C0</string>
+                  </property>
+                  </row>
+                  <row>
+                  <property name="text">
+                    <string>D0</string>
+                  </property>
+                  </row>
+                  <row>
+                  <property name="text">
+                    <string>E0</string>
+                  </property>
+                  </row>
+                  <row>
+                  <property name="text">
+                    <string>F0</string>
+                  </property>
+                  </row>
+                  <column>
+                  <property name="text">
+                    <string>00</string>
+                  </property>
+                  </column>
+                  <column>
+                  <property name="text">
+                    <string>01</string>
+                  </property>
+                  </column>
+                  <column>
+                  <property name="text">
+                    <string>02</string>
+                  </property>
+                  </column>
+                  <column>
+                  <property name="text">
+                    <string>03</string>
+                  </property>
+                  </column>
+                  <column>
+                  <property name="text">
+                    <string>04</string>
+                  </property>
+                  </column>
+                  <column>
+                  <property name="text">
+                    <string>05</string>
+                  </property>
+                  </column>
+                  <column>
+                  <property name="text">
+                    <string>06</string>
+                  </property>
+                  </column>
+                  <column>
+                  <property name="text">
+                    <string>07</string>
+                  </property>
+                  </column>
+                  <column>
+                  <property name="text">
+                    <string>08</string>
+                  </property>
+                  </column>
+                  <column>
+                  <property name="text">
+                    <string>09</string>
+                  </property>
+                  </column>
+                  <column>
+                  <property name="text">
+                    <string>0A</string>
+                  </property>
+                  </column>
+                  <column>
+                  <property name="text">
+                    <string>0B</string>
+                  </property>
+                  </column>
+                  <column>
+                  <property name="text">
+                    <string>0C</string>
+                  </property>
+                  </column>
+                  <column>
+                  <property name="text">
+                    <string>0D</string>
+                  </property>
+                  </column>
+                  <column>
+                  <property name="text">
+                    <string>0E</string>
+                  </property>
+                  </column>
+                  <column>
+                  <property name="text">
+                    <string>0F</string>
+                  </property>
+                  </column>
+                  <item row="0" column="0">
+                  <property name="text">
+                    <string>0x0</string>
+                  </property>
+                  </item>
+                  <item row="0" column="1">
+                  <property name="text">
+                    <string>0x0</string>
+                  </property>
+                  </item>
+                  <item row="0" column="2">
+                  <property name="text">
+                    <string>0x0</string>
+                  </property>
+                  </item>
+                  <item row="0" column="3">
+                  <property name="text">
+                    <string>0x0</string>
+                  </property>
+                  </item>
+                  <item row="0" column="4">
+                  <property name="text">
+                    <string>0x0</string>
+                  </property>
+                  </item>
+                  <item row="0" column="5">
+                  <property name="text">
+                    <string>0x0</string>
+                  </property>
+                  </item>
+                  <item row="0" column="6">
+                  <property name="text">
+                    <string>0x0</string>
+                  </property>
+                  </item>
+                  <item row="0" column="7">
+                  <property name="text">
+                    <string>0x0</string>
+                  </property>
+                  </item>
+                  <item row="0" column="8">
+                  <property name="text">
+                    <string>0x0</string>
+                  </property>
+                  </item>
+                  <item row="0" column="9">
+                  <property name="text">
+                    <string>0x0</string>
+                  </property>
+                  </item>
+                  <item row="0" column="10">
+                  <property name="text">
+                    <string>0x0</string>
+                  </property>
+                  </item>
+                  <item row="0" column="11">
+                  <property name="text">
+                    <string>0x0</string>
+                  </property>
+                  </item>
+                  <item row="0" column="12">
+                  <property name="text">
+                    <string>0x0</string>
+                  </property>
+                  </item>
+                  <item row="0" column="13">
+                  <property name="text">
+                    <string>0x0</string>
+                  </property>
+                  </item>
+                  <item row="0" column="14">
+                  <property name="text">
+                    <string>0x0</string>
+                  </property>
+                  </item>
+                  <item row="0" column="15">
+                  <property name="text">
+                    <string>0x0</string>
+                  </property>
+                  </item>
+                  <item row="1" column="0"/>
+                  <item row="1" column="1"/>
+                  <item row="1" column="2"/>
+                  <item row="1" column="3"/>
+                  <item row="1" column="4"/>
+                  <item row="1" column="5"/>
+                  <item row="1" column="6"/>
+                  <item row="1" column="7"/>
+                  <item row="1" column="8"/>
+                  <item row="1" column="9"/>
+                  <item row="1" column="10"/>
+                  <item row="1" column="11"/>
+                  <item row="1" column="12"/>
+                  <item row="1" column="13"/>
+                  <item row="1" column="14"/>
+                  <item row="1" column="15"/>
+                  <item row="2" column="0"/>
+                  <item row="2" column="1"/>
+                  <item row="2" column="2"/>
+                  <item row="2" column="3"/>
+                  <item row="2" column="4"/>
+                  <item row="2" column="5"/>
+                  <item row="2" column="6"/>
+                  <item row="2" column="7"/>
+                  <item row="2" column="8"/>
+                  <item row="2" column="9"/>
+                  <item row="2" column="10"/>
+                  <item row="2" column="11"/>
+                  <item row="2" column="12"/>
+                  <item row="2" column="13"/>
+                  <item row="2" column="14"/>
+                  <item row="2" column="15"/>
+                  <item row="3" column="0"/>
+                  <item row="3" column="1"/>
+                  <item row="3" column="2"/>
+                  <item row="3" column="3"/>
+                  <item row="3" column="4"/>
+                  <item row="3" column="5"/>
+                  <item row="3" column="6"/>
+                  <item row="3" column="7"/>
+                  <item row="3" column="8"/>
+                  <item row="3" column="9"/>
+                  <item row="3" column="10"/>
+                  <item row="3" column="11"/>
+                  <item row="3" column="12"/>
+                  <item row="3" column="13"/>
+                  <item row="3" column="14"/>
+                  <item row="3" column="15"/>
+                  <item row="4" column="0"/>
+                  <item row="4" column="1"/>
+                  <item row="4" column="2"/>
+                  <item row="4" column="3"/>
+                  <item row="4" column="4"/>
+                  <item row="4" column="5"/>
+                  <item row="4" column="6"/>
+                  <item row="4" column="7"/>
+                  <item row="4" column="8"/>
+                  <item row="4" column="9"/>
+                  <item row="4" column="10"/>
+                  <item row="4" column="11"/>
+                  <item row="4" column="12"/>
+                  <item row="4" column="13"/>
+                  <item row="4" column="14"/>
+                  <item row="4" column="15"/>
+                  <item row="5" column="0"/>
+                  <item row="5" column="1"/>
+                  <item row="5" column="2"/>
+                  <item row="5" column="3"/>
+                  <item row="5" column="4"/>
+                  <item row="5" column="5"/>
+                  <item row="5" column="6"/>
+                  <item row="5" column="7"/>
+                  <item row="5" column="8"/>
+                  <item row="5" column="9"/>
+                  <item row="5" column="10"/>
+                  <item row="5" column="11"/>
+                  <item row="5" column="12"/>
+                  <item row="5" column="13"/>
+                  <item row="5" column="14"/>
+                  <item row="5" column="15"/>
+                  <item row="6" column="0"/>
+                  <item row="6" column="1"/>
+                  <item row="6" column="2"/>
+                  <item row="6" column="3"/>
+                  <item row="6" column="4"/>
+                  <item row="6" column="5"/>
+                  <item row="6" column="6"/>
+                  <item row="6" column="7"/>
+                  <item row="6" column="8"/>
+                  <item row="6" column="9"/>
+                  <item row="6" column="10"/>
+                  <item row="6" column="11"/>
+                  <item row="6" column="12"/>
+                  <item row="6" column="13"/>
+                  <item row="6" column="14"/>
+                  <item row="6" column="15"/>
+                  <item row="7" column="0"/>
+                  <item row="7" column="1"/>
+                  <item row="7" column="2"/>
+                  <item row="7" column="3"/>
+                  <item row="7" column="4"/>
+                  <item row="7" column="5"/>
+                  <item row="7" column="6"/>
+                  <item row="7" column="7"/>
+                  <item row="7" column="8"/>
+                  <item row="7" column="9"/>
+                  <item row="7" column="10"/>
+                  <item row="7" column="11"/>
+                  <item row="7" column="12"/>
+                  <item row="7" column="13"/>
+                  <item row="7" column="14"/>
+                  <item row="7" column="15"/>
+                  <item row="8" column="0"/>
+                  <item row="8" column="1"/>
+                  <item row="8" column="2"/>
+                  <item row="8" column="3"/>
+                  <item row="8" column="4"/>
+                  <item row="8" column="5"/>
+                  <item row="8" column="6"/>
+                  <item row="8" column="7"/>
+                  <item row="8" column="8"/>
+                  <item row="8" column="9"/>
+                  <item row="8" column="10"/>
+                  <item row="8" column="11"/>
+                  <item row="8" column="12"/>
+                  <item row="8" column="13"/>
+                  <item row="8" column="14"/>
+                  <item row="8" column="15"/>
+                  <item row="9" column="0"/>
+                  <item row="9" column="1"/>
+                  <item row="9" column="2"/>
+                  <item row="9" column="3"/>
+                  <item row="9" column="4"/>
+                  <item row="9" column="5"/>
+                  <item row="9" column="6"/>
+                  <item row="9" column="7"/>
+                  <item row="9" column="8"/>
+                  <item row="9" column="9"/>
+                  <item row="9" column="10"/>
+                  <item row="9" column="11"/>
+                  <item row="9" column="12"/>
+                  <item row="9" column="13"/>
+                  <item row="9" column="14"/>
+                  <item row="9" column="15"/>
+                  <item row="10" column="0"/>
+                  <item row="10" column="1"/>
+                  <item row="10" column="2"/>
+                  <item row="10" column="3"/>
+                  <item row="10" column="4"/>
+                  <item row="10" column="5"/>
+                  <item row="10" column="6"/>
+                  <item row="10" column="7"/>
+                  <item row="10" column="8"/>
+                  <item row="10" column="9"/>
+                  <item row="10" column="10"/>
+                  <item row="10" column="11"/>
+                  <item row="10" column="12"/>
+                  <item row="10" column="13"/>
+                  <item row="10" column="14"/>
+                  <item row="10" column="15"/>
+                  <item row="11" column="0"/>
+                  <item row="11" column="1"/>
+                  <item row="11" column="2"/>
+                  <item row="11" column="3"/>
+                  <item row="11" column="4"/>
+                  <item row="11" column="5"/>
+                  <item row="11" column="6"/>
+                  <item row="11" column="7"/>
+                  <item row="11" column="8"/>
+                  <item row="11" column="9"/>
+                  <item row="11" column="10"/>
+                  <item row="11" column="11"/>
+                  <item row="11" column="12"/>
+                  <item row="11" column="13"/>
+                  <item row="11" column="14"/>
+                  <item row="11" column="15"/>
+                  <item row="12" column="0"/>
+                  <item row="12" column="1"/>
+                  <item row="12" column="2"/>
+                  <item row="12" column="3"/>
+                  <item row="12" column="4"/>
+                  <item row="12" column="5"/>
+                  <item row="12" column="6"/>
+                  <item row="12" column="7"/>
+                  <item row="12" column="8"/>
+                  <item row="12" column="9"/>
+                  <item row="12" column="10"/>
+                  <item row="12" column="11"/>
+                  <item row="12" column="12"/>
+                  <item row="12" column="13"/>
+                  <item row="12" column="14"/>
+                  <item row="12" column="15"/>
+                  <item row="13" column="0"/>
+                  <item row="13" column="1"/>
+                  <item row="13" column="2"/>
+                  <item row="13" column="3"/>
+                  <item row="13" column="4"/>
+                  <item row="13" column="5"/>
+                  <item row="13" column="6"/>
+                  <item row="13" column="7"/>
+                  <item row="13" column="8"/>
+                  <item row="13" column="9"/>
+                  <item row="13" column="10"/>
+                  <item row="13" column="11"/>
+                  <item row="13" column="12"/>
+                  <item row="13" column="13"/>
+                  <item row="13" column="14"/>
+                  <item row="13" column="15"/>
+                  <item row="14" column="0"/>
+                  <item row="14" column="1"/>
+                  <item row="14" column="2"/>
+                  <item row="14" column="3"/>
+                  <item row="14" column="4"/>
+                  <item row="14" column="5"/>
+                  <item row="14" column="6"/>
+                  <item row="14" column="7"/>
+                  <item row="14" column="8"/>
+                  <item row="14" column="9"/>
+                  <item row="14" column="10"/>
+                  <item row="14" column="11"/>
+                  <item row="14" column="12"/>
+                  <item row="14" column="13"/>
+                  <item row="14" column="14"/>
+                  <item row="14" column="15"/>
+                  <item row="15" column="0"/>
+                  <item row="15" column="1"/>
+                  <item row="15" column="2"/>
+                  <item row="15" column="3"/>
+                  <item row="15" column="4"/>
+                  <item row="15" column="5"/>
+                  <item row="15" column="6"/>
+                  <item row="15" column="7"/>
+                  <item row="15" column="8"/>
+                  <item row="15" column="9"/>
+                  <item row="15" column="10"/>
+                  <item row="15" column="11"/>
+                  <item row="15" column="12"/>
+                  <item row="15" column="13"/>
+                  <item row="15" column="14"/>
+                  <item row="15" column="15"/>
+                </widget>
+              </item>
+            </layout>
+          </widget>
+          <widget class="QWidget" name="tabRAM1">
+            <attribute name="title">
+              <string>RAM Page 1</string>
+            </attribute>
+            <layout class="QVBoxLayout" name="ram1Layout">
+              <item>
+                <widget class="QTableWidget" name="ram1DataTable">
+                  <property name="alternatingRowColors">
+                  <bool>true</bool>
+                  </property>
+                  <property name="selectionMode">
+                  <enum>QAbstractItemView::NoSelection</enum>
+                  </property>
+                  <property name="columnCount">
+                  <number>16</number>
+                  </property>
+                  <property name="rowCount">
+                  <number>16</number>
+                  </property>
+                  <property name="key" stdset="0">
+                  <string>RAM1</string>
+                  </property>
+                  <property name="type" stdset="0">
+                  <string>table</string>
+                  </property>
+                  <property name="mask" stdset="0">
+                  <string>0x%0.1X</string>
+                  </property>
+                  <attribute name="horizontalHeaderMinimumSectionSize">
+                  <number>0</number>
+                  </attribute>
+                  <attribute name="verticalHeaderMinimumSectionSize">
+                  <number>0</number>
+                  </attribute>
+                  <row>
+                  <property name="text">
+                    <string>00</string>
+                  </property>
+                  </row>
+                  <row>
+                  <property name="text">
+                    <string>10</string>
+                  </property>
+                  </row>
+                  <row>
+                  <property name="text">
+                    <string>20</string>
+                  </property>
+                  </row>
+                  <row>
+                  <property name="text">
+                    <string>30</string>
+                  </property>
+                  </row>
+                  <row>
+                  <property name="text">
+                    <string>40</string>
+                  </property>
+                  </row>
+                  <row>
+                  <property name="text">
+                    <string>50</string>
+                  </property>
+                  </row>
+                  <row>
+                  <property name="text">
+                    <string>60</string>
+                  </property>
+                  </row>
+                  <row>
+                  <property name="text">
+                    <string>70</string>
+                  </property>
+                  </row>
+                  <row>
+                  <property name="text">
+                    <string>80</string>
+                  </property>
+                  </row>
+                  <row>
+                  <property name="text">
+                    <string>90</string>
+                  </property>
+                  </row>
+                  <row>
+                  <property name="text">
+                    <string>A0</string>
+                  </property>
+                  </row>
+                  <row>
+                  <property name="text">
+                    <string>B0</string>
+                  </property>
+                  </row>
+                  <row>
+                  <property name="text">
+                    <string>C0</string>
+                  </property>
+                  </row>
+                  <row>
+                  <property name="text">
+                    <string>D0</string>
+                  </property>
+                  </row>
+                  <row>
+                  <property name="text">
+                    <string>E0</string>
+                  </property>
+                  </row>
+                  <row>
+                  <property name="text">
+                    <string>F0</string>
+                  </property>
+                  </row>
+                  <column>
+                  <property name="text">
+                    <string>00</string>
+                  </property>
+                  </column>
+                  <column>
+                  <property name="text">
+                    <string>01</string>
+                  </property>
+                  </column>
+                  <column>
+                  <property name="text">
+                    <string>02</string>
+                  </property>
+                  </column>
+                  <column>
+                  <property name="text">
+                    <string>03</string>
+                  </property>
+                  </column>
+                  <column>
+                  <property name="text">
+                    <string>04</string>
+                  </property>
+                  </column>
+                  <column>
+                  <property name="text">
+                    <string>05</string>
+                  </property>
+                  </column>
+                  <column>
+                  <property name="text">
+                    <string>06</string>
+                  </property>
+                  </column>
+                  <column>
+                  <property name="text">
+                    <string>07</string>
+                  </property>
+                  </column>
+                  <column>
+                  <property name="text">
+                    <string>08</string>
+                  </property>
+                  </column>
+                  <column>
+                  <property name="text">
+                    <string>09</string>
+                  </property>
+                  </column>
+                  <column>
+                  <property name="text">
+                    <string>0A</string>
+                  </property>
+                  </column>
+                  <column>
+                  <property name="text">
+                    <string>0B</string>
+                  </property>
+                  </column>
+                  <column>
+                  <property name="text">
+                    <string>0C</string>
+                  </property>
+                  </column>
+                  <column>
+                  <property name="text">
+                    <string>0D</string>
+                  </property>
+                  </column>
+                  <column>
+                  <property name="text">
+                    <string>0E</string>
+                  </property>
+                  </column>
+                  <column>
+                  <property name="text">
+                    <string>0F</string>
+                  </property>
+                  </column>
+                  <item row="0" column="0">
+                  <property name="text">
+                    <string>0x0</string>
+                  </property>
+                  </item>
+                  <item row="0" column="1">
+                  <property name="text">
+                    <string>0x0</string>
+                  </property>
+                  </item>
+                  <item row="0" column="2">
+                  <property name="text">
+                    <string>0x0</string>
+                  </property>
+                  </item>
+                  <item row="0" column="3">
+                  <property name="text">
+                    <string>0x0</string>
+                  </property>
+                  </item>
+                  <item row="0" column="4">
+                  <property name="text">
+                    <string>0x0</string>
+                  </property>
+                  </item>
+                  <item row="0" column="5">
+                  <property name="text">
+                    <string>0x0</string>
+                  </property>
+                  </item>
+                  <item row="0" column="6">
+                  <property name="text">
+                    <string>0x0</string>
+                  </property>
+                  </item>
+                  <item row="0" column="7">
+                  <property name="text">
+                    <string>0x0</string>
+                  </property>
+                  </item>
+                  <item row="0" column="8">
+                  <property name="text">
+                    <string>0x0</string>
+                  </property>
+                  </item>
+                  <item row="0" column="9">
+                  <property name="text">
+                    <string>0x0</string>
+                  </property>
+                  </item>
+                  <item row="0" column="10">
+                  <property name="text">
+                    <string>0x0</string>
+                  </property>
+                  </item>
+                  <item row="0" column="11">
+                  <property name="text">
+                    <string>0x0</string>
+                  </property>
+                  </item>
+                  <item row="0" column="12">
+                  <property name="text">
+                    <string>0x0</string>
+                  </property>
+                  </item>
+                  <item row="0" column="13">
+                  <property name="text">
+                    <string>0x0</string>
+                  </property>
+                  </item>
+                  <item row="0" column="14">
+                  <property name="text">
+                    <string>0x0</string>
+                  </property>
+                  </item>
+                  <item row="0" column="15">
+                  <property name="text">
+                    <string>0x0</string>
+                  </property>
+                  </item>
+                  <item row="1" column="0"/>
+                  <item row="1" column="1"/>
+                  <item row="1" column="2"/>
+                  <item row="1" column="3"/>
+                  <item row="1" column="4"/>
+                  <item row="1" column="5"/>
+                  <item row="1" column="6"/>
+                  <item row="1" column="7"/>
+                  <item row="1" column="8"/>
+                  <item row="1" column="9"/>
+                  <item row="1" column="10"/>
+                  <item row="1" column="11"/>
+                  <item row="1" column="12"/>
+                  <item row="1" column="13"/>
+                  <item row="1" column="14"/>
+                  <item row="1" column="15"/>
+                  <item row="2" column="0"/>
+                  <item row="2" column="1"/>
+                  <item row="2" column="2"/>
+                  <item row="2" column="3"/>
+                  <item row="2" column="4"/>
+                  <item row="2" column="5"/>
+                  <item row="2" column="6"/>
+                  <item row="2" column="7"/>
+                  <item row="2" column="8"/>
+                  <item row="2" column="9"/>
+                  <item row="2" column="10"/>
+                  <item row="2" column="11"/>
+                  <item row="2" column="12"/>
+                  <item row="2" column="13"/>
+                  <item row="2" column="14"/>
+                  <item row="2" column="15"/>
+                  <item row="3" column="0"/>
+                  <item row="3" column="1"/>
+                  <item row="3" column="2"/>
+                  <item row="3" column="3"/>
+                  <item row="3" column="4"/>
+                  <item row="3" column="5"/>
+                  <item row="3" column="6"/>
+                  <item row="3" column="7"/>
+                  <item row="3" column="8"/>
+                  <item row="3" column="9"/>
+                  <item row="3" column="10"/>
+                  <item row="3" column="11"/>
+                  <item row="3" column="12"/>
+                  <item row="3" column="13"/>
+                  <item row="3" column="14"/>
+                  <item row="3" column="15"/>
+                  <item row="4" column="0"/>
+                  <item row="4" column="1"/>
+                  <item row="4" column="2"/>
+                  <item row="4" column="3"/>
+                  <item row="4" column="4"/>
+                  <item row="4" column="5"/>
+                  <item row="4" column="6"/>
+                  <item row="4" column="7"/>
+                  <item row="4" column="8"/>
+                  <item row="4" column="9"/>
+                  <item row="4" column="10"/>
+                  <item row="4" column="11"/>
+                  <item row="4" column="12"/>
+                  <item row="4" column="13"/>
+                  <item row="4" column="14"/>
+                  <item row="4" column="15"/>
+                  <item row="5" column="0"/>
+                  <item row="5" column="1"/>
+                  <item row="5" column="2"/>
+                  <item row="5" column="3"/>
+                  <item row="5" column="4"/>
+                  <item row="5" column="5"/>
+                  <item row="5" column="6"/>
+                  <item row="5" column="7"/>
+                  <item row="5" column="8"/>
+                  <item row="5" column="9"/>
+                  <item row="5" column="10"/>
+                  <item row="5" column="11"/>
+                  <item row="5" column="12"/>
+                  <item row="5" column="13"/>
+                  <item row="5" column="14"/>
+                  <item row="5" column="15"/>
+                  <item row="6" column="0"/>
+                  <item row="6" column="1"/>
+                  <item row="6" column="2"/>
+                  <item row="6" column="3"/>
+                  <item row="6" column="4"/>
+                  <item row="6" column="5"/>
+                  <item row="6" column="6"/>
+                  <item row="6" column="7"/>
+                  <item row="6" column="8"/>
+                  <item row="6" column="9"/>
+                  <item row="6" column="10"/>
+                  <item row="6" column="11"/>
+                  <item row="6" column="12"/>
+                  <item row="6" column="13"/>
+                  <item row="6" column="14"/>
+                  <item row="6" column="15"/>
+                  <item row="7" column="0"/>
+                  <item row="7" column="1"/>
+                  <item row="7" column="2"/>
+                  <item row="7" column="3"/>
+                  <item row="7" column="4"/>
+                  <item row="7" column="5"/>
+                  <item row="7" column="6"/>
+                  <item row="7" column="7"/>
+                  <item row="7" column="8"/>
+                  <item row="7" column="9"/>
+                  <item row="7" column="10"/>
+                  <item row="7" column="11"/>
+                  <item row="7" column="12"/>
+                  <item row="7" column="13"/>
+                  <item row="7" column="14"/>
+                  <item row="7" column="15"/>
+                  <item row="8" column="0"/>
+                  <item row="8" column="1"/>
+                  <item row="8" column="2"/>
+                  <item row="8" column="3"/>
+                  <item row="8" column="4"/>
+                  <item row="8" column="5"/>
+                  <item row="8" column="6"/>
+                  <item row="8" column="7"/>
+                  <item row="8" column="8"/>
+                  <item row="8" column="9"/>
+                  <item row="8" column="10"/>
+                  <item row="8" column="11"/>
+                  <item row="8" column="12"/>
+                  <item row="8" column="13"/>
+                  <item row="8" column="14"/>
+                  <item row="8" column="15"/>
+                  <item row="9" column="0"/>
+                  <item row="9" column="1"/>
+                  <item row="9" column="2"/>
+                  <item row="9" column="3"/>
+                  <item row="9" column="4"/>
+                  <item row="9" column="5"/>
+                  <item row="9" column="6"/>
+                  <item row="9" column="7"/>
+                  <item row="9" column="8"/>
+                  <item row="9" column="9"/>
+                  <item row="9" column="10"/>
+                  <item row="9" column="11"/>
+                  <item row="9" column="12"/>
+                  <item row="9" column="13"/>
+                  <item row="9" column="14"/>
+                  <item row="9" column="15"/>
+                  <item row="10" column="0"/>
+                  <item row="10" column="1"/>
+                  <item row="10" column="2"/>
+                  <item row="10" column="3"/>
+                  <item row="10" column="4"/>
+                  <item row="10" column="5"/>
+                  <item row="10" column="6"/>
+                  <item row="10" column="7"/>
+                  <item row="10" column="8"/>
+                  <item row="10" column="9"/>
+                  <item row="10" column="10"/>
+                  <item row="10" column="11"/>
+                  <item row="10" column="12"/>
+                  <item row="10" column="13"/>
+                  <item row="10" column="14"/>
+                  <item row="10" column="15"/>
+                  <item row="11" column="0"/>
+                  <item row="11" column="1"/>
+                  <item row="11" column="2"/>
+                  <item row="11" column="3"/>
+                  <item row="11" column="4"/>
+                  <item row="11" column="5"/>
+                  <item row="11" column="6"/>
+                  <item row="11" column="7"/>
+                  <item row="11" column="8"/>
+                  <item row="11" column="9"/>
+                  <item row="11" column="10"/>
+                  <item row="11" column="11"/>
+                  <item row="11" column="12"/>
+                  <item row="11" column="13"/>
+                  <item row="11" column="14"/>
+                  <item row="11" column="15"/>
+                  <item row="12" column="0"/>
+                  <item row="12" column="1"/>
+                  <item row="12" column="2"/>
+                  <item row="12" column="3"/>
+                  <item row="12" column="4"/>
+                  <item row="12" column="5"/>
+                  <item row="12" column="6"/>
+                  <item row="12" column="7"/>
+                  <item row="12" column="8"/>
+                  <item row="12" column="9"/>
+                  <item row="12" column="10"/>
+                  <item row="12" column="11"/>
+                  <item row="12" column="12"/>
+                  <item row="12" column="13"/>
+                  <item row="12" column="14"/>
+                  <item row="12" column="15"/>
+                  <item row="13" column="0"/>
+                  <item row="13" column="1"/>
+                  <item row="13" column="2"/>
+                  <item row="13" column="3"/>
+                  <item row="13" column="4"/>
+                  <item row="13" column="5"/>
+                  <item row="13" column="6"/>
+                  <item row="13" column="7"/>
+                  <item row="13" column="8"/>
+                  <item row="13" column="9"/>
+                  <item row="13" column="10"/>
+                  <item row="13" column="11"/>
+                  <item row="13" column="12"/>
+                  <item row="13" column="13"/>
+                  <item row="13" column="14"/>
+                  <item row="13" column="15"/>
+                  <item row="14" column="0"/>
+                  <item row="14" column="1"/>
+                  <item row="14" column="2"/>
+                  <item row="14" column="3"/>
+                  <item row="14" column="4"/>
+                  <item row="14" column="5"/>
+                  <item row="14" column="6"/>
+                  <item row="14" column="7"/>
+                  <item row="14" column="8"/>
+                  <item row="14" column="9"/>
+                  <item row="14" column="10"/>
+                  <item row="14" column="11"/>
+                  <item row="14" column="12"/>
+                  <item row="14" column="13"/>
+                  <item row="14" column="14"/>
+                  <item row="14" column="15"/>
+                  <item row="15" column="0"/>
+                  <item row="15" column="1"/>
+                  <item row="15" column="2"/>
+                  <item row="15" column="3"/>
+                  <item row="15" column="4"/>
+                  <item row="15" column="5"/>
+                  <item row="15" column="6"/>
+                  <item row="15" column="7"/>
+                  <item row="15" column="8"/>
+                  <item row="15" column="9"/>
+                  <item row="15" column="10"/>
+                  <item row="15" column="11"/>
+                  <item row="15" column="12"/>
+                  <item row="15" column="13"/>
+                  <item row="15" column="14"/>
+                  <item row="15" column="15"/>
+                </widget>
+              </item>
+            </layout>
+          </widget>
+          <widget class="QWidget" name="tabRAM2">
+            <attribute name="title">
+              <string>RAM Page 2</string>
+            </attribute>
+            <layout class="QVBoxLayout" name="ram2Layout">
+              <item>
+                <widget class="QTableWidget" name="ram2DataTable">
+                  <property name="alternatingRowColors">
+                  <bool>true</bool>
+                  </property>
+                  <property name="selectionMode">
+                  <enum>QAbstractItemView::NoSelection</enum>
+                  </property>
+                  <property name="columnCount">
+                  <number>16</number>
+                  </property>
+                  <property name="rowCount">
+                  <number>8</number>
+                  </property>
+                  <property name="key" stdset="0">
+                  <string>RAM2</string>
+                  </property>
+                  <property name="type" stdset="0">
+                  <string>table</string>
+                  </property>
+                  <property name="mask" stdset="0">
+                  <string>0x%0.1X</string>
+                  </property>
+                  <attribute name="horizontalHeaderMinimumSectionSize">
+                  <number>0</number>
+                  </attribute>
+                  <attribute name="verticalHeaderMinimumSectionSize">
+                  <number>0</number>
+                  </attribute>
+                  <row>
+                  <property name="text">
+                    <string>00</string>
+                  </property>
+                  </row>
+                  <row>
+                  <property name="text">
+                    <string>10</string>
+                  </property>
+                  </row>
+                  <row>
+                  <property name="text">
+                    <string>20</string>
+                  </property>
+                  </row>
+                  <row>
+                  <property name="text">
+                    <string>30</string>
+                  </property>
+                  </row>
+                  <row>
+                  <property name="text">
+                    <string>40</string>
+                  </property>
+                  </row>
+                  <row>
+                  <property name="text">
+                    <string>50</string>
+                  </property>
+                  </row>
+                  <row>
+                  <property name="text">
+                    <string>60</string>
+                  </property>
+                  </row>
+                  <row>
+                  <property name="text">
+                    <string>70</string>
+                  </property>
+                  </row>
+                  <column>
+                  <property name="text">
+                    <string>00</string>
+                  </property>
+                  </column>
+                  <column>
+                  <property name="text">
+                    <string>01</string>
+                  </property>
+                  </column>
+                  <column>
+                  <property name="text">
+                    <string>02</string>
+                  </property>
+                  </column>
+                  <column>
+                  <property name="text">
+                    <string>03</string>
+                  </property>
+                  </column>
+                  <column>
+                  <property name="text">
+                    <string>04</string>
+                  </property>
+                  </column>
+                  <column>
+                  <property name="text">
+                    <string>05</string>
+                  </property>
+                  </column>
+                  <column>
+                  <property name="text">
+                    <string>06</string>
+                  </property>
+                  </column>
+                  <column>
+                  <property name="text">
+                    <string>07</string>
+                  </property>
+                  </column>
+                  <column>
+                  <property name="text">
+                    <string>08</string>
+                  </property>
+                  </column>
+                  <column>
+                  <property name="text">
+                    <string>09</string>
+                  </property>
+                  </column>
+                  <column>
+                  <property name="text">
+                    <string>0A</string>
+                  </property>
+                  </column>
+                  <column>
+                  <property name="text">
+                    <string>0B</string>
+                  </property>
+                  </column>
+                  <column>
+                  <property name="text">
+                    <string>0C</string>
+                  </property>
+                  </column>
+                  <column>
+                  <property name="text">
+                    <string>0D</string>
+                  </property>
+                  </column>
+                  <column>
+                  <property name="text">
+                    <string>0E</string>
+                  </property>
+                  </column>
+                  <column>
+                  <property name="text">
+                    <string>0F</string>
+                  </property>
+                  </column>
+                  <item row="0" column="0">
+                  <property name="text">
+                    <string>0x0</string>
+                  </property>
+                  </item>
+                  <item row="0" column="1">
+                  <property name="text">
+                    <string>0x0</string>
+                  </property>
+                  </item>
+                  <item row="0" column="2">
+                  <property name="text">
+                    <string>0x0</string>
+                  </property>
+                  </item>
+                  <item row="0" column="3">
+                  <property name="text">
+                    <string>0x0</string>
+                  </property>
+                  </item>
+                  <item row="0" column="4">
+                  <property name="text">
+                    <string>0x0</string>
+                  </property>
+                  </item>
+                  <item row="0" column="5">
+                  <property name="text">
+                    <string>0x0</string>
+                  </property>
+                  </item>
+                  <item row="0" column="6">
+                  <property name="text">
+                    <string>0x0</string>
+                  </property>
+                  </item>
+                  <item row="0" column="7">
+                  <property name="text">
+                    <string>0x0</string>
+                  </property>
+                  </item>
+                  <item row="0" column="8">
+                  <property name="text">
+                    <string>0x0</string>
+                  </property>
+                  </item>
+                  <item row="0" column="9">
+                  <property name="text">
+                    <string>0x0</string>
+                  </property>
+                  </item>
+                  <item row="0" column="10">
+                  <property name="text">
+                    <string>0x0</string>
+                  </property>
+                  </item>
+                  <item row="0" column="11">
+                  <property name="text">
+                    <string>0x0</string>
+                  </property>
+                  </item>
+                  <item row="0" column="12">
+                  <property name="text">
+                    <string>0x0</string>
+                  </property>
+                  </item>
+                  <item row="0" column="13">
+                  <property name="text">
+                    <string>0x0</string>
+                  </property>
+                  </item>
+                  <item row="0" column="14">
+                  <property name="text">
+                    <string>0x0</string>
+                  </property>
+                  </item>
+                  <item row="0" column="15">
+                  <property name="text">
+                    <string>0x0</string>
+                  </property>
+                  </item>
+                  <item row="1" column="0"/>
+                  <item row="1" column="1"/>
+                  <item row="1" column="2"/>
+                  <item row="1" column="3"/>
+                  <item row="1" column="4"/>
+                  <item row="1" column="5"/>
+                  <item row="1" column="6"/>
+                  <item row="1" column="7"/>
+                  <item row="1" column="8"/>
+                  <item row="1" column="9"/>
+                  <item row="1" column="10"/>
+                  <item row="1" column="11"/>
+                  <item row="1" column="12"/>
+                  <item row="1" column="13"/>
+                  <item row="1" column="14"/>
+                  <item row="1" column="15"/>
+                  <item row="2" column="0"/>
+                  <item row="2" column="1"/>
+                  <item row="2" column="2"/>
+                  <item row="2" column="3"/>
+                  <item row="2" column="4"/>
+                  <item row="2" column="5"/>
+                  <item row="2" column="6"/>
+                  <item row="2" column="7"/>
+                  <item row="2" column="8"/>
+                  <item row="2" column="9"/>
+                  <item row="2" column="10"/>
+                  <item row="2" column="11"/>
+                  <item row="2" column="12"/>
+                  <item row="2" column="13"/>
+                  <item row="2" column="14"/>
+                  <item row="2" column="15"/>
+                  <item row="3" column="0"/>
+                  <item row="3" column="1"/>
+                  <item row="3" column="2"/>
+                  <item row="3" column="3"/>
+                  <item row="3" column="4"/>
+                  <item row="3" column="5"/>
+                  <item row="3" column="6"/>
+                  <item row="3" column="7"/>
+                  <item row="3" column="8"/>
+                  <item row="3" column="9"/>
+                  <item row="3" column="10"/>
+                  <item row="3" column="11"/>
+                  <item row="3" column="12"/>
+                  <item row="3" column="13"/>
+                  <item row="3" column="14"/>
+                  <item row="3" column="15"/>
+                  <item row="4" column="0"/>
+                  <item row="4" column="1"/>
+                  <item row="4" column="2"/>
+                  <item row="4" column="3"/>
+                  <item row="4" column="4"/>
+                  <item row="4" column="5"/>
+                  <item row="4" column="6"/>
+                  <item row="4" column="7"/>
+                  <item row="4" column="8"/>
+                  <item row="4" column="9"/>
+                  <item row="4" column="10"/>
+                  <item row="4" column="11"/>
+                  <item row="4" column="12"/>
+                  <item row="4" column="13"/>
+                  <item row="4" column="14"/>
+                  <item row="4" column="15"/>
+                  <item row="5" column="0"/>
+                  <item row="5" column="1"/>
+                  <item row="5" column="2"/>
+                  <item row="5" column="3"/>
+                  <item row="5" column="4"/>
+                  <item row="5" column="5"/>
+                  <item row="5" column="6"/>
+                  <item row="5" column="7"/>
+                  <item row="5" column="8"/>
+                  <item row="5" column="9"/>
+                  <item row="5" column="10"/>
+                  <item row="5" column="11"/>
+                  <item row="5" column="12"/>
+                  <item row="5" column="13"/>
+                  <item row="5" column="14"/>
+                  <item row="5" column="15"/>
+                  <item row="6" column="0"/>
+                  <item row="6" column="1"/>
+                  <item row="6" column="2"/>
+                  <item row="6" column="3"/>
+                  <item row="6" column="4"/>
+                  <item row="6" column="5"/>
+                  <item row="6" column="6"/>
+                  <item row="6" column="7"/>
+                  <item row="6" column="8"/>
+                  <item row="6" column="9"/>
+                  <item row="6" column="10"/>
+                  <item row="6" column="11"/>
+                  <item row="6" column="12"/>
+                  <item row="6" column="13"/>
+                  <item row="6" column="14"/>
+                  <item row="6" column="15"/>
+                  <item row="7" column="0"/>
+                  <item row="7" column="1"/>
+                  <item row="7" column="2"/>
+                  <item row="7" column="3"/>
+                  <item row="7" column="4"/>
+                  <item row="7" column="5"/>
+                  <item row="7" column="6"/>
+                  <item row="7" column="7"/>
+                  <item row="7" column="8"/>
+                  <item row="7" column="9"/>
+                  <item row="7" column="10"/>
+                  <item row="7" column="11"/>
+                  <item row="7" column="12"/>
+                  <item row="7" column="13"/>
+                  <item row="7" column="14"/>
+                  <item row="7" column="15"/>
+                </widget>
+              </item>
+            </layout>
+          </widget>
+          <widget class="QWidget" name="tabVRAM">
+            <attribute name="title">
+              <string>VRAM</string>
+            </attribute>
+            <layout class="QVBoxLayout" name="vramLayout">
+              <item>
+                <widget class="QTableWidget" name="vramDataTable">
+                  <property name="alternatingRowColors">
+                  <bool>true</bool>
+                  </property>
+                  <property name="selectionMode">
+                  <enum>QAbstractItemView::NoSelection</enum>
+                  </property>
+                  <property name="columnCount">
+                  <number>16</number>
+                  </property>
+                  <property name="rowCount">
+                  <number>10</number>
+                  </property>
+                  <property name="key" stdset="0">
+                  <string>VRAM</string>
+                  </property>
+                  <property name="type" stdset="0">
+                  <string>table</string>
+                  </property>
+                  <property name="mask" stdset="0">
+                  <string>0x%0.1X</string>
+                  </property>
+                  <attribute name="horizontalHeaderMinimumSectionSize">
+                  <number>0</number>
+                  </attribute>
+                  <attribute name="verticalHeaderMinimumSectionSize">
+                  <number>0</number>
+                  </attribute>
+                  <row>
+                  <property name="text">
+                    <string>00</string>
+                  </property>
+                  </row>
+                  <row>
+                  <property name="text">
+                    <string>10</string>
+                  </property>
+                  </row>
+                  <row>
+                  <property name="text">
+                    <string>20</string>
+                  </property>
+                  </row>
+                  <row>
+                  <property name="text">
+                    <string>30</string>
+                  </property>
+                  </row>
+                  <row>
+                  <property name="text">
+                    <string>40</string>
+                  </property>
+                  </row>
+                  <row>
+                  <property name="text">
+                    <string>50</string>
+                  </property>
+                  </row>
+                  <row>
+                  <property name="text">
+                    <string>60</string>
+                  </property>
+                  </row>
+                  <row>
+                  <property name="text">
+                    <string>70</string>
+                  </property>
+                  </row>
+                  <row>
+                  <property name="text">
+                    <string>80</string>
+                  </property>
+                  </row>
+                  <row>
+                  <property name="text">
+                    <string>90</string>
+                  </property>
+                  </row>
+                  <column>
+                  <property name="text">
+                    <string>00</string>
+                  </property>
+                  </column>
+                  <column>
+                  <property name="text">
+                    <string>01</string>
+                  </property>
+                  </column>
+                  <column>
+                  <property name="text">
+                    <string>02</string>
+                  </property>
+                  </column>
+                  <column>
+                  <property name="text">
+                    <string>03</string>
+                  </property>
+                  </column>
+                  <column>
+                  <property name="text">
+                    <string>04</string>
+                  </property>
+                  </column>
+                  <column>
+                  <property name="text">
+                    <string>05</string>
+                  </property>
+                  </column>
+                  <column>
+                  <property name="text">
+                    <string>06</string>
+                  </property>
+                  </column>
+                  <column>
+                  <property name="text">
+                    <string>07</string>
+                  </property>
+                  </column>
+                  <column>
+                  <property name="text">
+                    <string>08</string>
+                  </property>
+                  </column>
+                  <column>
+                  <property name="text">
+                    <string>09</string>
+                  </property>
+                  </column>
+                  <column>
+                  <property name="text">
+                    <string>0A</string>
+                  </property>
+                  </column>
+                  <column>
+                  <property name="text">
+                    <string>0B</string>
+                  </property>
+                  </column>
+                  <column>
+                  <property name="text">
+                    <string>0C</string>
+                  </property>
+                  </column>
+                  <column>
+                  <property name="text">
+                    <string>0D</string>
+                  </property>
+                  </column>
+                  <column>
+                  <property name="text">
+                    <string>0E</string>
+                  </property>
+                  </column>
+                  <column>
+                  <property name="text">
+                    <string>0F</string>
+                  </property>
+                  </column>
+                  <item row="0" column="0">
+                  <property name="text">
+                    <string>0x0</string>
+                  </property>
+                  </item>
+                  <item row="0" column="1">
+                  <property name="text">
+                    <string>0x0</string>
+                  </property>
+                  </item>
+                  <item row="0" column="2">
+                  <property name="text">
+                    <string>0x0</string>
+                  </property>
+                  </item>
+                  <item row="0" column="3">
+                  <property name="text">
+                    <string>0x0</string>
+                  </property>
+                  </item>
+                  <item row="0" column="4">
+                  <property name="text">
+                    <string>0x0</string>
+                  </property>
+                  </item>
+                  <item row="0" column="5">
+                  <property name="text">
+                    <string>0x0</string>
+                  </property>
+                  </item>
+                  <item row="0" column="6">
+                  <property name="text">
+                    <string>0x0</string>
+                  </property>
+                  </item>
+                  <item row="0" column="7">
+                  <property name="text">
+                    <string>0x0</string>
+                  </property>
+                  </item>
+                  <item row="0" column="8">
+                  <property name="text">
+                    <string>0x0</string>
+                  </property>
+                  </item>
+                  <item row="0" column="9">
+                  <property name="text">
+                    <string>0x0</string>
+                  </property>
+                  </item>
+                  <item row="0" column="10">
+                  <property name="text">
+                    <string>0x0</string>
+                  </property>
+                  </item>
+                  <item row="0" column="11">
+                  <property name="text">
+                    <string>0x0</string>
+                  </property>
+                  </item>
+                  <item row="0" column="12">
+                  <property name="text">
+                    <string>0x0</string>
+                  </property>
+                  </item>
+                  <item row="0" column="13">
+                  <property name="text">
+                    <string>0x0</string>
+                  </property>
+                  </item>
+                  <item row="0" column="14">
+                  <property name="text">
+                    <string>0x0</string>
+                  </property>
+                  </item>
+                  <item row="0" column="15">
+                  <property name="text">
+                    <string>0x0</string>
+                  </property>
+                  </item>
+                  <item row="1" column="0"/>
+                  <item row="1" column="1"/>
+                  <item row="1" column="2"/>
+                  <item row="1" column="3"/>
+                  <item row="1" column="4"/>
+                  <item row="1" column="5"/>
+                  <item row="1" column="6"/>
+                  <item row="1" column="7"/>
+                  <item row="1" column="8"/>
+                  <item row="1" column="9"/>
+                  <item row="1" column="10"/>
+                  <item row="1" column="11"/>
+                  <item row="1" column="12"/>
+                  <item row="1" column="13"/>
+                  <item row="1" column="14"/>
+                  <item row="1" column="15"/>
+                  <item row="2" column="0"/>
+                  <item row="2" column="1"/>
+                  <item row="2" column="2"/>
+                  <item row="2" column="3"/>
+                  <item row="2" column="4"/>
+                  <item row="2" column="5"/>
+                  <item row="2" column="6"/>
+                  <item row="2" column="7"/>
+                  <item row="2" column="8"/>
+                  <item row="2" column="9"/>
+                  <item row="2" column="10"/>
+                  <item row="2" column="11"/>
+                  <item row="2" column="12"/>
+                  <item row="2" column="13"/>
+                  <item row="2" column="14"/>
+                  <item row="2" column="15"/>
+                  <item row="3" column="0"/>
+                  <item row="3" column="1"/>
+                  <item row="3" column="2"/>
+                  <item row="3" column="3"/>
+                  <item row="3" column="4"/>
+                  <item row="3" column="5"/>
+                  <item row="3" column="6"/>
+                  <item row="3" column="7"/>
+                  <item row="3" column="8"/>
+                  <item row="3" column="9"/>
+                  <item row="3" column="10"/>
+                  <item row="3" column="11"/>
+                  <item row="3" column="12"/>
+                  <item row="3" column="13"/>
+                  <item row="3" column="14"/>
+                  <item row="3" column="15"/>
+                  <item row="4" column="0"/>
+                  <item row="4" column="1"/>
+                  <item row="4" column="2"/>
+                  <item row="4" column="3"/>
+                  <item row="4" column="4"/>
+                  <item row="4" column="5"/>
+                  <item row="4" column="6"/>
+                  <item row="4" column="7"/>
+                  <item row="4" column="8"/>
+                  <item row="4" column="9"/>
+                  <item row="4" column="10"/>
+                  <item row="4" column="11"/>
+                  <item row="4" column="12"/>
+                  <item row="4" column="13"/>
+                  <item row="4" column="14"/>
+                  <item row="4" column="15"/>
+                  <item row="5" column="0"/>
+                  <item row="5" column="1"/>
+                  <item row="5" column="2"/>
+                  <item row="5" column="3"/>
+                  <item row="5" column="4"/>
+                  <item row="5" column="5"/>
+                  <item row="5" column="6"/>
+                  <item row="5" column="7"/>
+                  <item row="5" column="8"/>
+                  <item row="5" column="9"/>
+                  <item row="5" column="10"/>
+                  <item row="5" column="11"/>
+                  <item row="5" column="12"/>
+                  <item row="5" column="13"/>
+                  <item row="5" column="14"/>
+                  <item row="5" column="15"/>
+                  <item row="6" column="0"/>
+                  <item row="6" column="1"/>
+                  <item row="6" column="2"/>
+                  <item row="6" column="3"/>
+                  <item row="6" column="4"/>
+                  <item row="6" column="5"/>
+                  <item row="6" column="6"/>
+                  <item row="6" column="7"/>
+                  <item row="6" column="8"/>
+                  <item row="6" column="9"/>
+                  <item row="6" column="10"/>
+                  <item row="6" column="11"/>
+                  <item row="6" column="12"/>
+                  <item row="6" column="13"/>
+                  <item row="6" column="14"/>
+                  <item row="6" column="15"/>
+                  <item row="7" column="0"/>
+                  <item row="7" column="1"/>
+                  <item row="7" column="2"/>
+                  <item row="7" column="3"/>
+                  <item row="7" column="4"/>
+                  <item row="7" column="5"/>
+                  <item row="7" column="6"/>
+                  <item row="7" column="7"/>
+                  <item row="7" column="8"/>
+                  <item row="7" column="9"/>
+                  <item row="7" column="10"/>
+                  <item row="7" column="11"/>
+                  <item row="7" column="12"/>
+                  <item row="7" column="13"/>
+                  <item row="7" column="14"/>
+                  <item row="7" column="15"/>
+                  <item row="8" column="0"/>
+                  <item row="8" column="1"/>
+                  <item row="8" column="2"/>
+                  <item row="8" column="3"/>
+                  <item row="8" column="4"/>
+                  <item row="8" column="5"/>
+                  <item row="8" column="6"/>
+                  <item row="8" column="7"/>
+                  <item row="8" column="8"/>
+                  <item row="8" column="9"/>
+                  <item row="8" column="10"/>
+                  <item row="8" column="11"/>
+                  <item row="8" column="12"/>
+                  <item row="8" column="13"/>
+                  <item row="8" column="14"/>
+                  <item row="8" column="15"/>
+                  <item row="9" column="0"/>
+                  <item row="9" column="1"/>
+                  <item row="9" column="2"/>
+                  <item row="9" column="3"/>
+                  <item row="9" column="4"/>
+                  <item row="9" column="5"/>
+                  <item row="9" column="6"/>
+                  <item row="9" column="7"/>
+                  <item row="9" column="8"/>
+                  <item row="9" column="9"/>
+                  <item row="9" column="10"/>
+                  <item row="9" column="11"/>
+                  <item row="9" column="12"/>
+                  <item row="9" column="13"/>
+                  <item row="9" column="14"/>
+                  <item row="9" column="15"/>
+                </widget>
+              </item>
+            </layout>
+          </widget>
+          <widget class="QWidget" name="tabVRAM">
+            <attribute name="title">
+              <string>IORAM</string>
+            </attribute>
+            <layout class="QVBoxLayout" name="vramLayout">
+              <item>
+                <widget class="QTableWidget" name="ioramDataTable">
+                  <property name="alternatingRowColors">
+                  <bool>true</bool>
+                  </property>
+                  <property name="selectionMode">
+                  <enum>QAbstractItemView::NoSelection</enum>
+                  </property>
+                  <property name="columnCount">
+                  <number>1</number>
+                  </property>
+                  <property name="rowCount">
+                  <number>48</number>
+                  </property>
+                  <property name="key" stdset="0">
+                  <string>IORAM</string>
+                  </property>
+                  <property name="type" stdset="0">
+                  <string>table</string>
+                  </property>
+                  <property name="mask" stdset="0">
+                  <string>0x%0.1X</string>
+                  </property>
+                  <attribute name="horizontalHeaderMinimumSectionSize">
+                  <number>0</number>
+                  </attribute>
+                  <attribute name="verticalHeaderMinimumSectionSize">
+                  <number>0</number>
+                  </attribute>
+                  <attribute name="horizontalHeaderVisible">
+                    <bool>false</bool>
+                  </attribute>
+                  
+                  <row>
+                  <property name="text">
+                    <string>IT</string>
+                  </property>
+                  </row>
+                  <row>
+                  <property name="text">
+                    <string>ISW</string>
+                  </property>
+                  </row>
+                  <row>
+                  <property name="text">
+                    <string>IPT</string>
+                  </property>
+                  </row>
+                  <row>
+                  <property name="text">
+                    <string>ISIO</string>
+                  </property>
+                  </row>
+                  <row>
+                  <property name="text">
+                    <string>IK0</string>
+                  </property>
+                  </row>
+                  <row>
+                  <property name="text">
+                    <string>IK1</string>
+                  </property>
+                  </row>
+                  <row>
+                  <property name="text">
+                    <string>EIT</string>
+                  </property>
+                  </row>
+                  <row>
+                  <property name="text">
+                    <string>EISW</string>
+                  </property>
+                  </row>
+                  <row>
+                  <property name="text">
+                    <string>EIPT</string>
+                  </property>
+                  </row>
+                  <row>
+                  <property name="text">
+                    <string>EISO</string>
+                  </property>
+                  </row>
+                  <row>
+                  <property name="text">
+                    <string>EIK0</string>
+                  </property>
+                  </row>
+                  <row>
+                  <property name="text">
+                    <string>EIK1</string>
+                  </property>
+                  </row>
+                  <row>
+                  <property name="text">
+                    <string>TM</string>
+                  </property>
+                  </row>
+                  <row>
+                  <property name="text">
+                    <string>TM</string>
+                  </property>
+                  </row>
+                  <row>
+                  <property name="text">
+                    <string>SWL</string>
+                  </property>
+                  </row>
+                  <row>
+                  <property name="text">
+                    <string>SWH</string>
+                  </property>
+                  </row>
+                  <row>
+                  <property name="text">
+                    <string>PT</string>
+                  </property>
+                  </row>
+                  <row>
+                  <property name="text">
+                    <string>PT</string>
+                  </property>
+                  </row>
+                  <row>
+                  <property name="text">
+                    <string>RD</string>
+                  </property>
+                  </row>
+                  <row>
+                  <property name="text">
+                    <string>RD</string>
+                  </property>
+                  </row>
+                  <row>
+                  <property name="text">
+                    <string>SD</string>
+                  </property>
+                  </row>
+                  <row>
+                  <property name="text">
+                    <string>SD</string>
+                  </property>
+                  </row>
+                  <row>
+                  <property name="text">
+                    <string>K0</string>
+                  </property>
+                  </row>
+                  <row>
+                  <property name="text">
+                    <string>DFK0</string>
+                  </property>
+                  </row>
+                  <row>
+                  <property name="text">
+                    <string>K1</string>
+                  </property>
+                  </row>
+                  <row>
+                  <property name="text">
+                    <string>R0</string>
+                  </property>
+                  </row>
+                  <row>
+                  <property name="text">
+                    <string>R1</string>
+                  </property>
+                  </row>
+                  <row>
+                  <property name="text">
+                    <string>R2</string>
+                  </property>
+                  </row>
+                  <row>
+                  <property name="text">
+                    <string>R3</string>
+                  </property>
+                  </row>
+                  <row>
+                  <property name="text">
+                    <string>R4</string>
+                  </property>
+                  </row>
+                  <row>
+                  <property name="text">
+                    <string>P0</string>
+                  </property>
+                  </row>
+                  <row>
+                  <property name="text">
+                    <string>P1</string>
+                  </property>
+                  </row>
+                  <row>
+                  <property name="text">
+                    <string>P2</string>
+                  </property>
+                  </row>
+                  <row>
+                  <property name="text">
+                    <string>P3</string>
+                  </property>
+                  </row>
+                  <row>
+                  <property name="text">
+                    <string>CTRL_OSC</string>
+                  </property>
+                  </row>
+                  <row>
+                  <property name="text">
+                    <string>CTRL_LCD</string>
+                  </property>
+                  </row>
+                  <row>
+                  <property name="text">
+                    <string>LC</string>
+                  </property>
+                  </row>
+                  <row>
+                  <property name="text">
+                    <string>CTRL_SVD</string>
+                  </property>
+                  </row>
+                  <row>
+                  <property name="text">
+                    <string>CTRL_BZ1</string>
+                  </property>
+                  </row>
+                  <row>
+                  <property name="text">
+                    <string>CTRL_BZ2</string>
+                  </property>
+                  </row>
+                  <row>
+                  <property name="text">
+                    <string>CTRL_TM</string>
+                  </property>
+                  </row>
+                  <row>
+                  <property name="text">
+                    <string>CTRL_SW</string>
+                  </property>
+                  </row>
+                  <row>
+                  <property name="text">
+                    <string>CTRL_PT</string>
+                  </property>
+                  </row>
+                  <row>
+                  <property name="text">
+                    <string>PTC</string>
+                  </property>
+                  </row>
+                  <row>
+                  <property name="text">
+                    <string>SC</string>
+                  </property>
+                  </row>
+                  <row>
+                  <property name="text">
+                    <string>HZR</string>
+                  </property>
+                  </row>
+                  <row>
+                  <property name="text">
+                    <string>IOC</string>
+                  </property>
+                  </row>
+                  <row>
+                  <property name="text">
+                    <string>PUP</string>
+                  </property>
+                  </row>
+                  <item row="0" column="0">
+                    <property name="text">
+                      <string>0x0</string>
+                    </property>
+                  </item>
+                  <item row="1" column="0"/>
+                  <item row="2" column="0"/>
+                  <item row="3" column="0"/>
+                  <item row="4" column="0"/>
+                  <item row="5" column="0"/>
+                  <item row="6" column="0"/>
+                  <item row="7" column="0"/>
+                  <item row="8" column="0"/>
+                  <item row="9" column="0"/>
+                  <item row="10" column="0"/>
+                  <item row="11" column="0"/>
+                  <item row="12" column="0"/>
+                  <item row="13" column="0"/>
+                  <item row="14" column="0"/>
+                  <item row="15" column="0"/>
+                  <item row="16" column="0"/>
+                  <item row="17" column="0"/>
+                  <item row="18" column="0"/>
+                  <item row="19" column="0"/>
+                  <item row="20" column="0"/>
+                  <item row="21" column="0"/>
+                  <item row="22" column="0"/>
+                  <item row="23" column="0"/>
+                  <item row="24" column="0"/>
+                  <item row="25" column="0"/>
+                  <item row="26" column="0"/>
+                  <item row="27" column="0"/>
+                  <item row="28" column="0"/>
+                  <item row="29" column="0"/>
+                  <item row="30" column="0"/>
+                  <item row="31" column="0"/>
+                  <item row="32" column="0"/>
+                  <item row="33" column="0"/>
+                  <item row="34" column="0"/>
+                  <item row="35" column="0"/>
+                  <item row="36" column="0"/>
+                  <item row="37" column="0"/>
+                  <item row="38" column="0"/>
+                  <item row="39" column="0"/>
+                  <item row="40" column="0"/>
+                  <item row="41" column="0"/>
+                  <item row="42" column="0"/>
+                  <item row="43" column="0"/>
+                  <item row="44" column="0"/>
+                  <item row="45" column="0"/>
+                  <item row="46" column="0"/>
+                  <item row="47" column="0"/>
+                </widget>
+              </item>
+            </layout>
+          </widget>
+        </widget>
+      </item>
+      <item row="0" column="0">
+        <widget class="QGroupBox" name="flagsGroupBox">
+        <property name="title">
+          <string> Flags </string>
+        </property>
+        <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0,0,0,0">
+          <property name="spacing">
+          <number>4</number>
+          </property>
+          <item>
+          <widget class="QCheckBox" name="cfCheckBox">
+            <property name="toolTip">
+            <string>Carry flag</string>
+            </property>
+            <property name="layoutDirection">
+            <enum>Qt::RightToLeft</enum>
+            </property>
+            <property name="text">
+            <string>CF</string>
+            </property>
+            <property name="key" stdset="0">
+            <string>CF</string>
+            </property>
+            <property name="type" stdset="0">
+            <string>boolean</string>
+            </property>
+          </widget>
+          </item>
+          <item>
+          <widget class="QCheckBox" name="zfCheckBox">
+            <property name="toolTip">
+            <string>Zero flag</string>
+            </property>
+            <property name="layoutDirection">
+            <enum>Qt::RightToLeft</enum>
+            </property>
+            <property name="text">
+            <string>ZF</string>
+            </property>
+            <property name="key" stdset="0">
+            <string>ZF</string>
+            </property>
+            <property name="type" stdset="0">
+            <string>boolean</string>
+            </property>
+          </widget>
+          </item>
+          <item>
+          <widget class="QCheckBox" name="dfCheckBox">
+            <property name="toolTip">
+            <string>Decimal adjuster mod flag</string>
+            </property>
+            <property name="layoutDirection">
+            <enum>Qt::RightToLeft</enum>
+            </property>
+            <property name="text">
+            <string>DF</string>
+            </property>
+            <property name="key" stdset="0">
+            <string>DF</string>
+            </property>
+            <property name="type" stdset="0">
+            <string>boolean</string>
+            </property>
+          </widget>
+          </item>
+          <item>
+          <widget class="QCheckBox" name="ifCheckBox">
+            <property name="toolTip">
+            <string>Enable interrupt flag</string>
+            </property>
+            <property name="layoutDirection">
+            <enum>Qt::RightToLeft</enum>
+            </property>
+            <property name="text">
+            <string>IF</string>
+            </property>
+            <property name="key" stdset="0">
+            <string>IF</string>
+            </property>
+            <property name="type" stdset="0">
+            <string>boolean</string>
+            </property>
+          </widget>
+          </item>
+          <item>
+          <widget class="QCheckBox" name="haltCheckBox">
+            <property name="toolTip">
+            <string>Halt mode</string>
+            </property>
+            <property name="layoutDirection">
+            <enum>Qt::RightToLeft</enum>
+            </property>
+            <property name="text">
+            <string>HALT</string>
+            </property>
+            <property name="key" stdset="0">
+            <string>HALT</string>
+            </property>
+            <property name="type" stdset="0">
+            <string>boolean</string>
+            </property>
+          </widget>
+          </item>
+        </layout>
+        </widget>
+      </item>
+      </layout>
+    </widget>
+    </widget>
+    <widget class="QTabWidget" name="tabWidget">
+    <property name="currentIndex">
+      <number>0</number>
+    </property>
+    <property name="tabBarAutoHide">
+      <bool>true</bool>
+    </property>
+    <widget class="QWidget" name="tab">
+      <property name="enabled">
+      <bool>true</bool>
+      </property>
+      <attribute name="title">
+      <string>Page</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_7">
+      <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_7">
+        <property name="spacing">
+          <number>0</number>
+        </property>
+        <item>
+          <widget class="QPushButton" name="runButton">
+          <property name="enabled">
+            <bool>false</bool>
+          </property>
+          <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+            </sizepolicy>
+          </property>
+          <property name="toolTip">
+            <string>Run</string>
+          </property>
+          <property name="icon">
+            <iconset>
+            <normaloff>run.svg</normaloff>run.svg</iconset>
+          </property>
+          <property name="iconSize">
+            <size>
+            <width>14</width>
+            <height>14</height>
+            </size>
+          </property>
+          <property name="flat">
+            <bool>true</bool>
+          </property>
+          </widget>
+        </item>
+        <item>
+          <widget class="QPushButton" name="pauseButton">
+          <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+            </sizepolicy>
+          </property>
+          <property name="toolTip">
+            <string>Pause</string>
+          </property>
+          <property name="icon">
+            <iconset>
+            <normaloff>pause.svg</normaloff>pause.svg</iconset>
+          </property>
+          <property name="iconSize">
+            <size>
+            <width>14</width>
+            <height>14</height>
+            </size>
+          </property>
+          <property name="flat">
+            <bool>true</bool>
+          </property>
+          </widget>
+        </item>
+        <item>
+          <widget class="QPushButton" name="stopButton">
+          <property name="enabled">
+            <bool>true</bool>
+          </property>
+          <property name="toolTip">
+            <string>Stop</string>
+          </property>
+          <property name="icon">
+            <iconset>
+            <normaloff>stop.svg</normaloff>stop.svg</iconset>
+          </property>
+          <property name="iconSize">
+            <size>
+            <width>14</width>
+            <height>14</height>
+            </size>
+          </property>
+          <property name="flat">
+            <bool>true</bool>
+          </property>
+          </widget>
+        </item>
+        <item>
+          <widget class="QPushButton" name="stepButton">
+          <property name="enabled">
+            <bool>false</bool>
+          </property>
+          <property name="toolTip">
+            <string>Step</string>
+          </property>
+          <property name="icon">
+            <iconset>
+            <normaloff>step.svg</normaloff>step.svg</iconset>
+          </property>
+          <property name="iconSize">
+            <size>
+            <width>14</width>
+            <height>14</height>
+            </size>
+          </property>
+          <property name="autoRepeat">
+            <bool>true</bool>
+          </property>
+          <property name="flat">
+            <bool>true</bool>
+          </property>
+          </widget>
+        </item>
+        <item>
+          <spacer name="horizontalSpacer">
+          <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+            <size>
+            <width>40</width>
+            <height>20</height>
+            </size>
+          </property>
+          </spacer>
+        </item>
+        </layout>
+      </item>
+      <item>
+        <widget class="QTableWidget" name="listingTable">
+        <property name="focusPolicy">
+          <enum>Qt::NoFocus</enum>
+        </property>
+        <property name="editTriggers">
+          <set>QAbstractItemView::DoubleClicked|QAbstractItemView::EditKeyPressed</set>
+        </property>
+        <property name="selectionMode">
+          <enum>QAbstractItemView::SingleSelection</enum>
+        </property>
+        <property name="selectionBehavior">
+          <enum>QAbstractItemView::SelectRows</enum>
+        </property>
+        <property name="showGrid">
+          <bool>false</bool>
+        </property>
+        <property name="columnCount">
+          <number>3</number>
+        </property>
+        <property name="key" stdset="0">
+          <string>LISTING</string>
+        </property>
+        <property name="type" stdset="0">
+          <string>listing</string>
+        </property>
+        <attribute name="horizontalHeaderVisible">
+          <bool>false</bool>
+        </attribute>
+        <attribute name="horizontalHeaderStretchLastSection">
+          <bool>true</bool>
+        </attribute>
+        <attribute name="verticalHeaderVisible">
+          <bool>false</bool>
+        </attribute>
+        <attribute name="verticalHeaderMinimumSectionSize">
+          <number>0</number>
+        </attribute>
+        <column/>
+        <column/>
+        <column/>
+        </widget>
+      </item>
+      </layout>
+    </widget>
+    </widget>
+  </widget>
+  </item>
+</layout>
+<action name="actionDebug">
+  <property name="checkable">
+    <bool>true</bool>
+  </property>
+</action>
+</widget>
+
+<connections>
+  <connection>
+   <sender>cfCheckBox</sender>
+   <signal>stateChanged(int)</signal>
+   <receiver>DebugWidget</receiver>
+   <slot>checkBoxStateChanged()</slot>
+  </connection>
+  <connection>
+   <sender>zfCheckBox</sender>
+   <signal>stateChanged(int)</signal>
+   <receiver>DebugWidget</receiver>
+   <slot>checkBoxStateChanged()</slot>
+  </connection>
+  <connection>
+   <sender>dfCheckBox</sender>
+   <signal>stateChanged(int)</signal>
+   <receiver>DebugWidget</receiver>
+   <slot>checkBoxStateChanged()</slot>
+  </connection>
+  <connection>
+   <sender>ifCheckBox</sender>
+   <signal>stateChanged(int)</signal>
+   <receiver>DebugWidget</receiver>
+   <slot>checkBoxStateChanged()</slot>
+  </connection>
+  <connection>
+   <sender>haltCheckBox</sender>
+   <signal>stateChanged(int)</signal>
+   <receiver>DebugWidget</receiver>
+   <slot>checkBoxStateChanged()</slot>
+  </connection>
+  <connection>
+    <sender>pcEdit</sender>
+    <signal>editingFinished()</signal>
+    <receiver>DebugWidget</receiver>
+    <slot>lineEditFinished()</slot>
+  </connection>
+  <connection>
+    <sender>npcEdit</sender>
+    <signal>editingFinished()</signal>
+    <receiver>DebugWidget</receiver>
+    <slot>lineEditFinished()</slot>
+  </connection>
+  <connection>
+   <sender>spEdit</sender>
+   <signal>editingFinished()</signal>
+   <receiver>DebugWidget</receiver>
+   <slot>lineEditFinished()</slot>
+  </connection>
+  <connection>
+   <sender>aEdit</sender>
+   <signal>editingFinished()</signal>
+   <receiver>DebugWidget</receiver>
+   <slot>lineEditFinished()</slot>
+  </connection>
+  <connection>
+   <sender>bEdit</sender>
+   <signal>editingFinished()</signal>
+   <receiver>DebugWidget</receiver>
+   <slot>lineEditFinished()</slot>
+  </connection>
+  <connection>
+   <sender>ixEdit</sender>
+   <signal>editingFinished()</signal>
+   <receiver>DebugWidget</receiver>
+   <slot>lineEditFinished()</slot>
+  </connection>
+  <connection>
+   <sender>iyEdit</sender>
+   <signal>editingFinished()</signal>
+   <receiver>DebugWidget</receiver>
+   <slot>lineEditFinished()</slot>
+  </connection>
+  <connection>
+   <sender>ram0DataTable</sender>
+   <signal>itemChanged(QTableWidgetItem*)</signal>
+   <receiver>DebugWidget</receiver>
+   <slot>tableItemChanged()</slot>
+  </connection>
+  <connection>
+   <sender>ram1DataTable</sender>
+   <signal>itemChanged(QTableWidgetItem*)</signal>
+   <receiver>DebugWidget</receiver>
+   <slot>tableItemChanged()</slot>
+  </connection>
+  <connection>
+   <sender>ram2DataTable</sender>
+   <signal>itemChanged(QTableWidgetItem*)</signal>
+   <receiver>DebugWidget</receiver>
+   <slot>tableItemChanged()</slot>
+  </connection>
+  <connection>
+   <sender>vramDataTable</sender>
+   <signal>itemChanged(QTableWidgetItem*)</signal>
+   <receiver>DebugWidget</receiver>
+   <slot>tableItemChanged()</slot>
+  </connection>
+  <connection>
+   <sender>ioramDataTable</sender>
+   <signal>itemChanged(QTableWidgetItem*)</signal>
+   <receiver>DebugWidget</receiver>
+   <slot>tableItemChanged()</slot>
+  </connection>
+
+  <connection>
+    <sender>actionDebug</sender>
+    <signal>toggled(bool)</signal>
+    <receiver>runButton</receiver>
+    <slot>setEnabled(bool)</slot>
+  </connection>
+  <connection>
+    <sender>actionDebug</sender>
+    <signal>toggled(bool)</signal>
+    <receiver>stopButton</receiver>
+    <slot>setDisabled(bool)</slot>
+  </connection>
+  <connection>
+    <sender>actionDebug</sender>
+    <signal>toggled(bool)</signal>
+    <receiver>pauseButton</receiver>
+    <slot>setDisabled(bool)</slot>
+  </connection>
+  <connection>
+    <sender>actionDebug</sender>
+    <signal>toggled(bool)</signal>
+    <receiver>stepButton</receiver>
+    <slot>setEnabled(bool)</slot>
+  </connection>
+
+  <connection>
+    <sender>runButton</sender>
+    <signal>clicked()</signal>
+    <receiver>DebugWidget</receiver>
+    <slot>debugRunSignal()</slot>
+  </connection>
+  <connection>
+    <sender>stopButton</sender>
+    <signal>clicked()</signal>
+    <receiver>DebugWidget</receiver>
+    <slot>debugStopSignal()</slot>
+  </connection>
+  <connection>
+    <sender>pauseButton</sender>
+    <signal>clicked()</signal>
+    <receiver>DebugWidget</receiver>
+    <slot>debugPauseSignal()</slot>
+  </connection>
+  <connection>
+    <sender>stepButton</sender>
+    <signal>clicked()</signal>
+    <receiver>DebugWidget</receiver>
+    <slot>debugStepSignal()</slot>
+  </connection>
+  <connection>
+    <sender>listingTable</sender>
+    <signal>itemChanged(QTableWidgetItem*)</signal>
+    <receiver>DebugWidget</receiver>
+    <slot>listingTableChanged()</slot>
+  </connection>
+
+  <connection>
+    <sender>memTabWidget</sender>
+    <signal>currentChanged(int)</signal>
+    <receiver>DebugWidget</receiver>
+    <slot>refrashStateSignal()</slot>
+  </connection>
+</connections>
+ 
+ <slots>
+  <slot>lineEditFinished()</slot>
+  <slot>tableItemChanged()</slot>
+  <slot>checkBoxStateChanged()</slot>
+  <slot>debugRunSignal()</slot>
+  <slot>debugStopSignal()</slot>
+  <slot>debugPauseSignal()</slot>
+  <slot>debugStepSignal()</slot>
+  <slot>listingTableChanged()</slot>
+  <slot>refrashStateSignal()</slot>
+ </slots>
+</ui>
