@@ -59,7 +59,7 @@ class AudioData(QIODevice):
             if (newSample != prevSample):
                 prevSample = newSample
                 sample = -newSample if (noise and (random.random() > 0.5)) else newSample
-            squareWaveData.append((sample & 0xFFFF).to_bytes(2))
+            squareWaveData.append((sample & 0xFFFF).to_bytes(2, 'big'))
         self._phase += (size // 2) * mul
         return squareWaveData    
     
