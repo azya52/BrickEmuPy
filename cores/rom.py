@@ -34,7 +34,7 @@ class ROM():
                     self._ROM = bytearray(bin_f.read())
                     self._rom_size = len(self._ROM)
             except FileNotFoundError as e:
-                print(e.strerror, e.filename)
+                raise FileNotFoundError(e.errno, "ROM file not found, please add the required ROM to this path", e.filename)
 
     def examine(self):
         return {

@@ -11,5 +11,6 @@ if __name__ == '__main__':
     except FileNotFoundError as e:
         print(e.strerror, e.filename)
 
-    Window().show()
+    window = Window()
+    window.show()
     sys.exit(app.exec())

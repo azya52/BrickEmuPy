@@ -1,6 +1,7 @@
 from PyQt6 import QtCore, QtGui, QtWidgets, QtSvgWidgets, QtSvg
 from PyQt6.QtCore import Qt, pyqtSlot
-from PyQt6.QtWidgets import QGraphicsScene
+from PyQt6.QtWidgets import QGraphicsScene, QMessageBox
+from functools import partial
 
 from brick import Brick
 
@@ -24,19 +25,35 @@ class BrickWidget(QtWidgets.QGraphicsView):
         self.setBackgroundRole(QtGui.QPalette.ColorRole.NoRole)
         self.setFrameStyle(0)
 
-        self._examine = examine
-
-        self._draw(self._config["face_path"])        
-
-        self._brick = Brick(self._config, self)
+        self._brick = Brick(config)
+        self._brick.uiDisplayUpdateSignal.connect(self.render)
+        self._brick.examineSignal.connect(examine)
+        self._brick.errorSignal.connect(self.error)
         
+        self._draw(config["face_path"])
+
         self._brickThread = QtCore.QThread()
         self._brick.moveToThread(self._brickThread)
         self._brickThread.started.connect(self._brick.run)
-        self._brickThread.finished.connect(self._brick.finish)
         self._brickThread.finished.connect(self._brick.deleteLater)
         self._brickThread.finished.connect(self._brickThread.deleteLater)
         self._brickThread.start(QtCore.QThread.Priority.LowestPriority)
+
+    def __del__(self):
+        self._brick.uiDisplayUpdateSignal.disconnect()
+        self._brick.examineSignal.disconnect()
+        self._brick.errorSignal.disconnect()
+        try:
+            self._brickThread.requestInterruption()
+            self._brickThread.quit()
+            self._brickThread.wait(1000)
+            self._brickThread.terminate()
+            self._brickThread.wait()
+            del self._brick
+        except:
+            pass
+
+        self._saveSettings()
 
     @pyqtSlot(dict)
     def editState(self, state):
@@ -59,34 +76,28 @@ class BrickWidget(QtWidgets.QGraphicsView):
         self._scene_rect = None
         self._fitBrickInView()
 
+    @pyqtSlot()
     def step(self):
         self._brick.debugStep()
 
+    @pyqtSlot()
     def pause(self):
         self._brick.debugPause()
     
+    @pyqtSlot()
     def stop(self):
         self._brick.debugStop()
     
+    @pyqtSlot()
     def run(self):
         self._brick.debugRun()
 
     def setBreakpoint(self, pc, checked):
         self._brick.setBreakpoint(pc, checked)
 
-    def setSpeed(self, speed):
-        self._brick.setSpeed(speed)
-
-    def closeEvent(self, event):
-        self._brickThread.requestInterruption()
-        self._brickThread.quit()
-        self._brickThread.wait(1000)
-        self._brickThread.terminate()
-        self._brickThread.wait()
-
-        self._saveSettings()
-
-        return super().closeEvent(event)
+    @pyqtSlot()
+    def setSpeed(self):
+        self._brick.setSpeed(self.sender().checkedAction().property("factor"))
     
     def _fitBrickInView(self):
         if self._scene_rect is not None:
@@ -129,6 +140,8 @@ class BrickWidget(QtWidgets.QGraphicsView):
         self.setScene(QGraphicsScene())
         self.scene().setItemIndexMethod(QGraphicsScene.ItemIndexMethod.NoIndex)
         faceRenderer = QtSvg.QSvgRenderer(faceSVG)
+        if (not faceRenderer.isValid()):
+            QMessageBox(parent=self, text="Error loading SVG file").exec()
         
         body = QtSvgWidgets.QGraphicsSvgItem()
         body.setSharedRenderer(faceRenderer)
@@ -146,7 +159,7 @@ class BrickWidget(QtWidgets.QGraphicsView):
                     segment.setPos(faceRenderer.boundsOnElement(nextId).topLeft())
                     self.scene().addItem(segment)
                     self._segments.append((ramNibble, ramBit, segment))
-     
+
         for name, value in self._config["buttons"].items():
             if (faceRenderer.elementExists(name)):
                 btn = QtWidgets.QPushButton(objectName = "brickButton")
@@ -155,10 +168,8 @@ class BrickWidget(QtWidgets.QGraphicsView):
                 for shortcut in value["hot_keys"]:
                     shortcuts += Qt.Key(shortcut).name + ", "
                 btn.setToolTip(shortcuts[:-2])
-                btn.pressed.connect(lambda port = value["port"], pin = value["pin"], level = value["level"]: 
-                                    self._brick.btnPressed(port, pin, level))
-                btn.released.connect(lambda port = value["port"], pin = value["pin"], level = value["level"]: 
-                                    self._brick.btnReleased(port, pin))
+                btn.pressed.connect(partial(self._brick.btnPressed, value["port"], value["pin"], value["level"]))
+                btn.released.connect(partial(self._brick.btnReleased, value["port"], value["pin"]))
                 self.scene().addWidget(btn)
 
     @pyqtSlot(tuple)
@@ -167,7 +178,7 @@ class BrickWidget(QtWidgets.QGraphicsView):
             if (len(RAM) > nibble):
                 segment.setOpacity(0.40 * ((RAM[nibble] >> bit) & 0x1) + 0.60 * segment.opacity())
 
-    @pyqtSlot(dict)
-    def examineSlot(self, info):
-        if (self._examine != None):
-            self._examine(info)
+    @pyqtSlot(str)
+    def error(self, error):
+        QMessageBox(parent=self, text=error).exec()
+        self.close()

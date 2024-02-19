@@ -23,8 +23,9 @@ class Brick(QObject):
     editStateSignal = pyqtSignal(dict)
     uiDisplayUpdateSignal = pyqtSignal(tuple)
     setConfigSignal = pyqtSignal(dict)
+    errorSignal = pyqtSignal(str)
 
-    def __init__(self, config, ui):
+    def __init__(self, config):
         super().__init__()
         self._config = config
 
@@ -38,9 +39,8 @@ class Brick(QObject):
         self.stopSignal.connect(self._stop)
         self.setSpeedSignal.connect(self._setSpeed)
         self.editStateSignal.connect(self._editState)
-        self.uiDisplayUpdateSignal.connect(ui.render)
-        self.examineSignal.connect(ui.examineSlot)
 
+        
     @pyqtSlot()
     def run(self):
         self._breakpoints = {}
@@ -48,28 +48,16 @@ class Brick(QObject):
         self._cycleTimeNs = self._getMCicleTimeNs()
         self._icounterOnStop = 0
 
-        self._setConfig(self._config)
+        try:
+            self._setConfig(self._config)
+        except Exception as e:
+            self.errorSignal.emit(str(e))
+            return
 
         self._uiDisplayUpdate()
         self._uiExamineUpdate()
         
         self._clock()
-
-    @pyqtSlot()
-    def finish(self):
-        self.btnPressSignal.disconnect()
-        self.btnReleaseSignal.disconnect()
-        self.setBreakpointSignal.disconnect()
-        self.runSignal.disconnect()
-        self.pauseSignal.disconnect()
-        self.stepSignal.disconnect()
-        self.stopSignal.disconnect()
-        self.setConfigSignal.disconnect()
-        self.setSpeedSignal.disconnect()
-        self.editStateSignal.disconnect()
-        self.examineSignal.disconnect()
-        self.uiDisplayUpdateSignal.disconnect()
-        del self._CPU
     
     @pyqtSlot(dict)
     def _editState(self, state):
@@ -150,7 +138,7 @@ class Brick(QObject):
     def _uiExamineUpdate(self):
         self.examineSignal.emit({
             **self._CPU.examine(),
-            **{"ICTR": self._CPU.istr_counter() - self._icounterOnStop}
+            "ICTR": self._CPU.istr_counter() - self._icounterOnStop
         })
 
     @pyqtSlot(str, int, int)

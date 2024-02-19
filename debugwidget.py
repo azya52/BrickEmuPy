@@ -1,5 +1,6 @@
 from PyQt6 import uic, QtCore, QtGui, QtWidgets
 from PyQt6.QtCore import Qt, pyqtSignal, pyqtSlot, QByteArray
+from PyQt6.QtWidgets import QMessageBox
 import time
 
 class DebugWidget(QtWidgets.QWidget):
@@ -11,28 +12,30 @@ class DebugWidget(QtWidgets.QWidget):
 
     def __init__(self, core_name, breakpoints):
         super().__init__()
-        try:
-            uic.loadUi("ui/" + core_name + ".ui", self)
-        except Exception as e:
-            print(str(e))
 
         self._breakpoints = breakpoints
         self._examineMap = {}
+
+        try:
+            uic.loadUi("ui/" + core_name + ".ui", self)
+        except Exception as e:
+            QMessageBox(parent=self, text=str(e)).exec()
+            self.close()
+
         self.prepareWidgetMap()
+
+    def __del__(self):
+        self.editStateSignal.disconnect()
+        self.debugRunSignal.disconnect()
+        self.debugStopSignal.disconnect()
+        self.debugPauseSignal.disconnect()
+        self.debugStepSignal.disconnect()
     
     def showEvent(self, event):
         for tableView in self.findChildren(QtWidgets.QTableWidget):
             tableView.resizeRowsToContents()
             tableView.resizeColumnsToContents()
         super().showEvent(event)
-
-    def closeEvent(self, event):
-        self.editStateSignal.disconnect()
-        self.debugRunSignal.disconnect()
-        self.debugStopSignal.disconnect()
-        self.debugPauseSignal.disconnect()
-        self.debugStepSignal.disconnect()
-        super().closeEvent(event)
 
     def prepareWidgetMap(self):
         for widget in self.findChildren((QtWidgets.QLineEdit, QtWidgets.QCheckBox, QtWidgets.QTableView)):

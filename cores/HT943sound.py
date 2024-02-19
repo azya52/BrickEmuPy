@@ -30,7 +30,7 @@ class HT943sound():
                 with open(mask["sound_rom_path"], "rb") as bin_f:
                     self._sROM = bytearray(bin_f.read())
             except FileNotFoundError as e:
-                print(e.strerror, e.filename)
+                raise FileNotFoundError(e.errno, "Sound ROM file not found, please add the required sound ROM to this path", e.filename)
         self._sROM += bytearray([0] * (SROM_SIZE - len(self._sROM)))
         self._sROM = self._sROM[:SROM_SIZE]
 

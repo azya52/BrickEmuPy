@@ -2,14 +2,6 @@
 <ui version="4.0">
  <class>MainWindow</class>
  <widget class="QMainWindow" name="MainWindow">
-  <property name="geometry">
-   <rect>
-    <x>0</x>
-    <y>0</y>
-    <width>1041</width>
-    <height>826</height>
-   </rect>
-  </property>
   <property name="minimumSize">
    <size>
     <width>150</width>
@@ -65,14 +57,6 @@
    </layout>
   </widget>
   <widget class="QMenuBar" name="menubar">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>1041</width>
-     <height>21</height>
-    </rect>
-   </property>
    <widget class="QMenu" name="menuDebug">
     <property name="title">
      <string>Debug</string>
@@ -183,73 +167,99 @@
     <string>Shift+F5</string>
    </property>
   </action>
-  <action name="actionSpeedx01">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>x0.1</string>
-   </property>
-  </action>
-  <action name="actionSpeedx02">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>x0.2</string>
-   </property>
-  </action>
-  <action name="actionSpeedx05">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>x0.5</string>
-   </property>
-  </action>
-  <action name="actionSpeedx1">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="checked">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>x1</string>
-   </property>
-  </action>
-  <action name="actionSpeedx2">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>x2</string>
-   </property>
-  </action>
-  <action name="actionSpeedx5">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>x5</string>
-   </property>
-  </action>
-  <action name="actionSpeedx10">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>x10</string>
-   </property>
-  </action>
-  <action name="actionSpeedMax">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>Maximum</string>
-   </property>
-  </action>
+  <actiongroup name="speedGroup">
+    <action name="actionSpeedx01">
+    <property name="factor" stdset="0">
+      <double>10</double>
+    </property>
+    <property name="checkable">
+      <bool>true</bool>
+    </property>
+    <property name="text">
+      <string>x0.1</string>
+    </property>
+    </action>
+    <action name="actionSpeedx02">
+    <property name="factor" stdset="0">
+      <double>5</double>
+    </property>
+    <property name="checkable">
+      <bool>true</bool>
+    </property>
+    <property name="text">
+      <string>x0.2</string>
+    </property>
+    </action>
+    <action name="actionSpeedx05">
+    <property name="factor" stdset="0">
+      <double>2</double>
+    </property>
+    <property name="checkable">
+      <bool>true</bool>
+    </property>
+    <property name="text">
+      <string>x0.5</string>
+    </property>
+    </action>
+    <action name="actionSpeedx1">
+    <property name="factor" stdset="0">
+      <double>1</double>
+    </property>
+    <property name="checkable">
+      <bool>true</bool>
+    </property>
+    <property name="checked">
+      <bool>true</bool>
+    </property>
+    <property name="text">
+      <string>x1</string>
+    </property>
+    </action>
+    <action name="actionSpeedx2">
+    <property name="factor" stdset="0">
+      <double>0.5</double>
+    </property>
+    <property name="checkable">
+      <bool>true</bool>
+    </property>
+    <property name="text">
+      <string>x2</string>
+    </property>
+    </action>
+    <action name="actionSpeedx5">
+    <property name="factor" stdset="0">
+      <double>0.2</double>
+    </property>
+    <property name="checkable">
+      <bool>true</bool>
+    </property>
+    <property name="text">
+      <string>x5</string>
+    </property>
+    </action>
+    <action name="actionSpeedx10">
+    <property name="factor" stdset="0">
+      <double>0.1</double>
+    </property>
+    <property name="checkable">
+      <bool>true</bool>
+    </property>
+    <property name="text">
+      <string>x10</string>
+    </property>
+    </action>
+    <action name="actionSpeedMax">
+    <property name="factor" stdset="0">
+      <double>0</double>
+    </property>
+    <property name="checkable">
+      <bool>true</bool>
+    </property>
+    <property name="text">
+      <string>Maximum</string>
+    </property>
+    </action>
+  </actiongroup>
   <action name="actionactionKeyCodes">
    <property name="checkable">
     <bool>true</bool>
@@ -266,131 +276,48 @@
    <signal>triggered()</signal>
    <receiver>MainWindow</receiver>
    <slot>close()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>464</x>
-     <y>402</y>
-    </hint>
-   </hints>
   </connection>
   <connection>
    <sender>actionStop</sender>
    <signal>triggered()</signal>
    <receiver>actionDebug</receiver>
    <slot>toggle()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-   </hints>
   </connection>
   <connection>
    <sender>actionPause</sender>
    <signal>triggered()</signal>
    <receiver>actionDebug</receiver>
    <slot>toggle()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-   </hints>
   </connection>
   <connection>
    <sender>actionRun</sender>
    <signal>triggered()</signal>
    <receiver>actionDebug</receiver>
    <slot>toggle()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-   </hints>
   </connection>
   <connection>
    <sender>actionDebug</sender>
    <signal>toggled(bool)</signal>
    <receiver>actionRun</receiver>
    <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-   </hints>
   </connection>
   <connection>
    <sender>actionDebug</sender>
    <signal>toggled(bool)</signal>
    <receiver>actionStop</receiver>
    <slot>setDisabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-   </hints>
   </connection>
   <connection>
    <sender>actionDebug</sender>
    <signal>toggled(bool)</signal>
    <receiver>actionPause</receiver>
    <slot>setDisabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-   </hints>
   </connection>
   <connection>
    <sender>actionDebug</sender>
    <signal>toggled(bool)</signal>
    <receiver>actionStep</receiver>
    <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-   </hints>
   </connection>
  </connections>
- <slots>
-  <slot>debugTabCurrentChanged()</slot>
- </slots>
 </ui>
