@@ -1,0 +1,36 @@
+{
+	"id": "49236f71-6338-4284-8aa0-93e250739d38",
+	"core": "E0C6200",
+	"face_path": "./assets/TamagotchiP1.svg",
+	"clock": 32768,
+	
+	"buttons": {
+		"btnLeft": {
+			"port": "K0",
+			"pin": 2,
+			"level": 0,
+			"hot_keys": [49]
+		},
+		"btnCenter": {
+			"port": "K0",
+			"pin": 1,
+			"level": 0,
+			"hot_keys": [50]
+		},
+		"btnRight": {
+			"port": "K0",
+			"pin": 0,
+			"level": 0,
+			"hot_keys": [51]
+		}
+	},
+	
+	"mask_options": {
+		"rom_path": "./assets/TamagotchiP1.bin",
+		"port_pullup": {
+			"K0": 15,
+			"K1": 15
+		},
+		"p3_dedicated": 0
+	}
+}
