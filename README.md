@@ -1,6 +1,11 @@
 # BrickEmuPy
 Brick Game (aka Tetris) emulator in Python with PyQt6.<br/>
-Currently, two game are emulated: E-23 PLUS MARK II 96 in 1 and GA888 (Tetris Jr. clone)
+
+The following handheld games are currently emulated: 
+* E-23 PLUS MARK II 96 in 1
+* GA888 (Tetris Jr. clone)
+* Space Intruder TK-150I
+* Radio Shack Stack Challenge
 
 An [article](https://habr.com/ru/articles/773040/) describing the reverse engineering.
 
