@@ -45,7 +45,7 @@ class Brick(QObject):
     def run(self):
         self._breakpoints = {}
         self._debug = False
-        self._cycleTimeNs = self._getMCicleTimeNs()
+        self._cycleTimeNs = self._getCicleTimeNs()
         self._icounterOnStop = 0
 
         try:
@@ -151,9 +151,9 @@ class Brick(QObject):
 
     @pyqtSlot(float)
     def _setSpeed(self, speed):
-        self._cycleTimeNs = int(self._getMCicleTimeNs() * speed)
+        self._cycleTimeNs = int(self._getCicleTimeNs() * speed)
 
-    def _getMCicleTimeNs(self):
+    def _getCicleTimeNs(self):
         return 1000000000 / self._config["clock"]
 
     def debugRun(self):
