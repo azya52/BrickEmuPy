@@ -460,7 +460,7 @@ class E0C6200():
 
     def edit_state(self, state):
         if ("CF" in state):
-            self._PC = state["CF"]
+            self._CF = state["CF"]
         if ("ZF" in state):
             self._ZF = state["DF"]
         if ("DF" in state):
@@ -470,35 +470,35 @@ class E0C6200():
         if ("HALT" in state):
             self._HALT = state["HALT"]
         if ("PC" in state):
-            self._PC = state["PC"]
+            self._PC = state["PC"] & 0x1FFF
         if ("NPC" in state):
-            self._NPC = state["NPC"]
+            self._NPC = state["NPC"] & 0x1F00
         if ("SP" in state):
-            self._SP = state["SP"]
+            self._SP = state["SP"] & 0xFF
         if ("A" in state):
-            self._A = state["A"]
+            self._A = state["A"] & 0xF
         if ("B" in state):
-            self._B = state["B"]
+            self._B = state["B"] & 0xF
         if ("IX" in state):
-            self._IX = state["IX"]
+            self._IX = state["IX"] & 0xFF
         if ("IY" in state):
-            self._IY = state["Ix"]
+            self._IY = state["IY"] & 0xFF
         if ("RAM0" in state):
             for i, value in state["RAM0"].items():
-                self._RAM[i] = value
+                self._RAM[i] = value & 0xF
         if ("RAM1" in state):
             for i, value in state["RAM1"].items():
-                self._RAM[256 + i] = value
+                self._RAM[256 + i] = value & 0xF
         if ("RAM2" in state):
             for i, value in state["RAM2"].items():
-                self._RAM[512 + i] = value
+                self._RAM[512 + i] = value & 0xF
         if ("VRAM" in state):
             for i, value in state["VRAM"].items():
-                self._VRAM[i] = value
+                self._VRAM[i] = value & 0xF
         if ("IORAM" in state):
             for i, value in state["IORAM"].items():
                 if i < len(self._io_tbl):
-                    list(self._io_tbl.values())[i][1](self, value)
+                    list(self._io_tbl.values())[i][1](self, value & 0xF)
         if ("MEMORY" in state):
             self._ROM.writeWord(state["MEMORY"][0], state["MEMORY"][1])
 
