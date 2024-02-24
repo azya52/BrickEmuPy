@@ -43,30 +43,36 @@ class DebugWidget(QtWidgets.QWidget):
             if (key):
                 self._examineMap[key] = (widget, widget.property("type"), widget.property("mask"))
 
+    def str2int(self, value):
+        try:
+            return int(value, 0)
+        except ValueError:
+            return int(value, 16)
+
     @pyqtSlot()
     def lineEditFinished(self):
         self.sender().clearFocus()
         try:
-            self.editStateSignal.emit({self.sender().property("key"): int(self.sender().text(), 0)})
+            self.editStateSignal.emit({self.sender().property("key"): self.str2int(self.sender().text())})
         except ValueError:
-            pass
+            self.editStateSignal.emit({})
 
     @pyqtSlot(QtWidgets.QTableWidgetItem)
     def tableItemChanged(self, item):
         try:
-            self.editStateSignal.emit({self.sender().property("key"): {item.row() * self.sender().columnCount() + item.column(): int(item.text(), 0)}})
+            self.editStateSignal.emit({self.sender().property("key"): {
+                    item.row() * self.sender().columnCount() + item.column(): self.str2int(item.text())
+                }})
         except ValueError:
-            pass
+            self.editStateSignal.emit({})
 
     @pyqtSlot(QtWidgets.QTableWidgetItem)
     def listingTableChanged(self, item):
         if (item.column() == 1):
             try:
-                self.editStateSignal.emit(
-                    {"MEMORY": [item.row() * 2, int(item.text(), 0)]}
-                )
+                self.editStateSignal.emit({"MEMORY": [item.row() * 2, self.str2int(item.text())]})
             except ValueError:
-                pass
+                self.editStateSignal.emit({})
         else:
             self.editStateSignal.emit({"BRKPT": (item.row(), item.checkState() == Qt.CheckState.Checked)})
 
@@ -110,9 +116,9 @@ class DebugWidget(QtWidgets.QWidget):
                             item = itemAdr.clone()
                             if (i in self._breakpoints):
                                 item.setCheckState(Qt.CheckState.Checked)
-                            item.setText('0x%0.4X:' % i)
+                            item.setText(mask % i)
                             widget.setItem(i, 0, item)
-                            itemOpcode = QtWidgets.QTableWidgetItem(' %0.2X ' % instr[0])
+                            itemOpcode = QtWidgets.QTableWidgetItem(instr[0])
                             itemOpcode.setFlags(itemOpcode.flags() & ~QtCore.Qt.ItemFlag.ItemIsEditable)
                             widget.setItem(i, 1, itemOpcode)
                             itemAsm = QtWidgets.QTableWidgetItem(instr[1])

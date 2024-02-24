@@ -4,6 +4,7 @@ class HT943dasm():
         self._base = '0x%X'
         self._bytebase = '0x%0.2X'
         self._addrbase = '%0.3X'
+        self._opbase = '%0.2X'
 
         self._instructions = (
             HT943dasm._rr_a,                          #0 0 0 0 0 0 0 0
@@ -113,7 +114,7 @@ class HT943dasm():
                 if (listing[i] is None):
                     byte = rom.getByte(i)
                     listing[i] = (1, byte, 'db ' + self._bytebase % byte)
-                listing[i] = listing[i][1:] 
+                listing[i] = (self._opbase % listing[i][1], listing[i][2])
             
             return {"LISTING": tuple(listing)}
         else:
@@ -124,7 +125,7 @@ class HT943dasm():
         result = ""
         for i, line in enumerate(listing):
             if (i > 0 and listing[i - 1][0] < 2):
-                result += (self._addrbase % i) + ":\t" + (line[2] + "\t;" + '%0.2X' % line[1]).expandtabs(30) + "\n"
+                result += (self._addrbase % i) + ":\t" + (line[2] + "\t;" + self._opbase % line[1]).expandtabs(30) + "\n"
         with open('./assets/asm.asm', 'w') as f:
             f.write(result)
     

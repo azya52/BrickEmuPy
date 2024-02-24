@@ -325,7 +325,7 @@
                   <string>table</string>
                   </property>
                   <property name="mask" stdset="0">
-                  <string>0x%0.1X</string>
+                  <string>%0.1X</string>
                   </property>
                   <attribute name="horizontalHeaderMinimumSectionSize">
                   <number>0</number>
@@ -495,82 +495,82 @@
                   </column>
                   <item row="0" column="0">
                   <property name="text">
-                    <string>0x0</string>
+                    <string>0</string>
                   </property>
                   </item>
                   <item row="0" column="1">
                   <property name="text">
-                    <string>0x0</string>
+                    <string>0</string>
                   </property>
                   </item>
                   <item row="0" column="2">
                   <property name="text">
-                    <string>0x0</string>
+                    <string>0</string>
                   </property>
                   </item>
                   <item row="0" column="3">
                   <property name="text">
-                    <string>0x0</string>
+                    <string>0</string>
                   </property>
                   </item>
                   <item row="0" column="4">
                   <property name="text">
-                    <string>0x0</string>
+                    <string>0</string>
                   </property>
                   </item>
                   <item row="0" column="5">
                   <property name="text">
-                    <string>0x0</string>
+                    <string>0</string>
                   </property>
                   </item>
                   <item row="0" column="6">
                   <property name="text">
-                    <string>0x0</string>
+                    <string>0</string>
                   </property>
                   </item>
                   <item row="0" column="7">
                   <property name="text">
-                    <string>0x0</string>
+                    <string>0</string>
                   </property>
                   </item>
                   <item row="0" column="8">
                   <property name="text">
-                    <string>0x0</string>
+                    <string>0</string>
                   </property>
                   </item>
                   <item row="0" column="9">
                   <property name="text">
-                    <string>0x0</string>
+                    <string>0</string>
                   </property>
                   </item>
                   <item row="0" column="10">
                   <property name="text">
-                    <string>0x0</string>
+                    <string>0</string>
                   </property>
                   </item>
                   <item row="0" column="11">
                   <property name="text">
-                    <string>0x0</string>
+                    <string>0</string>
                   </property>
                   </item>
                   <item row="0" column="12">
                   <property name="text">
-                    <string>0x0</string>
+                    <string>0</string>
                   </property>
                   </item>
                   <item row="0" column="13">
                   <property name="text">
-                    <string>0x0</string>
+                    <string>0</string>
                   </property>
                   </item>
                   <item row="0" column="14">
                   <property name="text">
-                    <string>0x0</string>
+                    <string>0</string>
                   </property>
                   </item>
                   <item row="0" column="15">
                   <property name="text">
-                    <string>0x0</string>
+                    <string>0</string>
                   </property>
                   </item>
                   <item row="1" column="0"/>
@@ -843,7 +843,7 @@
                   <string>table</string>
                   </property>
                   <property name="mask" stdset="0">
-                  <string>0x%0.1X</string>
+                  <string>%0.1X</string>
                   </property>
                   <attribute name="horizontalHeaderMinimumSectionSize">
                   <number>0</number>
@@ -1013,82 +1013,82 @@
                   </column>
                   <item row="0" column="0">
                   <property name="text">
-                    <string>0x0</string>
+                    <string>0</string>
                   </property>
                   </item>
                   <item row="0" column="1">
                   <property name="text">
-                    <string>0x0</string>
+                    <string>0</string>
                   </property>
                   </item>
                   <item row="0" column="2">
                   <property name="text">
-                    <string>0x0</string>
+                    <string>0</string>
                   </property>
                   </item>
                   <item row="0" column="3">
                   <property name="text">
-                    <string>0x0</string>
+                    <string>0</string>
                   </property>
                   </item>
                   <item row="0" column="4">
                   <property name="text">
-                    <string>0x0</string>
+                    <string>0</string>
                   </property>
                   </item>
                   <item row="0" column="5">
                   <property name="text">
-                    <string>0x0</string>
+                    <string>0</string>
                   </property>
                   </item>
                   <item row="0" column="6">
                   <property name="text">
-                    <string>0x0</string>
+                    <string>0</string>
                   </property>
                   </item>
                   <item row="0" column="7">
                   <property name="text">
-                    <string>0x0</string>
+                    <string>0</string>
                   </property>
                   </item>
                   <item row="0" column="8">
                   <property name="text">
-                    <string>0x0</string>
+                    <string>0</string>
                   </property>
                   </item>
                   <item row="0" column="9">
                   <property name="text">
-                    <string>0x0</string>
+                    <string>0</string>
                   </property>
                   </item>
                   <item row="0" column="10">
                   <property name="text">
-                    <string>0x0</string>
+                    <string>0</string>
                   </property>
                   </item>
                   <item row="0" column="11">
                   <property name="text">
-                    <string>0x0</string>
+                    <string>0</string>
                   </property>
                   </item>
                   <item row="0" column="12">
                   <property name="text">
-                    <string>0x0</string>
+                    <string>0</string>
                   </property>
                   </item>
                   <item row="0" column="13">
                   <property name="text">
-                    <string>0x0</string>
+                    <string>0</string>
                   </property>
                   </item>
                   <item row="0" column="14">
                   <property name="text">
-                    <string>0x0</string>
+                    <string>0</string>
                   </property>
                   </item>
                   <item row="0" column="15">
                   <property name="text">
-                    <string>0x0</string>
+                    <string>0</string>
                   </property>
                   </item>
                   <item row="1" column="0"/>
@@ -1361,7 +1361,7 @@
                   <string>table</string>
                   </property>
                   <property name="mask" stdset="0">
-                  <string>0x%0.1X</string>
+                  <string>%0.1X</string>
                   </property>
                   <attribute name="horizontalHeaderMinimumSectionSize">
                   <number>0</number>
@@ -1491,82 +1491,82 @@
                   </column>
                   <item row="0" column="0">
                   <property name="text">
-                    <string>0x0</string>
+                    <string>0</string>
                   </property>
                   </item>
                   <item row="0" column="1">
                   <property name="text">
-                    <string>0x0</string>
+                    <string>0</string>
                   </property>
                   </item>
                   <item row="0" column="2">
                   <property name="text">
-                    <string>0x0</string>
+                    <string>0</string>
                   </property>
                   </item>
                   <item row="0" column="3">
                   <property name="text">
-                    <string>0x0</string>
+                    <string>0</string>
                   </property>
                   </item>
                   <item row="0" column="4">
                   <property name="text">
-                    <string>0x0</string>
+                    <string>0</string>
                   </property>
                   </item>
                   <item row="0" column="5">
                   <property name="text">
-                    <string>0x0</string>
+                    <string>0</string>
                   </property>
                   </item>
                   <item row="0" column="6">
                   <property name="text">
-                    <string>0x0</string>
+                    <string>0</string>
                   </property>
                   </item>
                   <item row="0" column="7">
                   <property name="text">
-                    <string>0x0</string>
+                    <string>0</string>
                   </property>
                   </item>
                   <item row="0" column="8">
                   <property name="text">
-                    <string>0x0</string>
+                    <string>0</string>
                   </property>
                   </item>
                   <item row="0" column="9">
                   <property name="text">
-                    <string>0x0</string>
+                    <string>0</string>
                   </property>
                   </item>
                   <item row="0" column="10">
                   <property name="text">
-                    <string>0x0</string>
+                    <string>0</string>
                   </property>
                   </item>
                   <item row="0" column="11">
                   <property name="text">
-                    <string>0x0</string>
+                    <string>0</string>
                   </property>
                   </item>
                   <item row="0" column="12">
                   <property name="text">
-                    <string>0x0</string>
+                    <string>0</string>
                   </property>
                   </item>
                   <item row="0" column="13">
                   <property name="text">
-                    <string>0x0</string>
+                    <string>0</string>
                   </property>
                   </item>
                   <item row="0" column="14">
                   <property name="text">
-                    <string>0x0</string>
+                    <string>0</string>
                   </property>
                   </item>
                   <item row="0" column="15">
                   <property name="text">
-                    <string>0x0</string>
+                    <string>0</string>
                   </property>
                   </item>
                   <item row="1" column="0"/>
@@ -1711,7 +1711,7 @@
                   <string>table</string>
                   </property>
                   <property name="mask" stdset="0">
-                  <string>0x%0.1X</string>
+                  <string>%0.1X</string>
                   </property>
                   <attribute name="horizontalHeaderMinimumSectionSize">
                   <number>0</number>
@@ -1851,82 +1851,82 @@
                   </column>
                   <item row="0" column="0">
                   <property name="text">
-                    <string>0x0</string>
+                    <string>0</string>
                   </property>
                   </item>
                   <item row="0" column="1">
                   <property name="text">
-                    <string>0x0</string>
+                    <string>0</string>
                   </property>
                   </item>
                   <item row="0" column="2">
                   <property name="text">
-                    <string>0x0</string>
+                    <string>0</string>
                   </property>
                   </item>
                   <item row="0" column="3">
                   <property name="text">
-                    <string>0x0</string>
+                    <string>0</string>
                   </property>
                   </item>
                   <item row="0" column="4">
                   <property name="text">
-                    <string>0x0</string>
+                    <string>0</string>
                   </property>
                   </item>
                   <item row="0" column="5">
                   <property name="text">
-                    <string>0x0</string>
+                    <string>0</string>
                   </property>
                   </item>
                   <item row="0" column="6">
                   <property name="text">
-                    <string>0x0</string>
+                    <string>0</string>
                   </property>
                   </item>
                   <item row="0" column="7">
                   <property name="text">
-                    <string>0x0</string>
+                    <string>0</string>
                   </property>
                   </item>
                   <item row="0" column="8">
                   <property name="text">
-                    <string>0x0</string>
+                    <string>0</string>
                   </property>
                   </item>
                   <item row="0" column="9">
                   <property name="text">
-                    <string>0x0</string>
+                    <string>0</string>
                   </property>
                   </item>
                   <item row="0" column="10">
                   <property name="text">
-                    <string>0x0</string>
+                    <string>0</string>
                   </property>
                   </item>
                   <item row="0" column="11">
                   <property name="text">
-                    <string>0x0</string>
+                    <string>0</string>
                   </property>
                   </item>
                   <item row="0" column="12">
                   <property name="text">
-                    <string>0x0</string>
+                    <string>0</string>
                   </property>
                   </item>
                   <item row="0" column="13">
                   <property name="text">
-                    <string>0x0</string>
+                    <string>0</string>
                   </property>
                   </item>
                   <item row="0" column="14">
                   <property name="text">
-                    <string>0x0</string>
+                    <string>0</string>
                   </property>
                   </item>
                   <item row="0" column="15">
                   <property name="text">
-                    <string>0x0</string>
+                    <string>0</string>
                   </property>
                   </item>
                   <item row="1" column="0"/>
@@ -2081,7 +2081,7 @@
             <attribute name="title">
               <string>IORAM</string>
             </attribute>
-            <layout class="QVBoxLayout" name="vramLayout">
+            <layout class="QVBoxLayout" name="ioramLayout">
               <item>
                 <widget class="QTableWidget" name="ioramDataTable">
                   <property name="alternatingRowColors">
@@ -2103,7 +2103,7 @@
                   <string>table</string>
                   </property>
                   <property name="mask" stdset="0">
-                  <string>0x%0.1X</string>
+                  <string>%0.1X</string>
                   </property>
                   <attribute name="horizontalHeaderMinimumSectionSize">
                   <number>0</number>
@@ -2687,6 +2687,9 @@
         </property>
         <property name="type" stdset="0">
           <string>listing</string>
+        </property>
+        <property name="mask" stdset="0">
+          <string>0x%0.4X</string>
         </property>
         <attribute name="horizontalHeaderVisible">
           <bool>false</bool>

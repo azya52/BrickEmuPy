@@ -572,7 +572,7 @@
                         <string>table</string>
                       </property>
                       <property name="mask" stdset="0">
-                        <string>0x%0.1X</string>
+                        <string>%0.1X</string>
                       </property>
                       <property name="alternatingRowColors">
                       <bool>true</bool>
@@ -754,82 +754,82 @@
                       </column>
                       <item row="0" column="0">
                       <property name="text">
-                        <string>0x0</string>
+                        <string>0</string>
                       </property>
                       </item>
                       <item row="0" column="1">
                       <property name="text">
-                        <string>0x0</string>
+                        <string>0</string>
                       </property>
                       </item>
                       <item row="0" column="2">
                       <property name="text">
-                        <string>0x0</string>
+                        <string>0</string>
                       </property>
                       </item>
                       <item row="0" column="3">
                       <property name="text">
-                        <string>0x0</string>
+                        <string>0</string>
                       </property>
                       </item>
                       <item row="0" column="4">
                       <property name="text">
-                        <string>0x0</string>
+                        <string>0</string>
                       </property>
                       </item>
                       <item row="0" column="5">
                       <property name="text">
-                        <string>0x0</string>
+                        <string>0</string>
                       </property>
                       </item>
                       <item row="0" column="6">
                       <property name="text">
-                        <string>0x0</string>
+                        <string>0</string>
                       </property>
                       </item>
                       <item row="0" column="7">
                       <property name="text">
-                        <string>0x0</string>
+                        <string>0</string>
                       </property>
                       </item>
                       <item row="0" column="8">
                       <property name="text">
-                        <string>0x0</string>
+                        <string>0</string>
                       </property>
                       </item>
                       <item row="0" column="9">
                       <property name="text">
-                        <string>0x0</string>
+                        <string>0</string>
                       </property>
                       </item>
                       <item row="0" column="10">
                       <property name="text">
-                        <string>0x0</string>
+                        <string>0</string>
                       </property>
                       </item>
                       <item row="0" column="11">
                       <property name="text">
-                        <string>0x0</string>
+                        <string>0</string>
                       </property>
                       </item>
                       <item row="0" column="12">
                       <property name="text">
-                        <string>0x0</string>
+                        <string>0</string>
                       </property>
                       </item>
                       <item row="0" column="13">
                       <property name="text">
-                        <string>0x0</string>
+                        <string>0</string>
                       </property>
                       </item>
                       <item row="0" column="14">
                       <property name="text">
-                        <string>0x0</string>
+                        <string>0</string>
                       </property>
                       </item>
                       <item row="0" column="15">
                       <property name="text">
-                        <string>0x0</string>
+                        <string>0</string>
                       </property>
                       </item>
                       <item row="1" column="0"/>
@@ -1227,6 +1227,9 @@
                 </property>
                 <property name="type" stdset="0">
                   <string>listing</string>
+                </property>
+                <property name="mask" stdset="0">
+                  <string>0x%0.3X</string>
                 </property>
                 <property name="focusPolicy">
                   <enum>Qt::NoFocus</enum>

@@ -9,6 +9,7 @@ class E0C6200dasm():
         self._bytebase = '0x%0.2X'
         self._wordbase = '0x%0.3X'
         self._addrbase = '%00.4X'
+        self._opbase = '%0.3X'
 
         self._abmxmy_tbl = (
             "A",
@@ -137,7 +138,7 @@ class E0C6200dasm():
                 if (opcode & PSETMASK == PSETOP):
                     pc = opcode << 8 & 0x1F00
                 opcode = rom.getWord(i * 2) & 0xFFF
-                listing[i] = (opcode, self._instruction_tbl[opcode](self, pc, opcode))
+                listing[i] = (self._opbase % opcode, self._instruction_tbl[opcode](self, pc, opcode))
             return {"LISTING": tuple(listing)}
         else:
             return {}
