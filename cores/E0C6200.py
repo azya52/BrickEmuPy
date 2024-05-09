@@ -10,8 +10,7 @@ TIMER_CLOCK_DIV = OSC1_CLOCK / 256
 STOPWATCH_CLOCK_DIV = OSC1_CLOCK / 100
 PTIMER_CLOCK_DIV = [0, 0, OSC1_CLOCK / 256, OSC1_CLOCK / 512, OSC1_CLOCK / 1024, OSC1_CLOCK / 2048, OSC1_CLOCK / 4096, OSC1_CLOCK / 8192]
 
-ROM_SIZE = 0x3000
-RAM_SIZE = 0x280
+RAM_SIZE = 0x300
 VRAM_PART1_OFFSET = 0xE00
 VRAM_PART2_OFFSET = 0xE80
 VRAM_PART_SIZE = 0x050
@@ -247,7 +246,7 @@ class E0C6200():
             0xF62: (E0C6200._get_io_p2, E0C6200._set_io_p2),
             0xF63: (E0C6200._get_io_p3, E0C6200._set_io_p3),
 
-            0xF70: (E0C6200._get_io_dummy, E0C6200._set_io_dummy), #to-do
+            0xF70: (E0C6200._get_io_ctrl_osc, E0C6200._set_io_ctrl_osc), #to-do
             0xF71: (E0C6200._get_io_ctrl_lcd, E0C6200._set_io_ctrl_lcd),
             0xF72: (E0C6200._get_io_lc, E0C6200._set_io_lc),
             0xF73: (E0C6200._get_io_ctrl_svd, E0C6200._set_io_dummy), #to-do
@@ -517,7 +516,7 @@ class E0C6200():
         self._DF = 0
         self._IF = 0
 
-        self._RAM = [0] * 640
+        self._RAM = [0] * RAM_SIZE
         self._VRAM = [0] * 160
         
         self._HALT = 0
@@ -798,7 +797,12 @@ class E0C6200():
     def _set_io_pup(self, value):
         self._PUP = value
 
+    def _get_io_ctrl_osc(self):
+        return self._CTRL_OSC
     
+    def _set_io_ctrl_osc(self, value):
+        self._CTRL_OSC = value
+
     def _get_io_ctrl_lcd(self):
         return self._CTRL_LCD
     
@@ -955,9 +959,9 @@ class E0C6200():
                     exec_cycles += self._interrupt(0xC)
                 elif (self._ISIO):
                     exec_cycles += self._interrupt(0xA)
-                elif (self._IK0):
-                    exec_cycles += self._interrupt(0x8)
                 elif (self._IK1):
+                    exec_cycles += self._interrupt(0x8)
+                elif (self._IK0):
                     exec_cycles += self._interrupt(0x6)
                 elif (self._ISW):
                     exec_cycles += self._interrupt(0x4)
@@ -968,8 +972,6 @@ class E0C6200():
             while (self._OSC1_counter <= 0):
                 self._OSC1_counter += self._OSC1_clock_div
                 self._clock_OSC1()
-                #if (self._CTRL_OSC & IO_CLKCHG):
-                #    return exec_cycles * self._OSC1_clock_div
         
         return exec_cycles
 
