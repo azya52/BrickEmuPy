@@ -6,6 +6,8 @@ The following handheld games are currently emulated:
 * GA888 (Tetris Jr. clone)
 * Space Intruder TK-150I
 * Radio Shack Stack Challenge
+* Tamagotchi P1 (distributed without ROM)
+* Tamagotchi Mothra (distributed without ROM)
 
 An [article](https://habr.com/ru/articles/773040/) describing the reverse engineering.
 
