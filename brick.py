@@ -73,21 +73,27 @@ class Brick(QObject):
         lastExamine = lastTick
         lastDisplayUpdate = lastTick
         while not(thread.isInterruptionRequested() or self._debug):
+            cycleTimeNs = self._cycleTimeNs
             ns = time.perf_counter_ns()
-            while (ns > lastTick and ns < lastDisplayUpdate and ns < lastExamine and not self._debug):     
-                lastTick += self._CPU.clock() * self._cycleTimeNs
-                if (self._CPU.pc() in self._breakpoints):
+            while (ns > lastTick and ns < lastDisplayUpdate and ns < lastExamine and not self._debug):
+                lastTick += self._CPU.clock() * cycleTimeNs
+                if (self._breakpoints and self._CPU.pc() in self._breakpoints):
                     self.examineSignal.emit({"DEBUG": True})
                     self._pause()
 
                 ns = time.perf_counter_ns()
-            
+
             if (ns > lastDisplayUpdate):
                 lastDisplayUpdate += DISPLAY_UPDTE_NS
                 self._uiDisplayUpdate()
             elif (ns > lastExamine):
                 lastExamine += EXAMINE_UPDTE_NS
                 self._uiExamineUpdate()
+
+            if (lastTick > ns):
+                time.sleep((lastTick - ns) / 1000000000)
+            else:
+                lastTick = ns
 
             QtCore.QCoreApplication.processEvents()
 
