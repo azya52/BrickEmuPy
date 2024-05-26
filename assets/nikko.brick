@@ -1,0 +1,36 @@
+{
+	"id": "1ceb0f40-10b6-403f-84cb-f6378d8859f5",
+	"core": "E0C6200",
+	"face_path": "./assets/nikko.svg",
+	"clock": 32768,
+	
+	"buttons": {
+		"btnLeft": {
+			"port": "K1",
+			"pin": 2,
+			"level": 0,
+			"hot_keys": [49]
+		},
+		"btnCenter": {
+			"port": "K1",
+			"pin": 1,
+			"level": 0,
+			"hot_keys": [50]
+		},
+		"btnRight": {
+			"port": "K1",
+			"pin": 0,
+			"level": 0,
+			"hot_keys": [51]
+		}
+	},
+	
+	"mask_options": {
+		"rom_path": "./assets/nikko.bin",
+		"port_pullup": {
+			"K0": 15,
+			"K1": 15
+		},
+		"p3_dedicated": 0
+	}
+}
