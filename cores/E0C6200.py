@@ -666,7 +666,7 @@ class E0C6200():
         return self._SWL & 0xF
 
     def _get_io_swh(self):
-        return self._SWH >> 4 & 0xF
+        return self._SWH & 0xF
 
     def _get_io_pt30(self):
         return self._PT & 0xF
