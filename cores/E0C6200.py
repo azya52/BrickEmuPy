@@ -3,19 +3,20 @@ from .E0C6200sound import E0C6200sound
 
 OSC1_CLOCK = 32768
 
-EMPTY_VRAM = tuple([0] * 160)
-FULL_VRAM = tuple([1] * 160)
-
 TIMER_CLOCK_DIV = OSC1_CLOCK / 256
 STOPWATCH_CLOCK_DIV = OSC1_CLOCK / 100
 PTIMER_CLOCK_DIV = [0, 0, OSC1_CLOCK / 256, OSC1_CLOCK / 512, OSC1_CLOCK / 1024, OSC1_CLOCK / 2048, OSC1_CLOCK / 4096, OSC1_CLOCK / 8192]
 
 RAM_SIZE = 0x300
+VRAM_SIZE = 0x0A0
 VRAM_PART1_OFFSET = 0xE00
 VRAM_PART2_OFFSET = 0xE80
 VRAM_PART_SIZE = 0x050
 IORAM_OFFSET = 0xF00
 IORAM_SIZE = 0x07F
+
+EMPTY_VRAM = tuple([0] * VRAM_SIZE)
+FULL_VRAM = tuple([1] * VRAM_SIZE)
 
 IO_IT1 = 8
 IO_IT2 = 4
@@ -517,7 +518,7 @@ class E0C6200():
         self._IF = 0
 
         self._RAM = [0] * RAM_SIZE
-        self._VRAM = [0] * 160
+        self._VRAM = [0] * VRAM_SIZE
         
         self._HALT = 0
 
@@ -1971,7 +1972,6 @@ class E0C6200():
     def _halt(self, opcode):
         #Halt (stop clock)
         self._HALT = 1
-        #self._IK0 |= IO_IK0
         self._PC = self._NPC = (self._PC & 0x1000) | (self._PC + 1 & 0xFFF)
 
         return 5           #1 1 1 1  1 1 1 1  1 0 0 0                          5
