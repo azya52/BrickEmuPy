@@ -8,6 +8,7 @@ The following handheld games are currently emulated:
 * Radio Shack Stack Challenge
 * Tamagotchi P1 (distributed without ROM)
 * Tamagotchi Mothra (distributed without ROM)
+* Nikko virtual pet
 
 An [article](https://habr.com/ru/articles/773040/) describing the reverse engineering.
 
