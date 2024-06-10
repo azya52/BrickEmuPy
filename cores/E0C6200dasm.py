@@ -147,7 +147,7 @@ class E0C6200dasm():
         listing = self.disassemble(rom)["LISTING"]
         result = ""
         for i, line in enumerate(listing):
-            result += (self._addrbase % i) + ":\t" + (line[1] + "\t;" + self._wordbase % line[0]).expandtabs(30) + "\n"
+            result += (self._addrbase % i) + ":\t" + (line[1] + "\t;" + line[0]).expandtabs(30) + "\n"
         with open(file_path, 'w') as f:
             f.write(result)
 

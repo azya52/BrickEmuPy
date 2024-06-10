@@ -462,7 +462,7 @@ class E0C6200():
         if ("CF" in state):
             self._CF = state["CF"]
         if ("ZF" in state):
-            self._ZF = state["DF"]
+            self._ZF = state["ZF"]
         if ("DF" in state):
             self._DF = state["DF"]
         if ("IF" in state):
