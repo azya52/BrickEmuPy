@@ -121,6 +121,7 @@ class Brick(QObject):
         self._CPU.reset()
         self._uiDisplayUpdate()
         self._uiExamineUpdate()
+        self._icounterOnStop = self._CPU.istr_counter()
             
     @pyqtSlot(int, bool)
     def _setBreakpoint(self, pc, add):
