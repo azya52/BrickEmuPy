@@ -1,0 +1,63 @@
+{
+	"id": "0a4ae325-1f46-4f2f-bfe0-634b7331ed26",
+	"core": "EM73000",
+	"face_path": "./assets/E33_2in1.svg",
+	"clock": 2000000,
+	
+	"buttons": {
+		"btnStart": {
+			"port": "P8",
+			"pin": 1,
+			"level": 0,
+			"hot_keys": [49]
+		},
+		"btnOnOff": {
+			"port": "P0",
+			"pin": 0,
+			"level": 0,
+			"hot_keys": [50]
+		},
+		"btnMute": {
+			"port": "P8",
+			"pin": 3,
+			"level": 0,
+			"hot_keys": [51]
+		},
+		"btnLeft": {
+			"port": "P7",
+			"pin": 2,
+			"level": 0,
+			"hot_keys": [65, 16777234]
+		},
+		"btnDown": {
+			"port": "P7",
+			"pin": 1,
+			"level": 0,
+			"hot_keys": [83, 16777237]
+		},
+		"btnRight": {
+			"port": "P7",
+			"pin": 3,
+			"level": 0,
+			"hot_keys": [68, 16777236]
+		},
+		"btnRotate": {
+			"port": "P7",
+			"pin": 0,
+			"level": 0,
+			"hot_keys": [32, 16777235, 16777220]
+		}
+	},
+	
+	"mask_options": {
+		"rom_path": "./assets/result.bin",
+		"port_pullup": {
+			"P0": 15,
+			"P7": 15
+		},
+		"port_wakeup": {
+			"P0": 1,
+			"P8": 0
+		}
+	}
+}
