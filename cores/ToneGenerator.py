@@ -6,7 +6,7 @@ from PyQt6.QtMultimedia import QAudioFormat, QAudioSink
 
 SAMPLE_RATE = 44100
 BUFFER_SIZE = 2048
-SOUND_LEVEL = (int) (32767 * 0.2)
+SOUND_LEVEL = (int) (32767 * 0.1)
 SAMPLES_PART_SIZE = 1000
 DATA_PART_SIZE = SAMPLES_PART_SIZE * 2
 
@@ -19,7 +19,7 @@ class AudioData(QIODevice):
         self._phase = 0
         self._sampleRate = sampleRate
         self._bytesPerSample = bytesPerSample
-        self._initTime = time.perf_counter()
+        self._initTime = time.process_time()# perf_counter()
         self.open(QIODeviceBase.OpenModeFlag.ReadOnly | QIODeviceBase.OpenModeFlag.Unbuffered)
         
     def readData(self, maxlen):
@@ -67,7 +67,7 @@ class AudioData(QIODevice):
         return DATA_PART_SIZE
         
     def start(self, freq, noise, dutyRatio):
-        goalTime = time.perf_counter() - self._initTime
+        goalTime = time.process_time() - self._initTime
         goalSample = DATA_PART_SIZE + int(self._sampleRate * goalTime) * self._bytesPerSample
         if (len(self._toneStarts) > len(self._toneEnds)):
             self._toneEnds.append(goalSample)
@@ -75,7 +75,7 @@ class AudioData(QIODevice):
             self._toneStarts.append([goalSample, freq, noise, dutyRatio])
 
     def startFor(self, freq, noise, duration, dutyRatio):
-        goalTime = time.perf_counter() - self._initTime
+        goalTime = time.process_time() - self._initTime
         goalSample = DATA_PART_SIZE + int(self._sampleRate * goalTime) * self._bytesPerSample
         if (len(self._toneStarts) > len(self._toneEnds)):
             self._toneEnds.append(goalSample)
@@ -87,7 +87,7 @@ class AudioData(QIODevice):
         
     def stop(self):
         if (len(self._toneStarts) > len(self._toneEnds)):
-            goalTime = time.perf_counter() - self._initTime
+            goalTime = time.process_time() - self._initTime
             goalSample = DATA_PART_SIZE + int(self._sampleRate * goalTime) * self._bytesPerSample
             self._toneEnds.append(goalSample)
 
@@ -109,7 +109,7 @@ class ToneGenerator(QAudioSink):
         self._audioData.start(freq, noise, dutyRatio)
 
     def startFor(self, freq, noise, duration, dutyRatio):
-        self._audioData.startFor(freq, noise, dutyRatio)
+        self._audioData.startFor(freq, noise, duration, dutyRatio)
         
     def stop(self):
         self._audioData.stop()
