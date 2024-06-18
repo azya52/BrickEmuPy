@@ -1,0 +1,72 @@
+{
+	"id": "0991a1a4-34cd-4ab9-b4b5-d62f1a94fd2e",
+	"core": "HT943",
+	"face_path": "./assets/E88_8in1.svg",
+	"clock": 1000000,
+	
+	"buttons": {
+		"btnStart": {
+			"port": "PS",
+			"pin": 0,
+			"level": 0,
+			"hot_keys": [49]
+		},
+		"btnOnOff": {
+			"port": "PS",
+			"pin": 2,
+			"level": 0,
+			"hot_keys": [50]
+		},
+		"btnMute": {
+			"port": "PS",
+			"pin": 1,
+			"level": 0,
+			"hot_keys": [51]
+		},
+		"btnLeft": {
+			"port": "PP",
+			"pin": 3,
+			"level": 0,
+			"hot_keys": [65, 16777234]
+		},
+		"btnDown": {
+			"port": "PP",
+			"pin": 1,
+			"level": 0,
+			"hot_keys": [83, 16777237]
+		},
+		"btnRight": {
+			"port": "PP",
+			"pin": 2,
+			"level": 0,
+			"hot_keys": [68, 16777236]
+		},
+		"btnRotate": {
+			"port": "PP",
+			"pin": 0,
+			"level": 0,
+			"hot_keys": [32, 16777235, 16777220]
+		}
+	},
+	
+	"mask_options": {
+		"rom_path": "./assets/E88_8in1.bin",
+		"sound_rom_path": "./assets/E23PlusMarkII96in1.srom",
+		"port_pullup": {
+			"PP": 15,
+			"PM": 15,
+			"PS": 15
+		},
+		"port_wakeup": {
+			"PP": 0,
+			"PM": 0,
+			"PS": 4
+		},
+		"PA_open_drain": 0,
+		"timer_clock_div": 16,
+		"sound_freq_div": 64,
+		"sound_speed_div": [7, 41, 103, 31, 63, 63, 109, 31, 123, 119, 1, 37, 17, 114, 11, 11],
+		"sound_effect": [0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0],
+		"sound_unknown": [0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0]
+	}
+}
