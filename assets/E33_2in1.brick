@@ -50,7 +50,7 @@
 	},
 	
 	"mask_options": {
-		"rom_path": "./assets/result.bin",
+		"rom_path": "./assets/E33_2in1.bin",
 		"port_pullup": {
 			"P0": 15,
 			"P7": 15
