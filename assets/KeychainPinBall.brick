@@ -1,0 +1,72 @@
+{
+	"id": "1fed76a3-9f3c-43b1-b253-9011e0733f1e",
+	"core": "HT943",
+	"face_path": "./assets/KeychainPinBall.svg",
+	"clock": 256000,
+	
+	"buttons": {
+		"btnLeft": {
+			"port": "PP",
+			"pin": 1,
+			"level": 0,
+			"hot_keys": [65, 16777234]
+		},
+		"btnRight": {
+			"port": "PP",
+			"pin": 0,
+			"level": 0,
+			"hot_keys": [68, 16777236]
+		},
+		"btnStartOn": {
+			"port": "PS",
+			"pin": 0,
+			"level": 0,
+			"hot_keys": [32, 16777235, 16777220]
+		},
+		"btnPause": {
+			"port": "PS",
+			"pin": 2,
+			"level": 0,
+			"hot_keys": [83, 16777237]
+		},
+		"btnReset": {
+			"port": "RES",
+			"pin": 0,
+			"level": 0,
+			"hot_keys": [51, 82]
+		},
+		"btnMute": {
+			"port": "PS",
+			"pin": 1,
+			"level": 0,
+			"hot_keys": [50]
+		},
+		"btnOff": {
+			"port": "PS",
+			"pin": 3,
+			"level": 0,
+			"hot_keys": [49]
+		}
+	},
+	
+	"mask_options": {
+		"rom_path": "./assets/KeychainPinBall.bin",
+		"sound_rom_path": "./assets/KeychainPinBall.srom",
+		"port_pullup": {
+			"PP": 15,
+			"PM": 15,
+			"PS": 15
+		},
+		"port_wakeup": {
+			"PP": 0,
+			"PM": 0,
+			"PS": 1
+		},
+		"PA_open_drain": 0,
+		"timer_clock_div": 16,
+		"sound_freq_div": 32,
+		"sound_speed_div":  [29, 125, 59, 17, 83, 60, 37, 100, 127, 117, 127, 127, 54, 14, 91, 127] ,
+		"sound_effect":  [0, 0, 0, 0, 0, 0, 0, 0, 7, 0, 7, 7, 0, 0, 0, 7] ,
+		"sound_unknown":  [1, 1, 1, 1, 1, 7, 1, 126, 127, 126, 127, 127, 1, 21, 7, 127]
+	}
+}
