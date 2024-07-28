@@ -12,6 +12,7 @@ The following handheld games are currently emulated:
 * Tamagotchi Mothra (distributed without ROM)
 * Nikko virtual pet
 * Keychain Pin Ball
+* Keychain 55 in 1
 
 An [article](https://habr.com/ru/articles/773040/) describing the reverse engineering.
 
