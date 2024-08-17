@@ -91,7 +91,7 @@ M_IM2_KR0TOKR3 = 3
 class KS56CX2X():
     def __init__(self, mask, clock):
         self._ROM = ROM(mask['rom_path'])
-        self._sound = KS56CX2Xsound()
+        self._sound = KS56CX2Xsound(clock)
 
         self._instr_counter = 0
         self._basic_timer_counter = 0
@@ -101,6 +101,8 @@ class KS56CX2X():
         self._timerWatch_counter = 0
         self._sub_clock_div = clock / SUB_CLOCK
         self._cpu_clock_div = MAIN_CLOCK_DIV[0]
+
+        self._cycle_counter = 0
         
         self._reset()
 
@@ -842,7 +844,7 @@ class KS56CX2X():
 
     def _set_io_port3(self, value):
         self._PORT3_OUT_LATCH = value
-        self._sound.update(value & 0x8)
+        self._sound.update(value & 0x8, self._cycle_counter)
 
     def _get_io_port5(self):
         return ~self._PORT5[0] & self._PORT5[1]
@@ -1022,6 +1024,7 @@ class KS56CX2X():
             if (IRQn > 0):
                 self._interrupt(IRQn)
         
+        self._cycle_counter += exec_cycles
         return exec_cycles
 
     def _get_mem(self, addr):

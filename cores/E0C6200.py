@@ -189,7 +189,7 @@ IO_PUP0 = 1
 class E0C6200():
     def __init__(self, mask, clock):
         self._ROM = ROM(mask['rom_path'])
-        self._sound = E0C6200sound(mask, OSC1_CLOCK)
+        self._sound = E0C6200sound(OSC1_CLOCK)
 
         self._port_pullup = mask['port_pullup']
 

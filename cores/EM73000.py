@@ -79,6 +79,7 @@ class EM73000():
         self._reset()
 
         self._instr_counter = 0
+        self._cycle_counter = 0
 
         self._io_tbl = {
             0: (EM73000._get_io_P0, EM73000._set_io_dummy),
@@ -306,7 +307,7 @@ class EM73000():
         self._P16 = value
 
     def _set_io_P23(self, value):
-        self._sound.set_freq_div(((self._P24 << 4) | value) + 1)
+        self._sound.set_freq_div(((self._P24 << 4) | value) + 1, self._cycle_counter)
         self._P23 = value
 
     def _set_io_P24(self, value):
@@ -328,7 +329,7 @@ class EM73000():
 
     def _set_io_P30(self, value):
         self._sound.set_basic_freq_div(4 << ((value & P30_BFREQ) >> 2))
-        self._sound.set_mode(value & P30_SMODE)
+        self._sound.set_mode(value & P30_SMODE, self._cycle_counter)
         self._P30 = value
 
     def examine(self):
@@ -502,8 +503,10 @@ class EM73000():
             exec_cycles = self._execute[opcode](self, opcode)
             self._instr_counter += 1
             self._process_timer(exec_cycles)
+            self._cycle_counter += exec_cycles
             return exec_cycles
 
+        self._cycle_counter += WARMUP_TIME[self._P16 & P16_SWWT]
         return WARMUP_TIME[self._P16 & P16_SWWT]
 
     def _sbr_a(self, opcode):

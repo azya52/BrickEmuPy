@@ -14,12 +14,12 @@ class EM73000sound():
 
         self._toneGenerator = ToneGenerator()
 
-    def update(self):
+    def update(self, current_cycle):
         if (self._mode != MODE_DISABLE and (self._freq_div > 1)):
             freq = self._system_clock / self._basic_freq_div / self._freq_div / 2
-            self._toneGenerator.addStart(freq, self._mode != MODE_TONE, 0.5)
+            self._toneGenerator.play(freq, self._mode != MODE_TONE, 0.5, current_cycle / self._system_clock)
         else:
-            self._toneGenerator.stop()
+            self._toneGenerator.stop(current_cycle / self._system_clock)
 
     def stop(self):
         self._toneGenerator.close()
@@ -28,10 +28,10 @@ class EM73000sound():
     def set_basic_freq_div(self, basic_freq_div):
         self._basic_freq_div = basic_freq_div
 
-    def set_freq_div(self, freq_div):
+    def set_freq_div(self, freq_div, current_cycle):
         self._freq_div = freq_div
-        self.update()
+        self.update(current_cycle)
 
-    def set_mode(self, mode):
+    def set_mode(self, mode, current_cycle):
         self._mode = mode
-        self.update()
+        self.update(current_cycle)

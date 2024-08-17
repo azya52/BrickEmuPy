@@ -23,6 +23,7 @@ class HT943sound():
         self._freq_div = mask["sound_freq_div"]
         self._speed_div = mask["sound_speed_div"]
         self._channel_effect = mask["sound_effect"]
+        self._cycle_counter = 0
 
         self._sROM = bytearray()
         if (mask["sound_rom_path"] != None):
@@ -37,16 +38,17 @@ class HT943sound():
         self._toneGenerator = ToneGenerator()
 
     def clock(self, exec_cycles):
+        self._cycle_counter += exec_cycles
         if (self._sound_on):
             self._clock_counter -= exec_cycles
             if (self._clock_counter <= 0):
                 self._clock_counter += LFSR2DIV[self._speed_div[self._channel]] * self._freq_div * 16
                 chanel_size = SINGLE_SIZE_CHANNEL_SIZE * ((self._channel >= SINGLE_SIZE_CHANNEL_COUNT) + 1)
-                self._toneGenerator.addStart(self._get_freq(), self._channel_effect[self._channel], 0.5)
+                self._toneGenerator.play(self._get_freq(), self._channel_effect[self._channel], 0.5, self._cycle_counter / self._system_clock)
                 self._note_counter = (self._note_counter + 1) % chanel_size
                 if ((self._note_counter == 0) and (not self._repeat_cycle)):
                     self._sound_on = False
-                    self._toneGenerator.stop()
+                    self._toneGenerator.stop(self._cycle_counter / self._system_clock)
 
     def _get_freq(self):
         chanel_offset = self._channel * SINGLE_SIZE_CHANNEL_SIZE
@@ -65,7 +67,7 @@ class HT943sound():
 
     def set_sound_off(self):
         self._sound_on = False
-        self._toneGenerator.stop()
+        self._toneGenerator.stop(self._cycle_counter / self._system_clock)
 
     def set_sound_channel(self, channel):
         self._sound_on = True
