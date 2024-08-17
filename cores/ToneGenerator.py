@@ -15,11 +15,11 @@ class AudioData(QIODevice):
         super().__init__()
         self._toneStarts = []
         self._toneEnds = []
-        self._pos = 0
+        self._currentByte = 0
         self._phase = 0
         self._sampleRate = sampleRate
         self._bytesPerSample = bytesPerSample
-        self._initTime = time.process_time()# perf_counter()
+        self._initTime = time.perf_counter()
         self.open(QIODeviceBase.OpenModeFlag.ReadOnly | QIODeviceBase.OpenModeFlag.Unbuffered)
         
     def readData(self, maxlen):
@@ -28,22 +28,25 @@ class AudioData(QIODevice):
         while maxlen:
             chunk = maxlen
             if (len(self._toneStarts) > 0):
-                if (self._pos < self._toneStarts[0][0]):
-                    chunk = min(maxlen, self._toneStarts[0][0] - self._pos)
+                if (self._currentByte < self._toneStarts[0][0]):
+                    chunk = min(maxlen, self._toneStarts[0][0] - self._currentByte)
                     data.append(chunk, b'\0')
                 elif (len(self._toneEnds) == 0):
                     data.append(self.getSquareWaveData(chunk, self._toneStarts[0][1], self._toneStarts[0][2], self._toneStarts[0][3]))
-                elif (self._pos < self._toneEnds[0]):
-                    chunk = min(maxlen, self._toneEnds[0] - self._pos)
+                elif (self._currentByte < self._toneEnds[0]):
+                    chunk = min(maxlen, self._toneEnds[0] - self._currentByte)
                     data.append(self.getSquareWaveData(chunk, self._toneStarts[0][1], self._toneStarts[0][2], self._toneStarts[0][3]))
                 else:
                     self._toneStarts.pop(0)
                     self._toneEnds.pop(0)
                     continue
             else:
-                data.append(chunk, b'\0')
+                self._toneEnds.clear()
+                self._initTime = time.perf_counter()
+                self._currentByte = 0
+                return data.append(chunk, b'\0')
 
-            self._pos += chunk
+            self._currentByte += chunk
             maxlen -= chunk
 
         return data
@@ -61,13 +64,13 @@ class AudioData(QIODevice):
                 sample = -newSample if (noise and (random.random() > 0.5)) else newSample
             squareWaveData.append((sample & 0xFFFF).to_bytes(2, 'big'))
         self._phase += (size // 2) * mul
-        return squareWaveData    
+        return squareWaveData
     
     def bytesAvailable(self):
         return DATA_PART_SIZE
         
     def start(self, freq, noise, dutyRatio):
-        goalTime = time.process_time() - self._initTime
+        goalTime = time.perf_counter() - self._initTime
         goalSample = DATA_PART_SIZE + int(self._sampleRate * goalTime) * self._bytesPerSample
         if (len(self._toneStarts) > len(self._toneEnds)):
             self._toneEnds.append(goalSample)
@@ -75,7 +78,7 @@ class AudioData(QIODevice):
             self._toneStarts.append([goalSample, freq, noise, dutyRatio])
 
     def startFor(self, freq, noise, duration, dutyRatio):
-        goalTime = time.process_time() - self._initTime
+        goalTime = time.perf_counter() - self._initTime
         goalSample = DATA_PART_SIZE + int(self._sampleRate * goalTime) * self._bytesPerSample
         if (len(self._toneStarts) > len(self._toneEnds)):
             self._toneEnds.append(goalSample)
@@ -87,7 +90,7 @@ class AudioData(QIODevice):
         
     def stop(self):
         if (len(self._toneStarts) > len(self._toneEnds)):
-            goalTime = time.process_time() - self._initTime
+            goalTime = time.perf_counter() - self._initTime
             goalSample = DATA_PART_SIZE + int(self._sampleRate * goalTime) * self._bytesPerSample
             self._toneEnds.append(goalSample)
 

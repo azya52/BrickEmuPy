@@ -15,6 +15,12 @@ class ROM():
         else:
             return 0
 
+    def getBytes(self, addres, count):
+        result = 0
+        for i in range(count):
+            result |= self._ROM[addres + i] << (8 * (count - i - 1))
+        return result
+
     def writeByte(self, addres, value):
         if (addres < self._rom_size):
             self._ROM[addres] = value
@@ -26,6 +32,9 @@ class ROM():
 
     def size(self):
         return self._rom_size
+
+    def getMask(self):
+        return (1 << self._rom_size.bit_length()) - 1
    
     def setRom(self, path):
         if (path != None):
