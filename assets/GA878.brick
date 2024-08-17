@@ -1,0 +1,55 @@
+{
+	"id": "521a8a5f-9113-4dd5-b5c9-4797ee8da37d",
+	"core": "KS56CX2X",
+	"face_path": "./assets/GA878.svg",
+	"clock": 1000000,
+	
+	"buttons": {
+		"btnOnPause": {
+			"port": "PORT6",
+			"pin": 2,
+			"level": 0,
+			"hot_keys": [49, 80]
+		},
+		"btnSound": {
+			"port": "PORT1",
+			"pin": 3,
+			"level": 0,
+			"hot_keys": [50]
+		},
+		"btnMode": {
+			"port": "PORT6",
+			"pin": 1,
+			"level": 0,
+			"hot_keys": [51, 82]
+		},
+		"btnLeft": {
+			"port": "PORT1",
+			"pin": 3,
+			"level": 0,
+			"hot_keys": [65, 16777234]
+		},
+		"btnRight": {
+			"port": "PORT1",
+			"pin": 2,
+			"level": 0,
+			"hot_keys": [68, 16777236]
+		},
+		"btnDown": {
+			"port": "PORT6",
+			"pin": 0,
+			"level": 0,
+			"hot_keys": [83, 16777237]
+		},
+		"btnRotate": {
+			"port": "PORT6",
+			"pin": 1,
+			"level": 0,
+			"hot_keys": [32, 16777220]
+		}
+	},
+	
+	"mask_options": {
+		"rom_path": "./assets/GA878.bin"
+	}
+}
