@@ -2,10 +2,10 @@
 Brick Game emulator in Python with PyQt6.<br/>
 
 The following handheld games are currently emulated: 
-* Brick Game E-23 PLUS MARK II 96 in 1
+* Brick Game E-23 PLUS MARK II 96 in 1 (An [article](https://habr.com/ru/articles/773040/) describing the reverse engineering.)
 * Brick Game E-88 8 in 1
 * Brick Game E-33 2 in 1
-* Block Game & Echo Key A888 (Tetris Jr. clone)
+* Block Game & Echo Key GA888 (Tetris Jr. clone)
 * Space Intruder TK-150I
 * Radio Shack Stack Challenge
 * Tamagotchi P1 (distributed without ROM)
@@ -13,8 +13,8 @@ The following handheld games are currently emulated:
 * Nikko virtual pet
 * Keychain Pin Ball
 * Keychain 55 in 1
-
-An [article](https://habr.com/ru/articles/773040/) describing the reverse engineering.
+* Keychain GA-878
+* Micon KC-32
 
 ## Compiling
 Tested with Ubuntu 24.
