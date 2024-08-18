@@ -1,0 +1,55 @@
+{
+	"id": "8f9ab83f-daea-41b4-b45c-4fce56e2e76a",
+	"core": "KS56CX2X",
+	"face_path": "./assets/MiconKC32.svg",
+	"clock": 1000000,
+	
+	"buttons": {
+		"btnLeft": {
+			"port": "PORT1",
+			"pin": 0,
+			"level": 0,
+			"hot_keys": [65, 16777234]
+		},
+		"btnSpeed": {
+			"port": "PORT1",
+			"pin": 1,
+			"level": 0,
+			"hot_keys": [83, 16777237]
+		},
+		"btnRight": {
+			"port": "PORT1",
+			"pin": 2,
+			"level": 0,
+			"hot_keys": [68, 16777236]
+		},
+		"btnStartPause": {
+			"port": "PORT1",
+			"pin": 3,
+			"level": 0,
+			"hot_keys": [49, 80]
+		},
+		"btnSound": {
+			"port": "PORT6",
+			"pin": 0,
+			"level": 0,
+			"hot_keys": [50]
+		},
+		"btnOnOff": {
+			"port": "PORT6",
+			"pin": 1,
+			"level": 0,
+			"hot_keys": [51]
+		},
+		"btnRotate": {
+			"port": "PORT6",
+			"pin": 2,
+			"level": 0,
+			"hot_keys": [32, 16777220]
+		}
+	},
+	
+	"mask_options": {
+		"rom_path": "./assets/MiconKC32.bin"
+	}
+}
