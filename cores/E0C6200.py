@@ -944,11 +944,10 @@ class E0C6200():
     
     def istr_counter(self):
         return self._instr_counter
-            
+
     def clock(self):
         exec_cycles = 7
         if (not self._RESET):
-
             if (not self._HALT):
                 self._if_delay = False
                 opcode = self._ROM.getWord(self._PC * 2)
@@ -969,11 +968,14 @@ class E0C6200():
                 elif (self._IT):
                     exec_cycles += self._interrupt(0x2)
 
+            if (not (self._CTRL_OSC & IO_CLKCHG)):
+                exec_cycles *= self._OSC1_clock_div
+
             self._OSC1_counter -= exec_cycles
             while (self._OSC1_counter <= 0):
                 self._OSC1_counter += self._OSC1_clock_div
                 self._clock_OSC1()
-        
+
         return exec_cycles
 
     def _clock_OSC1(self):
