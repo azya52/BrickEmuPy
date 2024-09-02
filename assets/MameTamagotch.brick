@@ -1,0 +1,72 @@
+{
+	"id": "37cdc537-b12e-455a-b387-c6914137c0e1",
+	"core": "HT943",
+	"face_path": "./assets/MameTamagotch.svg",
+	"clock": 1000000,
+	
+	"buttons": {
+		"btnPause": {
+			"port": "PS",
+			"pin": 1,
+			"level": 0,
+			"hot_keys": [49, 80]
+		},
+		"btnSound": {
+			"port": "PP",
+			"pin": 3,
+			"level": 0,
+			"hot_keys": [51]
+		},
+		"btnOnReset": {
+			"port": "RES",
+			"pin": 0,
+			"level": 0,
+			"hot_keys": [50, 82]
+		},
+		"btnLeft": {
+			"port": "PP",
+			"pin": 1,
+			"level": 0,
+			"hot_keys": [65, 16777234]
+		},
+		"btnRight": {
+			"port": "PP",
+			"pin": 0,
+			"level": 0,
+			"hot_keys": [68, 16777236]
+		},
+		"btnDown": {
+			"port": "PP",
+			"pin": 2,
+			"level": 0,
+			"hot_keys": [83, 16777237]
+		},
+		"btnStartRotate": {
+			"port": "PS",
+			"pin": 2,
+			"level": 0,
+			"hot_keys": [32, 16777235, 16777220]
+		}
+	},
+	
+	"mask_options": {
+		"rom_path": "./assets/MameTamagotch.bin",
+		"sound_rom_path": "./assets/MameTamagotch.srom",
+		"port_pullup": {
+			"PP": 15,
+			"PM": 15,
+			"PS": 15
+		},
+		"port_wakeup": {
+			"PP": 0,
+			"PM": 0,
+			"PS": 0
+		},
+		"PA_open_drain": 0,
+		"timer_clock_div": 512,
+		"sound_freq_div": 32,
+		"sound_speed_div":  [18, 18, 14, 121, 89, 89, 70, 89, 89, 89, 79, 25, 62, 2, 9, 52],
+		"sound_effect":  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+		"sound_unknown":  [26, 26, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 105, 0, 0, 0]
+	}
+}
