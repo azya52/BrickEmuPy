@@ -10,6 +10,8 @@ The following handheld games are currently emulated:
 * Radio Shack Stack Challenge
 * Tamagotchi P1 (distributed without ROM)
 * Tamagotchi Mothra (distributed without ROM)
+* Tamagotchi Angle (distributed without ROM)
+* Mame Game Tamagotch (distributed without ROM)
 * Nikko virtual pet
 * Keychain Pin Ball
 * Keychain 55 in 1
