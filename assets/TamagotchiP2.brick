@@ -1,5 +1,5 @@
 {
-	"id": "49236f71-6338-4284-8aa0-93e250739d38",
+	"id": "caf3dcea-a286-493e-a7bb-0072c2cbdc26",
 	"core": "E0C6200",
 	"face_path": "./assets/TamagotchiP1.svg",
 	"clock": 1600000,
@@ -26,7 +26,7 @@
 	},
 	
 	"mask_options": {
-		"rom_path": "./assets/TamagotchiP1.bin",
+		"rom_path": "./assets/TamagotchiP2.bin",
 		"port_pullup": {
 			"K0": 15,
 			"K1": 15
