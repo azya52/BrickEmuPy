@@ -12,6 +12,7 @@ The following handheld games are currently emulated:
 * Tamagotchi Mothra (distributed without ROM)
 * Tamagotchi Angle (distributed without ROM)
 * Mame Game Tamagotch (distributed without ROM)
+* Digimon Ver. 1 (distributed without ROM)
 * Nikko virtual pet
 * Keychain Pin Ball
 * Keychain 55 in 1
