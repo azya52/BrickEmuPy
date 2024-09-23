@@ -1,0 +1,42 @@
+{
+	"id": "71872598-4762-488e-aea0-300b22861333",
+	"core": "E0C6200",
+	"face_path": "./assets/DigimonV1.svg",
+	"clock": 1060000,
+	
+	"buttons": {
+		"btnTop": {
+			"port": "K0",
+			"pin": 2,
+			"level": 0,
+			"hot_keys": [49]
+		},
+		"btnCenter": {
+			"port": "K0",
+			"pin": 1,
+			"level": 0,
+			"hot_keys": [50]
+		},
+		"btnBottom": {
+			"port": "K0",
+			"pin": 0,
+			"level": 0,
+			"hot_keys": [51]
+		},
+		"btnReset": {
+			"port": "RES",
+			"pin": 0,
+			"level": 0,
+			"hot_keys": [82]
+		}
+	},
+	
+	"mask_options": {
+		"rom_path": "./assets/DigimonV1.bin",
+		"port_pullup": {
+			"K0": 15,
+			"K1": 15
+		},
+		"p3_dedicated": 0
+	}
+}
