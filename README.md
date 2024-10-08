@@ -1,5 +1,5 @@
 # BrickEmuPy
-Brick Game emulator in Python with PyQt6.<br/>
+Handheld LCD games emulator in Python with PyQt6.<br/>
 
 The following handheld games are currently emulated: 
 * Brick Game E-23 PLUS MARK II 96 in 1 (An [article](https://habr.com/ru/articles/773040/) describing the reverse engineering.)
