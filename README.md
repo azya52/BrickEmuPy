@@ -19,6 +19,7 @@ The following handheld games are currently emulated:
 * Keychain 55 in 1
 * Keychain GA-878
 * Micon KC-32
+* Pocket Pikachu (distributed without ROM)
 
 ## Compiling
 Tested with Ubuntu 24.
