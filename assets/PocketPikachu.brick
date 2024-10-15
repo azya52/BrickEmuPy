@@ -1,0 +1,77 @@
+{
+	"id": "69850543-fd12-4546-a5f2-94d1704e7b1c",
+	"core": "M37520",
+	"face_path": "./assets/PocketPikachu.svg",
+	"clock": 4000000,
+	
+	"buttons": {
+		"btnA": {
+			"port": "P2",
+			"pin": 0,
+			"level": 0,
+			"hot_keys": [32, 88]
+		},
+		"btnB": {
+			"port": "P2",
+			"pin": 1,
+			"level": 0,
+			"hot_keys": [90]
+		},
+		"btnStart": {
+			"port": "P2",
+			"pin": 2,
+			"level": 0,
+			"hot_keys": [50, 16777220]
+		},
+		"btnSelect": {
+			"port": "P2",
+			"pin": 3,
+			"level": 0,
+			"hot_keys": [49]
+		},
+		"btnLeft": {
+			"port": "P2",
+			"pin": 7,
+			"level": 0,
+			"hot_keys": [65, 16777234]
+		},
+		"btnUp": {
+			"port": "P2",
+			"pin": 6,
+			"level": 0,
+			"hot_keys": [87, 16777235]
+		},
+		"btnRight": {
+			"port": "P2",
+			"pin": 5,
+			"level": 0,
+			"hot_keys": [68, 16777236]
+		},
+		"btnDown": {
+			"port": "P2",
+			"pin": 4,
+			"level": 0,
+			"hot_keys": [83, 16777237]
+		},
+		"btnReset": {
+			"port": "RES",
+			"pin": 0,
+			"level": 0,
+			"hot_keys": [82]
+		},
+		"reflector": {
+			"port": "P4",
+			"pin": 0,
+			"level": 0,
+			"hot_keys": [51]	
+		}
+	},
+	
+	"mask_options": {
+		"rom_path": "./assets/pp.bin",
+		"port_pullup": {
+			"P3": 144,
+			"P4": 43
+		}
+	}
+}

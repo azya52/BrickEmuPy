@@ -149,7 +149,7 @@ class BrickWidget(QtWidgets.QGraphicsView):
         self.scene().addItem(body)
 
         self._segments = []
-        for ramBit in range(4):
+        for ramBit in range(8):
             for ramNibble in range(256):
                 nextId = str(ramNibble) + "_" + str(ramBit)
                 if (faceRenderer.elementExists(nextId)):
@@ -177,6 +177,8 @@ class BrickWidget(QtWidgets.QGraphicsView):
         for nibble, bit, segment in self._segments:
             if (len(RAM) > nibble):
                 segment.setOpacity(0.40 * ((RAM[nibble] >> bit) & 0x1) + 0.60 * segment.opacity())
+            else:
+                segment.setOpacity(0 + 0.60 * segment.opacity())
 
     @pyqtSlot(str)
     def error(self, error):

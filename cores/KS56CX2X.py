@@ -1,5 +1,5 @@
 from .rom import ROM
-from .KS56CX2Xsound import KS56CX2Xsound
+from .PinTogglingSound import PinTogglingSound
 
 SUB_CLOCK = 32768
 
@@ -91,7 +91,7 @@ M_IM2_KR0TOKR3 = 3
 class KS56CX2X():
     def __init__(self, mask, clock):
         self._ROM = ROM(mask['rom_path'])
-        self._sound = KS56CX2Xsound(clock)
+        self._sound = PinTogglingSound(clock)
 
         self._instr_counter = 0
         self._basic_timer_counter = 0
@@ -844,7 +844,7 @@ class KS56CX2X():
 
     def _set_io_port3(self, value):
         self._PORT3_OUT_LATCH = value
-        self._sound.update(value & 0x8, self._cycle_counter)
+        self._sound.toggle(value & 0x8, 0, self._cycle_counter)
 
     def _get_io_port5(self):
         return ~self._PORT5[0] & self._PORT5[1]
@@ -909,7 +909,7 @@ class KS56CX2X():
             
     def _process_basic_timer(self, exec_cycles):
         self._basic_timer_counter -= exec_cycles
-        if (self._basic_timer_counter <= 0):
+        while (self._basic_timer_counter <= 0):
             self._basic_timer_counter += BASIC_TIMER_DIV[self._BTM]
             self._BT = (self._BT + 1) & 0xFF
             if (self._BT == 0 and self._WDTM == 0):
@@ -918,7 +918,7 @@ class KS56CX2X():
     def _process_t0_timer(self, exec_cycles):
         if ((TIMER_T0_DIV[self._TM0h] > 0) and (self._TM0l & M_TM0l_COUNT)):
             self._T0_timer_counter -= exec_cycles
-            if (self._T0_timer_counter <= 0):
+            while (self._T0_timer_counter <= 0):
                 self._T0_timer_counter += TIMER_T0_DIV[self._TM0h]
                 self._T0 = (self._T0 + 1) & 0xFF
                 if (self._T0 == self._TMOD0):
@@ -928,7 +928,7 @@ class KS56CX2X():
     def _process_watch_timer(self, exec_cycles):
         if (self._WMl & M_WMl_WATCH_ENABLE):
             self._watch_timer_counter -= exec_cycles
-            if (self._watch_timer_counter <= 0):
+            while (self._watch_timer_counter <= 0):
                 if (self._WMl & M_WMl_SUB_CLOCK):
                     self._watch_timer_counter += WATCH_TIMER_DIV[self._WMl & M_WMl_WATCH_FAST_MODE] * self._sub_clock_div
                 else:

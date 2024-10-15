@@ -4,21 +4,18 @@ class ROM():
         self.setRom(romPath)
 
     def getByte(self, addres):
-        if (addres < self._rom_size):
-            return self._ROM[addres]
-        else:
-            return 0
+        return self._ROM[addres % self._rom_size]
     
     def getWord(self, addres):
-        if (addres < self._rom_size - 1):
-            return (self._ROM[addres] << 8) | self._ROM[addres + 1]
-        else:
-            return 0
+        return (self._ROM[addres % self._rom_size] << 8) | self._ROM[(addres + 1) % self._rom_size]
+
+    def getWordLSB(self, addres):
+        return self._ROM[addres % self._rom_size] | (self._ROM[(addres + 1) % self._rom_size] << 8)
 
     def getBytes(self, addres, count):
         result = 0
         for i in range(count):
-            result |= self._ROM[addres + i] << (8 * (count - i - 1))
+            result |= self._ROM[(addres + i) % self._rom_size] << (8 * (count - i - 1))
         return result
 
     def writeByte(self, addres, value):

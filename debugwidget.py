@@ -108,9 +108,17 @@ class DebugWidget(QtWidgets.QWidget):
                         widget.setRowCount(1)
                         
                         itemAdr = QtWidgets.QTableWidgetItem()
+                        itemAdr.setText(mask % 0)
                         itemAdr.setForeground(QtGui.QBrush(QtGui.QColor(128, 128, 128)))
                         itemAdr.setFlags(itemAdr.flags() & ~QtCore.Qt.ItemFlag.ItemIsEditable)
                         itemAdr.setCheckState(Qt.CheckState.Unchecked)
+
+                        widget.setItem(0, 0, itemAdr.clone())
+                        widget.setItem(0, 1, QtWidgets.QTableWidgetItem("000"))
+                        widget.resizeRowsToContents()
+                        widget.resizeColumnsToContents()
+                        widget.setItem(0, 1, None)
+                        widget.setRowCount(len(value))
 
                         for i, instr in enumerate(value):
                             item = itemAdr.clone()
@@ -118,16 +126,13 @@ class DebugWidget(QtWidgets.QWidget):
                                 item.setCheckState(Qt.CheckState.Checked)
                             item.setText(mask % i)
                             widget.setItem(i, 0, item)
-                            itemOpcode = QtWidgets.QTableWidgetItem(instr[0])
-                            itemOpcode.setFlags(itemOpcode.flags() & ~QtCore.Qt.ItemFlag.ItemIsEditable)
-                            widget.setItem(i, 1, itemOpcode)
-                            itemAsm = QtWidgets.QTableWidgetItem(instr[1])
-                            itemAsm.setFlags(itemAsm.flags() & ~QtCore.Qt.ItemFlag.ItemIsEditable)
-                            widget.setItem(i, 2, itemAsm)
-                            if (i == 0):
-                                widget.resizeRowsToContents()
-                                widget.resizeColumnsToContents()
-                                widget.setRowCount(len(value))
+                            if (instr):
+                                itemOpcode = QtWidgets.QTableWidgetItem(instr[0])
+                                itemOpcode.setFlags(itemOpcode.flags() & ~QtCore.Qt.ItemFlag.ItemIsEditable)
+                                widget.setItem(i, 1, itemOpcode)
+                                itemAsm = QtWidgets.QTableWidgetItem(instr[1])
+                                itemAsm.setFlags(itemAsm.flags() & ~QtCore.Qt.ItemFlag.ItemIsEditable)
+                                widget.setItem(i, 2, itemAsm)
                         widget.blockSignals(False)
 
             if ("PC" in state and "LISTING" in self._examineMap):
