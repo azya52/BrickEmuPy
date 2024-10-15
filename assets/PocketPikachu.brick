@@ -68,7 +68,7 @@
 	},
 	
 	"mask_options": {
-		"rom_path": "./assets/pp.bin",
+		"rom_path": "./assets/PocketPikachu.bin",
 		"port_pullup": {
 			"P3": 144,
 			"P4": 43
