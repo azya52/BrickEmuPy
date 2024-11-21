@@ -955,17 +955,17 @@ class E0C6200():
                 self._instr_counter += 1
 
             if (self._IF and not self._if_delay):
-                if (self._IPT):
+                if (self._IPT & self._EIPT):
                     exec_cycles += self._interrupt(0xC)
-                elif (self._ISIO):
+                elif (self._ISIO & self._EISIO):
                     exec_cycles += self._interrupt(0xA)
                 elif (self._IK1):
                     exec_cycles += self._interrupt(0x8)
                 elif (self._IK0):
                     exec_cycles += self._interrupt(0x6)
-                elif (self._ISW):
+                elif (self._ISW & self._EISW):
                     exec_cycles += self._interrupt(0x4)
-                elif (self._IT):
+                elif (self._IT & self._EIT):
                     exec_cycles += self._interrupt(0x2)
 
             if (not (self._CTRL_OSC & IO_CLKCHG)):
@@ -1001,30 +1001,28 @@ class E0C6200():
         self._PT = (self._PT - 1) & 0xFF
         if (self._PT == 0):
             self._PT = self._RD
-            if (self._EIPT & IO_EIPT):
-                self._IPT |= IO_IPT
+            self._IPT |= IO_IPT
         if (self._PTC & IO_PTCOUT):
             self._R3 ^= IO_R33
 
     def _process_stopwatch(self):
         if (self._CTRL_SW & IO_SWRUN):
-            self._SWL = self._SWL + 1 if self._SWL < 9 else 0
+            self._SWL = (self._SWL + 1) % 10
             if (self._SWL == 0):
-                self._SWH = self._SWH + 1 if self._SWH < 9 else 0
-                if (self._EISW & IO_EISW0 and self._SWH == 0):
+                self._SWH = (self._SWH + 1) % 10
+                self._ISW |= IO_ISW1
+                if (self._SWH == 0):
                     self._ISW |= IO_ISW0
-                if (self._EISW & IO_EISW1):
-                    self._ISW |= IO_ISW1
 
     def _process_timer(self):
         new_TM = (self._TM + 1) & 0xFF
-        if (self._EIT & IO_EIT32 and new_TM & IO_TM2 < self._TM & IO_TM2):
+        if (new_TM & IO_TM2 < self._TM & IO_TM2):
             self._IT |= IO_IT32
-        if (self._EIT & IO_EIT8 and new_TM >> 4 & IO_TM4 < self._TM >> 4 & IO_TM4):
+        if (new_TM >> 4 & IO_TM4 < self._TM >> 4 & IO_TM4):
             self._IT |= IO_IT8
-        if (self._EIT & IO_EIT2 and new_TM >> 4 & IO_TM6 < self._TM >> 4 & IO_TM6):
+        if (new_TM >> 4 & IO_TM6 < self._TM >> 4 & IO_TM6):
             self._IT |= IO_IT2
-        if (self._EIT & IO_EIT1 and new_TM >> 4 & IO_TM7 < self._TM >> 4 & IO_TM7):
+        if (new_TM >> 4 & IO_TM7 < self._TM >> 4 & IO_TM7):
             self._IT |= IO_IT1
         self._TM = new_TM
     
