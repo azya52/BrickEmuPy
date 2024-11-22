@@ -20,6 +20,7 @@ The following handheld games are currently emulated:
 * Keychain GA-878
 * Micon KC-32
 * Pocket Pikachu (distributed without ROM)
+* Epoch Chibi Pachi Alien Fever
 
 ## Compiling
 Tested with Ubuntu 24.
