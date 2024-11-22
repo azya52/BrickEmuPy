@@ -1,0 +1,42 @@
+{
+	"id": "d09790bf-e9c2-407b-b033-7d59d2a7b6f8",
+	"core": "E0C6200",
+	"face_path": "./assets/AlienFever.svg",
+	"clock": 1400000,
+	
+	"buttons": {
+		"btnMode": {
+			"port": "K0",
+			"pin": 0,
+			"level": 0,
+			"hot_keys": [48]
+		},
+		"btnSelect": {
+			"port": "K0",
+			"pin": 1,
+			"level": 0,
+			"hot_keys": [49]
+		},
+		"btnSound": {
+			"port": "K0",
+			"pin": 2,
+			"level": 0,
+			"hot_keys": [50]
+		},
+		"btnHandle": {
+			"port": "K0",
+			"pin": 3,
+			"level": 0,
+			"hot_keys": [51]
+		}
+	},
+	
+	"mask_options": {
+		"rom_path": "./assets/AlienFever.bin",
+		"port_pullup": {
+			"K0": 15,
+			"K1": 15
+		},
+		"p3_dedicated": 0
+	}
+}
