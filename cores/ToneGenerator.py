@@ -1,10 +1,9 @@
 import random
 
 from PyQt6.QtCore import QIODeviceBase, QByteArray, QIODevice
-from PyQt6.QtMultimedia import QAudioFormat, QAudioSink
+from PyQt6.QtMultimedia import QAudioFormat, QAudioSink, QMediaDevices
 
-SAMPLE_RATE = 44100
-BUFFER_SIZE = 2048
+BUFFER_SIZE = 4096
 SOUND_LEVEL = (int) (32767 * 0.001)
 SAMPLES_PART_SIZE = 4096
 DATA_PART_SIZE = SAMPLES_PART_SIZE * 2
@@ -50,15 +49,16 @@ class AudioData(QIODevice):
         phase = self._phase
         mul = freq / self._sampleRate
         squareWaveData = QByteArray()
-        prevSample = 0
-        sample = 0
-        for i in range(size // 2):
-            newSample = SOUND_LEVEL * (1 - ((((i * mul + phase) % 1) > dutyRatio) << 1))
+        sample = prevSample = 0
+        bytesPerSample = self._bytesPerSample
+        size //= self._bytesPerSample
+        for i in range(size):
+            newSample = 1 - ((((i * mul + phase) % 1) > dutyRatio) << 1)
             if (newSample != prevSample):
                 prevSample = newSample
-                sample = -newSample if (noise and (random.random() > 0.5)) else newSample
-            squareWaveData.append(sample.to_bytes(2, 'big', signed = True))
-        self._phase += (size // 2) * mul
+                sample = (SOUND_LEVEL * newSample * random.choice([1, 1 - (noise << 1)])).to_bytes(bytesPerSample, 'big', signed=True)
+            squareWaveData.append(sample)
+        self._phase += size * mul
         return squareWaveData
     
     def bytesAvailable(self):
@@ -94,7 +94,8 @@ class ToneGenerator(QAudioSink):
     def __init__(self):
         
         audioFormat = QAudioFormat()
-        audioFormat.setSampleRate(SAMPLE_RATE)
+        device = QMediaDevices.defaultAudioOutput()
+        audioFormat.setSampleRate(device.maximumSampleRate())
         audioFormat.setChannelCount(1)
         audioFormat.setSampleFormat(QAudioFormat.SampleFormat.Int16)
 
