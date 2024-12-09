@@ -21,6 +21,7 @@ The following handheld games are currently emulated:
 * Micon KC-32
 * Pocket Pikachu (distributed without ROM)
 * Epoch Chibi Pachi Alien Fever
+* Formel 1 (Hartung Spiele Berlin/Epoch)
 
 ## Compiling
 Tested with Ubuntu 24.
