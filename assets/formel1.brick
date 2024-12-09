@@ -1,0 +1,37 @@
+{
+	"id": "8a4f7cf9-f1ef-4671-baac-a69d3d499efc",
+	"core": "MSM50XX",
+	"face_path": "./assets/formel1.svg",
+	"clock": 32768,
+	
+	"buttons": {
+		"btnLeft": {
+			"port": "PK",
+			"pin": 0,
+			"level": 1,
+			"hot_keys": [65, 16777234, 49]
+		},
+		"btnGame": {
+			"port": "PS",
+			"pin": 1,
+			"level": 1,
+			"hot_keys": [32, 50]
+		},
+		"btnSet": {
+			"port": "PS",
+			"pin": 2,
+			"level": 1,
+			"hot_keys": [16777220, 51]
+		},
+		"btnRight": {
+			"port": "PS",
+			"pin": 3,
+			"level": 1,
+			"hot_keys": [68, 16777236, 52]
+		}
+	},
+	
+	"mask_options": {
+		"rom_path": "./assets/formel1.bin"
+	}
+}
