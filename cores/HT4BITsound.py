@@ -12,7 +12,7 @@ LFSR2DIV = (
     93, 23, 97, 32, 13, 53, 58, 50, 28, 45, 72, 108, 83, 92, 31, 12, 49, 27, 107, 82, 11, 48, 81, 10, 9, 8
 )
     
-class HT943sound():
+class HT4BITsound():
     def __init__(self, mask, clock):
         self._system_clock = clock
         self._clock_counter = 0
