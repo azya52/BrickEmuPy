@@ -1,0 +1,78 @@
+{
+	"id": "411c02c4-7e9c-49d9-9ac2-f9012b51e91d",
+	"core": "HT943",
+	"face_path": "./assets/MameGalaxian.svg",
+	"clock": 700000,
+	
+	"buttons": {
+		"btnPause": {
+			"port": "PS",
+			"pin": 1,
+			"level": 0,
+			"hot_keys": [49, 80]
+		},
+		"btnSound": {
+			"port": "PS",
+			"pin": 2,
+			"level": 0,
+			"hot_keys": [50, 77]
+		},
+		"btnOnReset": {
+			"port": "RES",
+			"pin": 0,
+			"level": 0,
+			"hot_keys": [51, 82]
+		},
+		"btnLeft": {
+			"port": "PP",
+			"pin": 1,
+			"level": 0,
+			"hot_keys": [65, 16777234]
+		},
+		"btnRight": {
+			"port": "PP",
+			"pin": 0,
+			"level": 0,
+			"hot_keys": [68, 16777236]
+		},
+		"btnLife": {
+			"port": "PP",
+			"pin": 2,
+			"level": 0,
+			"hot_keys": [83, 16777237]
+		},
+		"btnContinue": {
+			"port": "PP",
+			"pin": 2,
+			"level": 0,
+			"hot_keys": [87, 16777235]
+		},
+		"btnStartShoot": {
+			"port": "PS",
+			"pin": 0,
+			"level": 0,
+			"hot_keys": [32, 16777220]
+		}
+	},
+	
+	"mask_options": {
+		"rom_path": "./assets/MameGalaxian.bin",
+		"sound_rom_path": "./assets/MameGalaxian.srom",
+		"port_pullup": {
+			"PP": 15,
+			"PM": 15,
+			"PS": 15
+		},
+		"port_wakeup": {
+			"PP": 0,
+			"PM": 0,
+			"PS": 0
+		},
+		"PA_open_drain": 0,
+		"timer_clock_div": 256,
+		"sound_freq_div": 32,
+		"sound_speed_div":  [53, 83, 7, 92, 22, 123, 13, 36, 99, 112, 22, 85, 61, 20, 84, 84],
+		"sound_effect":  [7, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+		"sound_unknown":  [3, 0, 62, 0, 0, 0, 1, 0, 0, 0, 0, 0, 105, 0, 0, 0]
+	}
+}
