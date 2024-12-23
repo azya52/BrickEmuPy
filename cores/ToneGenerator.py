@@ -98,6 +98,9 @@ class ToneGenerator(QAudioSink):
         audioFormat.setSampleRate(device.maximumSampleRate())
         audioFormat.setChannelCount(1)
         audioFormat.setSampleFormat(QAudioFormat.SampleFormat.Int16)
+        
+        if (not device.isFormatSupported(audioFormat)):
+            audioFormat.setSampleRate(44100)
 
         super().__init__(audioFormat)
         self.setBufferSize(BUFFER_SIZE)

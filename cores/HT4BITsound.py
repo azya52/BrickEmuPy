@@ -44,7 +44,7 @@ class HT4BITsound():
             if (self._clock_counter <= 0):
                 self._clock_counter += LFSR2DIV[self._speed_div[self._channel]] * self._freq_div * 16
                 chanel_size = SINGLE_SIZE_CHANNEL_SIZE * ((self._channel >= SINGLE_SIZE_CHANNEL_COUNT) + 1)
-                self._toneGenerator.play(self._get_freq(), self._channel_effect[self._channel], 0.5, self._cycle_counter / self._system_clock)
+                self._toneGenerator.play(self._get_freq(), self._channel_effect[self._channel] & 0x1, 0.5, self._cycle_counter / self._system_clock)
                 self._note_counter = (self._note_counter + 1) % chanel_size
                 if ((self._note_counter == 0) and (not self._repeat_cycle)):
                     self._sound_on = False
