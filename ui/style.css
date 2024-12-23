@@ -31,7 +31,7 @@ QTableView#listingTable::indicator {
 }
 
 QTableView#listingTable::item:selected {
-	background: #cce8ff;              
+	background: #b0dcff;              
 }
 
 QTableView#listingTable::indicator:unchecked {
