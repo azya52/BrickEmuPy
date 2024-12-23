@@ -110,12 +110,12 @@ class HT943(HT4BIT):
                 self._EF = 1
                 self._HALT = 0
         elif (port == 'PM'):
-            self._PM = ~(1 << pin) & self._PP | level << pin
+            self._PM = ~(1 << pin) & self._PM | level << pin
             if (self._HALT and (self._PM_wakeup_mask & (1 << pin)) and (not level)):
                 self._EF = 1
                 self._HALT = 0
         elif (port == 'PS'):
-            self._PS = ~(1 << pin) & self._PP | level << pin
+            self._PS = ~(1 << pin) & self._PS | level << pin
             if (self._HALT and (self._PS_wakeup_mask & (1 << pin)) and (not level)):
                 self._EF = 1
                 self._HALT = 0
