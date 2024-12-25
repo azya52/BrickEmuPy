@@ -12,6 +12,7 @@ The following handheld games are currently emulated:
 * Tamagotchi Mothra (distributed without ROM)
 * Tamagotchi Angle (distributed without ROM)
 * Mame Game Tamagotch (distributed without ROM)
+* Mame Galaxian (distributed without ROM)
 * Digimon Ver. 1 (distributed without ROM)
 * Digimon Ver. 2 (distributed without ROM)
 * Digimon Ver. 3 (distributed without ROM)
@@ -23,6 +24,7 @@ The following handheld games are currently emulated:
 * Pocket Pikachu (distributed without ROM)
 * Epoch Chibi Pachi Alien Fever
 * Formel 1 (Hartung Spiele Berlin/Epoch)
+* Mickey Deluxe Virtual Game virtual pet
 
 ## Compiling
 Tested with Ubuntu 24.
