@@ -1,12 +1,14 @@
-import random
+import random, math
 
 from PyQt6.QtCore import QIODeviceBase, QByteArray, QIODevice
-from PyQt6.QtMultimedia import QAudioFormat, QAudioSink, QMediaDevices
+from PyQt6.QtMultimedia import QAudioFormat, QAudioSink
 
 BUFFER_SIZE = 4096
 SOUND_LEVEL = (int) (32767 * 0.001)
 SAMPLES_PART_SIZE = 4096
 DATA_PART_SIZE = SAMPLES_PART_SIZE * 2
+SQUARENESS_FACTOR = 6
+SAMPLE_RATE = 44100
 
 class AudioData(QIODevice):
     def __init__(self, sampleRate, bytesPerSample):
@@ -29,10 +31,10 @@ class AudioData(QIODevice):
                     chunk = min(maxlen, self._toneStarts[0][0] - self._currentByte)
                     data.append(chunk, b'\0')
                 elif (len(self._toneEnds) == 0):
-                    data.append(self.getSquareWaveData(chunk, self._toneStarts[0][1], self._toneStarts[0][2], self._toneStarts[0][3]))
+                    data.append(self.getWaveData(chunk, self._toneStarts[0][1], self._toneStarts[0][2], self._toneStarts[0][3]))
                 elif (self._currentByte < self._toneEnds[0]):
                     chunk = min(maxlen, self._toneEnds[0] - self._currentByte)
-                    data.append(self.getSquareWaveData(chunk, self._toneStarts[0][1], self._toneStarts[0][2], self._toneStarts[0][3]))
+                    data.append(self.getWaveData(chunk, self._toneStarts[0][1], self._toneStarts[0][2], self._toneStarts[0][3]))
                 else:
                     self._toneStarts.pop(0)
                     self._toneEnds.pop(0)
@@ -45,22 +47,23 @@ class AudioData(QIODevice):
 
         return data
 
-    def getSquareWaveData(self, size, freq, noise, dutyRatio):
+    def getWaveData(self, size, freq, noise, dutyRatio):
         phase = self._phase
-        mul = freq / self._sampleRate
-        squareWaveData = QByteArray()
-        sample = prevSample = 0
+        mul = math.pi * freq / self._sampleRate * 2
+        waveData = QByteArray()
         bytesPerSample = self._bytesPerSample
-        size //= self._bytesPerSample
+        size //= bytesPerSample
+        prevSample = rand = 1
+        dutyRatio = dutyRatio * 2 - 1
         for i in range(size):
-            newSample = 1 - ((((i * mul + phase) % 1) > dutyRatio) << 1)
-            if (newSample != prevSample):
+            newSample = max(-1, min(1, (math.sin(mul * i + phase) + dutyRatio) * SQUARENESS_FACTOR))
+            if (noise and (newSample * prevSample < 0)):
+                rand = random.choice([-1, 1])
                 prevSample = newSample
-                sample = (SOUND_LEVEL * newSample * random.choice([1, 1 - (noise << 1)])).to_bytes(bytesPerSample, 'big', signed=True)
-            squareWaveData.append(sample)
+            waveData.append(int(SOUND_LEVEL * newSample * rand).to_bytes(bytesPerSample, 'big', signed=True))
         self._phase += size * mul
-        return squareWaveData
-    
+        return waveData
+   
     def bytesAvailable(self):
         return DATA_PART_SIZE
         
@@ -94,13 +97,9 @@ class ToneGenerator(QAudioSink):
     def __init__(self):
         
         audioFormat = QAudioFormat()
-        device = QMediaDevices.defaultAudioOutput()
-        audioFormat.setSampleRate(device.maximumSampleRate())
+        audioFormat.setSampleRate(SAMPLE_RATE)
         audioFormat.setChannelCount(1)
         audioFormat.setSampleFormat(QAudioFormat.SampleFormat.Int16)
-        
-        if (not device.isFormatSupported(audioFormat)):
-            audioFormat.setSampleRate(44100)
 
         super().__init__(audioFormat)
         self.setBufferSize(BUFFER_SIZE)
