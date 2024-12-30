@@ -1,5 +1,6 @@
 {
 	"id": "8d4a428e-9528-436c-b137-fd356a845d24",
+	"credits": "ROM photo and LCD vector image by Sean Riddle (https://seanriddle.com/)",
 	"core": "MSM50XX",
 	"face_path": "./assets/ZeldaNelsonic.svg",
 	"clock": 32768,
