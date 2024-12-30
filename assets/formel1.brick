@@ -32,6 +32,7 @@
 	},
 	
 	"mask_options": {
-		"rom_path": "./assets/formel1.bin"
+		"rom_path": "./assets/formel1.bin",
+		"sound_freq_div_tbl": [0, 4, 8, 16]
 	}
 }

@@ -57,12 +57,14 @@ class MSM50XXdasm():
             MSM50XXdasm._format_n,                     #00 0100 0011 NNNN
             MSM50XXdasm._int_16,                       #00 0100 0100 00ED
             MSM50XXdasm._page_n,                       #00 0100 0101 NNNN
-            *([MSM50XXdasm._dummy] * 2),
+            MSM50XXdasm._adrs_n,                       #00 0100 0110 NNNN
+            MSM50XXdasm._dummy,
             MSM50XXdasm._rstrate,                      #00 0100 1000 1000
             *([MSM50XXdasm._dummy] * 2),
             MSM50XXdasm._int_32,                       #00 0100 1011 ED00
             MSM50XXdasm._buzzer_freq_sound,            #00 0100 1100 BBBB
-            *([MSM50XXdasm._dummy] * 19),
+            MSM50XXdasm._freq_n,                       #00 0100 1101 NNNN
+            *([MSM50XXdasm._dummy] * 18),
             *([MSM50XXdasm._bcs_n] * 2),               #00 0110 000N NNNN
             *([MSM50XXdasm._dummy] * 2),
             *([MSM50XXdasm._bze_n] * 2),               #00 0110 010N NNNN
@@ -74,10 +76,12 @@ class MSM50XXdasm():
             *([MSM50XXdasm._dummy] * 16),
             *([MSM50XXdasm._dsp_digit_a0] * 16),       #00 1000 DDDD AAAA
             *([MSM50XXdasm._dsp_digit_ap] * 16),       #00 1001 DDDD AAAA
-            *([MSM50XXdasm._dummy] * 32),
+            *([MSM50XXdasm._dsph_digit_a0] * 16),      #00 1010 DDDD AAAA
+            *([MSM50XXdasm._dsph_digit_ap] * 16),      #00 1011 DDDD AAAA
             *([MSM50XXdasm._dspf_digit_a0] * 16),      #00 1100 DDDD AAAA
             *([MSM50XXdasm._dspf_digit_ap] * 16),      #00 1101 DDDD AAAA
-            *([MSM50XXdasm._dummy] * 32),
+            *([MSM50XXdasm._dspfh_digit_a0] * 16),     #00 1110 DDDD AAAA
+            *([MSM50XXdasm._dspfh_digit_ap] * 16),     #00 1111 DDDD AAAA
             *([MSM50XXdasm._bis_d_a0] * 16),           #01 0000 DDDD AAAA
             *([MSM50XXdasm._bis_d_ap] * 16),           #01 0001 DDDD AAAA
             *([MSM50XXdasm._bic_d_a0] * 16),           #01 0010 DDDD AAAA
@@ -118,10 +122,13 @@ class MSM50XXdasm():
             MSM50XXdasm._format_a0,                    #11 0110 0011 AAAA
             MSM50XXdasm._dummy,
             MSM50XXdasm._page_a0,                      #11 0110 0101 AAAA
-            *([MSM50XXdasm._dummy] * 12),
+            MSM50XXdasm._adrs_a0,                      #11 0110 0110 AAAA
+            *([MSM50XXdasm._dummy] * 11),
             MSM50XXdasm._matrix_ap,                    #11 0111 0010 AAAA
             MSM50XXdasm._format_ap,                    #11 0111 0011 AAAA
-            *([MSM50XXdasm._dummy] * 12),
+            *([MSM50XXdasm._dummy] * 2),
+            MSM50XXdasm._adrs_ap,                      #11 0111 0110 AAAA
+            *([MSM50XXdasm._dummy] * 9),
             *([MSM50XXdasm._chg_ax] * 8),              #11 1000 0XXX AAAA
             *([MSM50XXdasm._dummy] * 8),
             MSM50XXdasm._chg_ap,                       #11 1001 0000 AAAA
@@ -326,6 +333,10 @@ class MSM50XXdasm():
         #00 0100 0101 NNNN
         return "page 0x%0.1X" % (opcode & 0xF)
 
+    def _adrs_n(self, pc, opcode):
+        #00 0100 0110 NNNN
+        return "adrs 0x%0.1X" % (opcode & 0xF)
+    
     def _rstrate(self, pc, opcode):
         #00 0100 1000 1000
         return "rstrate"
@@ -340,6 +351,10 @@ class MSM50XXdasm():
         #00 0100 1100 BBBB
         return "buzzer 0x%0.1X" % (opcode & 0xF)
 
+    def _freq_n(self, pc, opcode):
+        #00 0100 1101 BBBB
+        return "freq 0x%0.1X" % (opcode & 0xF)
+    
     def _bcs_n(self, pc, opcode):
         #00 0110 000N NNNN
         return "bcs %0.3X" % (pc + (opcode & 0x1F) + 1)
@@ -371,7 +386,15 @@ class MSM50XXdasm():
     def _dsp_digit_ap(self, pc, opcode):
         #00 1001 DDDD AAAA
         return "dsp 0x%0.1X, P(0x%0.1X)" % ((opcode >> 4) & 0xF, opcode & 0xF)
+    
+    def _dsph_digit_a0(self, pc, opcode):
+        #00 1010 DDDD AAAA
+        return "dspf 0x%0.1X, (0x%0.1X)" % ((opcode >> 4) & 0xF, opcode & 0xF)
 
+    def _dsph_digit_ap(self, pc, opcode):
+        #00 1011 DDDD AAAA
+        return "dspf 0x%0.1X, P(0x%0.1X)" % ((opcode >> 4) & 0xF, opcode & 0xF)
+    
     def _dspf_digit_a0(self, pc, opcode):
         #00 1100 DDDD AAAA
         return "dspf 0x%0.1X, (0x%0.1X)" % ((opcode >> 4) & 0xF, opcode & 0xF)
@@ -380,6 +403,14 @@ class MSM50XXdasm():
         #00 1101 DDDD AAAA
         return "dspf 0x%0.1X, P(0x%0.1X)" % ((opcode >> 4) & 0xF, opcode & 0xF)
 
+    def _dspfh_digit_a0(self, pc, opcode):
+        #00 1110 DDDD AAAA
+        return "dspfh 0x%0.1X, (0x%0.1X)" % ((opcode >> 4) & 0xF, opcode & 0xF)
+
+    def _dspfh_digit_ap(self, pc, opcode):
+        #00 1111 DDDD AAAA
+        return "dspfh 0x%0.1X, P(0x%0.1X)" % ((opcode >> 4) & 0xF, opcode & 0xF)
+    
     def _bis_d_a0(self, pc, opcode):
         #01 0000 DDDD AAAA
         return "bis 0x%0.1X, (0x%0.1X)" % ((opcode >> 4) & 0xF, opcode & 0xF)
@@ -511,7 +542,11 @@ class MSM50XXdasm():
     def _page_a0(self, pc, opcode):
         #11 0110 0101 AAAA
         return  "page (0x%0.1X)" % (opcode & 0xF)
-
+    
+    def _adrs_a0(self, pc, opcode):
+        #11 0110 0110 AAAA
+        return  "adrs (0x%0.1X)" % (opcode & 0xF)
+    
     def _matrix_ap(self, pc, opcode):
         #11 0111 0010 AAAA
         return "matrix P(0x%0.1X)" % (opcode & 0xF)
@@ -519,6 +554,10 @@ class MSM50XXdasm():
     def _format_ap(self, pc, opcode):
         #11 0111 0011 AAAA
         return "format P(0x%0.1X)" % (opcode & 0xF)
+    
+    def _adrs_ap(self, pc, opcode):
+        #11 0111 0110 AAAA
+        return  "adrs (0x%0.1X)" % (opcode & 0xF)
 
     def _chg_ax(self, pc, opcode):
         #11 1000 0XXX AAAA
