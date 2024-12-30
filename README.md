@@ -25,6 +25,7 @@ The following handheld games are currently emulated:
 * Epoch Chibi Pachi Alien Fever
 * Formel 1 (Hartung Spiele Berlin/Epoch)
 * Mickey Deluxe Virtual Game virtual pet
+* The Legend of Zelda Game Watch (distributed without ROM)
 
 ## Compiling
 Tested with Ubuntu 24.
