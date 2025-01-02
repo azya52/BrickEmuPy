@@ -260,7 +260,7 @@ class MSM50XX():
         return self._PC & 0xFFF
     
     def get_VRAM(self):
-        if (self._GRAM[15] == 1):
+        if (self._GRAM[15] & 1 or self._GRAM[31] & 1):
             return FULL_GRAM
         return tuple(self._GRAM)
     
@@ -552,12 +552,10 @@ class MSM50XX():
 
     def _buzzer_freq_sound(self, opcode):
         #00 0100 1100 BBBB
-        #print(self._instr_counter, "_buzzer_freq_sound", (opcode & 0xC) >> 2, opcode & 0x3)
         self._sound.set_sound(opcode & 0xF)
 
     def _freq_n(self, opcode):
         #00 0100 1101 NNNN
-        #print(self._instr_counter, "_freq_n", opcode & 0xF)
         self._sound.set_freq(opcode & 0xF)
 
     def _bcs_n(self, opcode):
@@ -751,10 +749,12 @@ class MSM50XX():
     def _switch_a0(self, opcode):
         #11 0100 0001 AAAA
         self._ACC = self._RAM[opcode & 0xF] = self._PS
+        self._ZF = not self._ACC
 
     def _kswitch_a0(self, opcode):
         #11 0100 0010 AAAA
         self._ACC = self._RAM[opcode & 0xF] = self._PK
+        self._ZF = not self._ACC
 
     def _intmode_a0(self, opcode):
         #11 0100 0100 AAAA
@@ -821,14 +821,14 @@ class MSM50XX():
         a = opcode & 0x7F
         b = self._ACC
         self._ACC = self._RAM[a]
-        self._RAM[a] = self._ACC
+        self._RAM[a] = b
 
     def _chg_ap(self, opcode):
         #11 1001 0000 AAAA
         a = self._get_ap(opcode)
         b = self._ACC
         self._ACC = self._RAM[a]
-        self._RAM[a] = self._ACC
+        self._RAM[a] = b
 
     def _mov_acc_ax(self, opcode):
         #11 1100 0XXX AAAA
