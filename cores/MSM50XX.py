@@ -732,7 +732,7 @@ class MSM50XX():
         #11 0000 NNNN AAAA
         a = opcode & 0xF
         value = self._RAM[a]
-        mod = ~((opcode >> 4) - 1) & 0xF
+        mod = (~(opcode >> 4) & 0xF) + 1
         self._ACC = self._RAM[a] = value % mod
         self._CF = value >= mod
         self._ZF = not self._ACC
@@ -741,7 +741,7 @@ class MSM50XX():
         #11 0001 NNNN AAAA
         a = self._get_ap(opcode)
         value = self._RAM[a]
-        mod = ~((opcode >> 4) - 1) & 0xF
+        mod = (~(opcode >> 4) & 0xF) + 1
         self._ACC = self._RAM[a] = value % mod
         self._CF = value >= mod
         self._ZF = not self._ACC
