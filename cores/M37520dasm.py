@@ -593,7 +593,7 @@ class M37520dasm():
         return (pc + 1,), "pla"
 
     def _adc_imm(self, pc, opcode):
-        return (pc + 2,), "adc" + IMM % (opcode & 0xFF)
+        return (pc + 2,), "adc " + IMM % (opcode & 0xFF)
 
     def _ror_a(self, pc, opcode):
         return (pc + 1,), "ror A"
