@@ -982,7 +982,7 @@ class M37520():
             new_value += 6
 
         self._VF = (~(A ^ operand) & (A ^ new_value)) >> 7
-        self._NF = new_value >> 7
+        self._NF = (new_value >> 7) & 0x1
 
         if ((self._DF) and (new_value > 0x99)):
             new_value += 0x60
@@ -1011,7 +1011,7 @@ class M37520():
                 new_value -= 0x60
 
         self._VF = ((A ^ operand) & (A ^ new_value)) >> 7
-        self._NF = new_value >> 7
+        self._NF = (new_value >> 7) & 0x1
         self._ZF = not(new_value & 0xFF)
         self._CF = new_value >= 0
 
@@ -1076,7 +1076,7 @@ class M37520():
             test_value = self._read_mem(self._X) - operand
         else:
             test_value = self._A - operand
-        self._NF = test_value >> 7
+        self._NF = test_value < 0
         self._ZF = not test_value
         self._CF = test_value >= 0
         return self._TF
@@ -1946,7 +1946,7 @@ class M37520():
 
     def _cpx_imm(self, opcode):
         test_value = self._X - (opcode & 0xFF)
-        self._NF = test_value >> 7
+        self._NF = test_value < 0
         self._ZF = not test_value
         self._CF = test_value >= 0
         return 2
@@ -1965,7 +1965,7 @@ class M37520():
 
     def _cpx_zp(self, opcode):
         test_value = self._X - self._read_mem(opcode & 0xFF)
-        self._NF = test_value >> 7
+        self._NF = test_value < 0
         self._ZF = not test_value
         self._CF = test_value >= 0
         return 3
@@ -1995,7 +1995,7 @@ class M37520():
     def _cpx_abs(self, opcode):
         addr = ((opcode & 0xFF) << 8) | ((opcode >> 8) & 0xFF)
         test_value = self._X - self._read_mem(addr)
-        self._NF = test_value >> 7
+        self._NF = test_value < 0
         self._ZF = not test_value
         self._CF = test_value >= 0
         return 4
