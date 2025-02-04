@@ -1,6 +1,6 @@
 from PyQt6 import uic, QtCore, QtGui, QtWidgets
 from PyQt6.QtCore import Qt, pyqtSignal, pyqtSlot, QByteArray
-from PyQt6.QtWidgets import QMessageBox
+from PyQt6.QtWidgets import QMessageBox, QTableWidgetItem
 import time
 
 class DebugWidget(QtWidgets.QWidget):
@@ -33,9 +33,28 @@ class DebugWidget(QtWidgets.QWidget):
     
     def showEvent(self, event):
         for tableView in self.findChildren(QtWidgets.QTableWidget):
-            tableView.resizeRowsToContents()
-            tableView.resizeColumnsToContents()
+            self.prepareTable(tableView)
         super().showEvent(event)
+
+    def prepareTable(self, tableView):
+        tableView.blockSignals(True)
+
+        tableView.resizeRowsToContents()
+        tableView.resizeColumnsToContents()
+
+        try:
+            startIndex = int(tableView.property("start_index") or "0", 0)
+        except ValueError:
+            startIndex = 0
+
+        rowCount = tableView.rowCount()
+        colCount = tableView.columnCount()
+        for row in range(rowCount):
+            for col in range(colCount):
+                tableView.item(row, col) or tableView.setItem(row, col, QTableWidgetItem(""))
+            tableView.verticalHeaderItem(row) or tableView.setVerticalHeaderItem(row, QTableWidgetItem("%X" % (startIndex + (row * colCount))))
+
+        tableView.blockSignals(False)
 
     def prepareWidgetMap(self):
         for widget in self.findChildren((QtWidgets.QLineEdit, QtWidgets.QCheckBox, QtWidgets.QTableView)):
