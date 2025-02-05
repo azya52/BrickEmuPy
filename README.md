@@ -26,6 +26,7 @@ The following handheld games are currently emulated:
 * Formel 1 (Hartung Spiele Berlin/Epoch)
 * Mickey Deluxe Virtual Game virtual pet
 * The Legend of Zelda Game Watch (distributed without ROM)
+* Apollo 2 in 1 virtual pet
 
 ## Compiling
 Tested with Ubuntu 24.
