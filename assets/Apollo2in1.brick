@@ -1,0 +1,38 @@
+{
+	"id": "677fa65a-c880-41dd-8c26-7a29d5cf5a4b",
+	"core": "SPLB20",
+	"face_path": "./assets/Apollo2in1.svg",
+	"clock": 500000,
+	
+	"buttons": {
+		"btnMode": {
+			"port": "PA",
+			"pin": 1,
+			"level": 0,
+			"hot_keys": [49]
+		},
+		"btnEnter": {
+			"port": "PA",
+			"pin": 2,
+			"level": 0,
+			"hot_keys": [50]
+		},
+		"btnExit": {
+			"port": "PA",
+			"pin": 3,
+			"level": 0,
+			"hot_keys": [51]
+		},
+		"btnRev": {
+			"port": "PA",
+			"pin": 4,
+			"level": 0,
+			"hot_keys": [52]
+		}
+	},
+	
+	"mask_options": {
+		"rom_path": "./assets/Apollo2in1.bin",
+		"non_crystal_mode": 0
+	}
+}
