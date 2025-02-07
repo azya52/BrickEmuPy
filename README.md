@@ -2,31 +2,37 @@
 Handheld LCD games emulator in Python with PyQt6.<br/>
 
 The following handheld games are currently emulated: 
-* Brick Game E-23 PLUS MARK II 96 in 1 (An [article](https://habr.com/ru/articles/773040/) describing the reverse engineering.)
-* Brick Game E-88 8 in 1
-* Brick Game E-33 2 in 1
-* Block Game & Echo Key GA888 (Tetris Jr. clone)
-* Space Intruder TK-150I
-* Radio Shack Stack Challenge
-* Tamagotchi P1 (distributed without ROM)
-* Tamagotchi Mothra (distributed without ROM)
-* Tamagotchi Angle (distributed without ROM)
-* Mame Game Tamagotch (distributed without ROM)
-* Mame Galaxian (distributed without ROM)
-* Digimon Ver. 1 (distributed without ROM)
-* Digimon Ver. 2 (distributed without ROM)
-* Digimon Ver. 3 (distributed without ROM)
-* Nikko virtual pet
-* Keychain Pin Ball
-* Keychain 55 in 1
-* Keychain GA-878
-* Micon KC-32
-* Pocket Pikachu (distributed without ROM)
-* Epoch Chibi Pachi Alien Fever
-* Formel 1 (Hartung Spiele Berlin/Epoch)
-* Mickey Deluxe Virtual Game virtual pet
-* The Legend of Zelda Game Watch (distributed without ROM)
-* Apollo 2 in 1 virtual pet
+* Brick Games
+  * Brick Game E-23 PLUS MARK II 96 in 1 (An [article](https://habr.com/ru/articles/773040/) describing the reverse engineering.)
+  * Brick Game E-88 8 in 1
+  * Brick Game E-33 2 in 1
+  * Block Game & Echo Key GA888 (Tetris Jr. clone)
+  * Radio Shack Stack Challenge
+  * Keychain 55 in 1
+  * Keychain GA-878
+  * Micon KC-32
+* Virtual Pets
+  * Tamagotchi P1 (distributed without ROM)
+  * Tamagotchi P2 (distributed without ROM)
+  * Tamagotchi Mothra (distributed without ROM)
+  * Tamagotchi Angle (distributed without ROM)
+  * Tamagotchi Umino (distributed without ROM)
+  * Tamagotchi Morino (distributed without ROM)
+  * Digimon Ver. 1 (distributed without ROM)
+  * Digimon Ver. 2 (distributed without ROM)
+  * Digimon Ver. 3 (distributed without ROM)
+  * Nikko virtual pet
+  * Pocket Pikachu (distributed without ROM)
+  * Mickey Deluxe Virtual Game virtual pet
+  * Apollo 2 in 1 virtual pet
+* Other LCD Games
+  * Epoch Chibi Pachi Alien Fever
+  * Formel 1 (Hartung Spiele Berlin/Epoch)
+  * The Legend of Zelda Game Watch (distributed without ROM)
+  * Space Intruder TK-150I
+  * Mame Game Tamagotch (distributed without ROM)
+  * Mame Galaxian (distributed without ROM)
+  * Keychain Pin Ball
 
 ## Compiling
 Tested with Ubuntu 24.
