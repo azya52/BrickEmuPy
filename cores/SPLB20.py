@@ -321,7 +321,7 @@ class SPLB20():
 
         self._LCD_CFG = 0
         self._LCD_BIAS = 0
-        self._SYS_CTRL = 0x80
+        self._SYS_CTRL = 0
         self._INT_CFG = 0
         self._IREQ = 0
         
@@ -330,8 +330,7 @@ class SPLB20():
         self._PRESCALAR = 0
         self._KEYSCAN_CTRL = 0
 
-        self._set_io_System_Ctrl(self._SYS_CTRL)
-
+        self._sound.set_enable(False, 0)
         self._go_vector(VADDR_RESET)
         
     def _go_vector(self, addr):
@@ -370,17 +369,17 @@ class SPLB20():
                 self.reset()
         else:
             prev_port = self._port_read(port)
-            self._port_input[port][0] &= ~(1 << pin)
-            self._port_input[port][1] &= ~(1 << pin)
+            self._port_input[port][0] &= ~pin
+            self._port_input[port][1] &= ~pin
             if (level >= 0):
-                self._port_input[port][level] |= (1 << pin)
+                self._port_input[port][level] |= pin
             if (prev_port != self._port_read(port)):
                 if (port == "PA" and level == 0):
-                    self._IREQ |= IO_INT_CFG_NORMALKEY_INT
                     if (self._INT_CFG & IO_INT_CFG_NORMALKEY_INT):
+                        self._IREQ |= IO_INT_CFG_NORMALKEY_INT
                         self._NMI()
 
-    def _interrupt(self, addr):
+    def _IRQ(self, addr):
         self._write_mem(self._SP, self._PC >> 8)
         self._SP = (self._SP - 1) & 0xFF
         self._write_mem(self._SP, self._PC & 0xFF)
@@ -388,18 +387,21 @@ class SPLB20():
         self._write_mem(self._SP, self._ps())
         self._SP = (self._SP - 1) & 0xFF
         self._IF = 1
-        self._go_vector(addr)
+        self._go_vector(VADDR_IRQ)
 
     def _NMI(self):
-        self._ROSC_ENBL = 1
-        self._CPU_ENBL = 1
-        self._write_mem(self._SP, self._PC >> 8)
-        self._SP = (self._SP - 1) & 0xFF
-        self._write_mem(self._SP, self._PC & 0xFF)
-        self._SP = (self._SP - 1) & 0xFF
-        self._write_mem(self._SP, self._ps())
-        self._SP = (self._SP - 1) & 0xFF
-        self._go_vector(VADDR_NMI)
+        if (self._INT_CFG & IO_INT_CFG_NMI_ENBL):
+            if (self._ROSC_ENBL and self._CPU_ENBL):
+                self._write_mem(self._SP, self._PC >> 8)
+                self._SP = (self._SP - 1) & 0xFF
+                self._write_mem(self._SP, self._PC & 0xFF)
+                self._SP = (self._SP - 1) & 0xFF
+                self._write_mem(self._SP, self._ps())
+                self._SP = (self._SP - 1) & 0xFF
+                self._go_vector(VADDR_NMI)
+            else:
+                self._CPU_ENBL = self._ROSC_ENBL = 1
+                self._go_vector(VADDR_RESET)
 
     def _timers_clock(self, exec_cycles):
         if (self._SYS_CTRL & IO_SYS_CTRL_TIMER_ENBL):
@@ -412,8 +414,8 @@ class SPLB20():
                 self._TC -= 1
                 if (self._TC < 0):
                     self._TC = self._TC_PRESET
-                    self._IREQ |= IO_INT_CFG_COUNTER_INT
                     if (self._INT_CFG & IO_INT_CFG_COUNTER_INT):
+                        self._IREQ |= IO_INT_CFG_COUNTER_INT
                         self._NMI()
 
         self._T2HZ_counter -= exec_cycles
@@ -422,8 +424,8 @@ class SPLB20():
                 self._T2HZ_counter += (1 << self._PRESCALAR) * (SUB_CLOCK // 2)
             else:
                 self._T2HZ_counter += self._sub_clock_div * (SUB_CLOCK // 2)
-            self._IREQ |= IO_INT_CFG_T2HZ_INT
             if (self._INT_CFG & IO_INT_CFG_T2HZ_INT):
+                self._IREQ |= IO_INT_CFG_T2HZ_INT
                 self._NMI()
         
         self._T128HZ_counter -= exec_cycles
@@ -432,8 +434,8 @@ class SPLB20():
                 self._T128HZ_counter += (1 << self._PRESCALAR) * (SUB_CLOCK // 128)
             else:
                 self._T128HZ_counter += self._sub_clock_div * (SUB_CLOCK // 128)
-            self._IREQ |= IO_INT_CFG_T128HZ_INT
             if (self._INT_CFG & IO_INT_CFG_T128HZ_INT):
+                self._IREQ |= IO_INT_CFG_T128HZ_INT
                 self._NMI()
 
     def clock(self):
@@ -444,7 +446,7 @@ class SPLB20():
                 bytes_count = self._execute[byte][1]
                 opcode = self._ROM.getBytes(self._PC - self._rom_offset, bytes_count)
                 self._PC += bytes_count
-                exec_cycles *= self._execute[byte][0](self, opcode)
+                exec_cycles = self._execute[byte][0](self, opcode)
                 self._instr_counter += 1
             self._timers_clock(exec_cycles)
         elif (self._SYS_CTRL & IO_SYS_CTRL_32K_ENBL):
@@ -471,10 +473,7 @@ class SPLB20():
     
     def _set_io_PortA_Output(self, value):
         self._PCFG["PA"] = value
-        if (value & 0xC0 != 0xC0):
-            self._sound.stop(self._cycle_counter)
-        else:
-            self._sound.tone(self._cycle_counter)
+        self._sound.set_enable(value & 0xC0 == 0xC0, self._cycle_counter)
 
     def _get_io_PortA_Data(self):
         return self._port_read("PA")
@@ -513,7 +512,7 @@ class SPLB20():
         pass
 
     def _get_io_Interrupt_Config(self):
-        buf = self._IREQ
+        buf = self._IREQ | (self._INT_CFG & 0x80)
         self._IREQ = 0
         return buf
 
@@ -527,8 +526,10 @@ class SPLB20():
         self._ROSC_ENBL = ((self._SYS_CTRL | ~value) & IO_SYS_CTRL_ROSC_STOP) > 0
         self._CPU_ENBL = ((self._SYS_CTRL | ~value) & IO_SYS_CTRL_CPU_STOP) > 0
         self._SYS_CTRL = value
-        if (not self._ROSC_ENBL and self._non_crystal_mode):
-            self._sound.stop(self._cycle_counter)
+        if ((not self._ROSC_ENBL and self._non_crystal_mode) or (not value & IO_SYS_CTRL_TIMER_ENBL)):
+            self._sound.set_enable(False, self._cycle_counter)
+        else:
+            self._sound.set_enable(self._PCFG["PA"] & 0xC0 == 0xC0, self._cycle_counter)
 
     def _get_io_DownCounter_PresetValue(self):
         return self._TC_PRESET
@@ -638,12 +639,11 @@ class SPLB20():
         self._CF = new_value >= 0
 
         self._A = new_value & 0xFF
-        return 0
 
     def _brk(self, opcode):
         self._BF = 1
         self._PC = (self._PC + 1) & 0xFFFF
-        self._interrupt(VADDR_IRQ)
+        self._IRQ()
         return 7
 
     def _ora_zp(self, opcode):
@@ -675,9 +675,10 @@ class SPLB20():
         return 2
 
     def _jsr_abs(self, opcode):
-        self._write_mem(self._SP, self._PC >> 8)
+        pc = self._PC - 1
+        self._write_mem(self._SP, (pc >> 8) & 0xFF)
         self._SP = (self._SP - 1) & 0xFF
-        self._write_mem(self._SP, self._PC & 0xFF)
+        self._write_mem(self._SP, pc & 0xFF)
         self._SP = (self._SP - 1) & 0xFF
         self._PC = ((opcode >> 8) & 0xFF) | ((opcode & 0xFF) << 8)
         return 6
@@ -700,7 +701,7 @@ class SPLB20():
         self._write_mem(opcode & 0xFF, new_value & 0xFF)
         self._NF = new_value & 0x80 > 0
         self._ZF = not(new_value & 0xFF)
-        self._CF = new_value >> 8
+        self._CF = new_value > 0xFF
         return 5
 
     def _plp(self, opcode):
@@ -719,7 +720,7 @@ class SPLB20():
         self._A = new_value & 0xFF
         self._NF = new_value & 0x80 > 0
         self._ZF = not(new_value & 0xFF)
-        self._CF = new_value >> 8
+        self._CF = new_value > 0xFF
         return 2
 
     def _bit_abs(self, opcode):
@@ -779,8 +780,7 @@ class SPLB20():
         return 2
 
     def _eor_zp_x(self, opcode):
-        addr = (opcode + self._X) & 0xFF
-        self._A ^= self._read_mem(addr)
+        self._A ^= self._read_mem((opcode + self._X) & 0xFF)
         self._NF = self._A >> 7
         self._ZF = not self._A
         return 4
@@ -803,6 +803,7 @@ class SPLB20():
         self._PC = self._read_mem(self._SP)
         self._SP = (self._SP + 1) & 0xFF
         self._PC |= self._read_mem(self._SP) << 8
+        self._PC += 1
         return 6
 
     def _adc_zp(self, opcode):
@@ -885,8 +886,7 @@ class SPLB20():
         return 2
 
     def _sta_zp_x(self, opcode):
-        addr = (opcode + self._X) & 0xFF
-        self._write_mem(addr, self._A)
+        self._write_mem((opcode + self._X) & 0xFF, self._A)
         return 4
 
     def _txs(self, opcode):
@@ -894,10 +894,9 @@ class SPLB20():
         return 2
 
     def _lda_ind_x(self, opcode):
-        operand = self._read_mem(self._read_mem((opcode + self._X) & 0xFF) | (self._read_mem((opcode + self._X + 1) & 0xFF) << 8))
-        self._NF = operand >> 7
-        self._ZF = not operand
-        self._A = operand
+        self._A = self._read_mem(self._read_mem((opcode + self._X) & 0xFF) | (self._read_mem((opcode + self._X + 1) & 0xFF) << 8))
+        self._NF = self._A >> 7
+        self._ZF = not self._A
         return 6
 
     def _ldx_imm(self, opcode):
@@ -907,10 +906,9 @@ class SPLB20():
         return 2
 
     def _lda_zp(self, opcode):
-        operand = self._read_mem(opcode & 0xFF)
-        self._NF = operand >> 7
-        self._ZF = not operand
-        self._A = operand
+        self._A = self._read_mem(opcode & 0xFF)
+        self._NF = self._A >> 7
+        self._ZF = not self._A
         return 3
 
     def _ldx_zp(self, opcode):
@@ -920,10 +918,9 @@ class SPLB20():
         return 3
 
     def _lda_imm(self, opcode):
-        operand = opcode & 0xFF
-        self._NF = operand >> 7
-        self._ZF = not operand
-        self._A = operand
+        self._A = opcode & 0xFF
+        self._NF = self._A >> 7
+        self._ZF = not self._A
         return 2
 
     def _tax(self, opcode):
@@ -933,10 +930,9 @@ class SPLB20():
         return 2
 
     def _lda_abs(self, opcode):
-        operand = self._read_mem(((opcode & 0xFF) << 8) | ((opcode >> 8) & 0xFF))
-        self._NF = operand >> 7
-        self._ZF = not operand
-        self._A = operand
+        self._A = self._read_mem(((opcode & 0xFF) << 8) | ((opcode >> 8) & 0xFF))
+        self._NF = self._A >> 7
+        self._ZF = not self._A
         return 4
 
     def _ldx_abs(self, opcode):
@@ -954,10 +950,9 @@ class SPLB20():
         return 2
 
     def _lda_zp_x(self, opcode):
-        operand = self._read_mem((opcode + self._X) & 0xFF)
-        self._NF = operand >> 7
-        self._ZF = not operand
-        self._A = operand
+        self._A = self._read_mem((opcode + self._X) & 0xFF)
+        self._NF = self._A >> 7
+        self._ZF = not self._A
         return 4
 
     def _clv(self, opcode):
@@ -972,10 +967,9 @@ class SPLB20():
 
     def _lda_abs_x(self, opcode):
         addr = (((opcode << 8) | ((opcode >> 8) & 0xFF)) + self._X) & 0xFFFF
-        operand = self._read_mem(addr)
-        self._NF = operand >> 7
-        self._ZF = not operand
-        self._A = operand
+        self._A = self._read_mem(addr)
+        self._NF = self._A >> 7
+        self._ZF = not self._A
         return 4 + ((self._PC ^ addr) > 255)
 
     def _cmp_zp(self, opcode):
@@ -1013,8 +1007,7 @@ class SPLB20():
         return 2
 
     def _cmp_zp_x(self, opcode):
-        addr = (opcode + self._X) & 0xFF
-        test_value = self._A - self._read_mem(addr)
+        test_value = self._A - self._read_mem((opcode + self._X) & 0xFF)
         self._NF = (test_value >> 7) & 0x1
         self._ZF = not test_value
         self._CF = test_value >= 0
@@ -1043,7 +1036,8 @@ class SPLB20():
         return 3
 
     def _sbc_zp(self, opcode):
-        return 3 + self._sbc(self._read_mem(opcode & 0xFF))
+        self._sbc(self._read_mem(opcode & 0xFF))
+        return 3
 
     def _inc_zp(self, opcode):
         new_value = (self._read_mem(opcode & 0xFF) + 1) & 0xFF
@@ -1059,13 +1053,14 @@ class SPLB20():
         return 2
 
     def _sbc_imm(self, opcode):
-        return 2 + self._sbc(opcode & 0xFF)
+        self._sbc(opcode & 0xFF)
+        return 2
 
     def _nop(self, opcode):
         return 2
 
     def _beq(self, opcode):
-        if (self._ZF == 1):
+        if (self._ZF):
             prev_PC = self._PC
             self._PC = (self._PC + (opcode & 0xFF) - ((opcode & 0x80) << 1)) & 0xFFFF
             return 3 + ((self._PC ^ prev_PC) > 255)
@@ -1076,5 +1071,5 @@ class SPLB20():
         return 2
     
     def _dummy(self, opcode):
-        print("illegal instruction %0.4X" % opcode)
+        print("illegal instruction %0.4X: %0.4X" % (self._PC, opcode))
         return 2

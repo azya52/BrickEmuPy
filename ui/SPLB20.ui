@@ -502,6 +502,86 @@
               <attribute name="verticalHeaderMinimumSectionSize">
                <number>0</number>
               </attribute>
+<column>
+               <property name="text">
+                <string>00</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>01</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>02</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>03</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>04</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>05</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>06</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>07</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>08</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>09</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>0A</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>0B</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>0C</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>0D</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>0E</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>0F</string>
+               </property>
+              </column>
               <item row="0" column="0">
                <property name="text">
                 <string>00</string>
