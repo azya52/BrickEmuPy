@@ -1,0 +1,56 @@
+{
+	"id": "87d5d943-7069-48bd-9bd6-6f4e0e4bc3c9",
+	"core": "SPLB20",
+	"face_path": "./assets/ElfinTwins.svg",
+	"clock": 780000,
+	
+	"buttons": {
+		"btnEsc": {
+			"port": "PA",
+			"pin": 1,
+			"level": 0,
+			"hot_keys": [49, 16777216]
+		},
+		"btnEnter": {
+			"port": "PA",
+			"pin": 16,
+			"level": 0,
+			"hot_keys": [50, 16777221]
+		},
+		"btnClock": {
+			"port": "PA",
+			"pin": 8,
+			"level": 0,
+			"hot_keys": [51, 67]
+		},
+		"btnLeft": {
+			"port": "PA",
+			"pin": 2,
+			"level": 0,
+			"hot_keys": [65, 16777234]
+		},
+		"btnRight": {
+			"port": "PA",
+			"pin": 4,
+			"level": 0,
+			"hot_keys": [68, 16777236]
+		},
+		"btnUp": {
+			"port": "PA",
+			"pin": 6,
+			"level": 0,
+			"hot_keys": [87, 16777235]
+		},
+		"btnDown": {
+			"port": "PA",
+			"pin": 12,
+			"level": 0,
+			"hot_keys": [83, 16777237]
+		}
+	},
+	
+	"mask_options": {
+		"rom_path": "./assets/ElfinTwins.bin",
+		"non_crystal_mode": 0
+	}
+}
