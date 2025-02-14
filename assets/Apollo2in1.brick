@@ -7,25 +7,25 @@
 	"buttons": {
 		"btnMode": {
 			"port": "PA",
-			"pin": 1,
+			"pin": 2,
 			"level": 0,
 			"hot_keys": [49]
 		},
 		"btnEnter": {
 			"port": "PA",
-			"pin": 2,
+			"pin": 4,
 			"level": 0,
 			"hot_keys": [50]
 		},
 		"btnExit": {
 			"port": "PA",
-			"pin": 3,
+			"pin": 8,
 			"level": 0,
 			"hot_keys": [51]
 		},
 		"btnRev": {
 			"port": "PA",
-			"pin": 4,
+			"pin": 16,
 			"level": 0,
 			"hot_keys": [52]
 		}
