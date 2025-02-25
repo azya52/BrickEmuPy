@@ -79,7 +79,8 @@ class AudioData(QIODevice):
     def startFor(self, freq, noise, duration, dutyRatio, goalTime):
         if (len(self._toneStarts) == 0):
             self._currentByte = round(self._sampleRate * goalTime) * self._bytesPerSample
-        goalSample = DATA_PART_SIZE + round(self._sampleRate * goalTime) * self._bytesPerSample
+        goalSample = DATA_PART_SIZE + round(self._sampleRate * goalTime) * self._bytesPerSample           
+        self._toneEnds = []
         if (len(self._toneStarts) > len(self._toneEnds)):
             self._toneEnds.append(goalSample)
         if (freq > 0):
