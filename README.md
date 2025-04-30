@@ -35,6 +35,7 @@ The following handheld games are currently emulated:
   * Mame Galaxian (distributed without ROM)
   * Keychain Pin Ball
   * Hiro Pocket Boy No.2
+  * Gundam Space Combat 3 in 1
 
 ## Compiling
 Tested with Ubuntu 24.
