@@ -18,6 +18,7 @@ The following handheld games are currently emulated:
   * Tamagotchi Angle (distributed without ROM)
   * Tamagotchi Umino (distributed without ROM)
   * Tamagotchi Morino (distributed without ROM)
+  * Tamagotchi Genjintch (distributed without ROM)
   * Digimon Ver. 1 (distributed without ROM)
   * Digimon Ver. 2 (distributed without ROM)
   * Digimon Ver. 3 (distributed without ROM)
@@ -33,6 +34,7 @@ The following handheld games are currently emulated:
   * Mame Game Tamagotch (distributed without ROM)
   * Mame Galaxian (distributed without ROM)
   * Keychain Pin Ball
+  * Hiro Pocket Boy No.2
 
 ## Compiling
 Tested with Ubuntu 24.
