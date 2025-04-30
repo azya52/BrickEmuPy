@@ -1,0 +1,43 @@
+{
+	"id": "d7bff894-756a-434e-a89f-afe2254aa738",
+	"core": "T6770S",
+	"face_path": "./assets/Gundam3in1.svg",
+	"clock": 150000,
+	
+	"buttons": {
+		"btnUp": {
+			"port": "INP",
+			"pin": 3,
+			"level": 1,
+			"hot_keys": [87, 16777235]
+		},
+		"btnDown": {
+			"port": "INP",
+			"pin": 2,
+			"level": 1,
+			"hot_keys": [83, 16777237]
+		},
+		"btnTime": {
+			"port": "INP",
+			"pin": 1,
+			"level": 1,
+			"hot_keys": [50, 77]
+		},
+		"btnStart": {
+			"port": "IOP",
+			"pin": 0,
+			"level": 1,
+			"hot_keys": [49, 32]
+		},
+		"btnReset": {
+			"port": "RES",
+			"pin": 0,
+			"level": 1,
+			"hot_keys": [82]
+		}
+	},
+	
+	"mask_options": {
+		"rom_path": "./assets/Gundam3in1.bin"
+	}
+}

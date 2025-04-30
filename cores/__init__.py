@@ -16,6 +16,8 @@ from .SPLB20 import *
 from .SPLB20dasm import *
 from .LC5732 import *
 from .LC5732dasm import *
+from .T6770S import *
+from .T6770Sdasm import *
 
 __all__ = [
     "E0C6200",
@@ -36,6 +38,8 @@ __all__ = [
     "SPLB20dasm",
     "LC5732",
     "LC5732dasm",
+    "T6770S",
+    "T6770Sdasm",
     "cores_map"]
 
 cores_map = {
@@ -74,5 +78,9 @@ cores_map = {
     "LC5732": {
         "core": LC5732,
         "dasm": LC5732dasm
+    },
+    "T6770S": {
+        "core": T6770S,
+        "dasm": T6770Sdasm
     }
 }

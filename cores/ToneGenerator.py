@@ -30,6 +30,7 @@ class AudioData(QIODevice):
                 if (self._currentByte < self._toneStarts[0][0]):
                     chunk = min(maxlen, self._toneStarts[0][0] - self._currentByte)
                     data.append(chunk, b'\0')
+                    self._phase = 0
                 elif (len(self._toneEnds) == 0):
                     data.append(self.getWaveData(chunk, self._toneStarts[0][1], self._toneStarts[0][2], self._toneStarts[0][3]))
                 elif (self._currentByte < self._toneEnds[0]):
