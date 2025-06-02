@@ -36,6 +36,7 @@ The following handheld games are currently emulated:
   * Keychain Pin Ball
   * Hiro Pocket Boy No.2
   * Gundam Space Combat 3 in 1
+  * Epoch Monster Panic
 
 ## Compiling
 Tested with Ubuntu 24.
