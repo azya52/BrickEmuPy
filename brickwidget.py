@@ -148,6 +148,10 @@ class BrickWidget(QtWidgets.QGraphicsView):
         body.setElementId("body")
         self.scene().addItem(body)
 
+        overlay = QtSvgWidgets.QGraphicsSvgItem()
+        overlay.setSharedRenderer(faceRenderer)
+        overlay.setElementId("overlay")
+
         self._segments = []
         for ramBit in range(8):
             for ramNibble in range(256):
@@ -159,6 +163,9 @@ class BrickWidget(QtWidgets.QGraphicsView):
                     segment.setPos(faceRenderer.boundsOnElement(nextId).topLeft())
                     self.scene().addItem(segment)
                     self._segments.append((ramNibble, ramBit, segment))
+        
+        overlay.setPos(faceRenderer.boundsOnElement("overlay").topLeft())
+        self.scene().addItem(overlay)
 
         for name, value in self._config["buttons"].items():
             if (faceRenderer.elementExists(name)):

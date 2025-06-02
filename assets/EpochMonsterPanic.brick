@@ -1,0 +1,54 @@
+{
+	"id": "6dd9a695-c493-4f4b-94d0-18b7610b9e97",
+	"core": "D750X",
+	"face_path": "./assets/EpochMonsterPanic.svg",
+	"clock": 90000,
+	
+	"buttons": {
+		"btnAdjust": {
+			"port": "5",
+			"pin": 0,
+			"level": 1,
+			"hot_keys": [50]
+		},
+		"btnMode": {
+			"port": "5",
+			"pin": 1,
+			"level": 1,
+			"hot_keys": [51, 82]
+		},
+		"btnLeft": {
+			"port": "4",
+			"pin": 1,
+			"level": 1,
+			"hot_keys": [65, 16777234]
+		},
+		"btnRight": {
+			"port": "4",
+			"pin": 0,
+			"level": 1,
+			"hot_keys": [68, 16777236]
+		},
+		"btnAttack": {
+			"port": "4",
+			"pin": 2,
+			"level": 1,
+			"hot_keys": [83, 16777237]
+		},
+		"btnJump": {
+			"port": "4",
+			"pin": 3,
+			"level": 1,
+			"hot_keys": [32, 16777235, 16777220]
+		}
+	},
+	
+	"mask_options": {
+		"rom_path": "./assets/result.bin",
+		
+		"sound": {
+			"port": 6,
+			"pin": 3
+		}
+	}
+}

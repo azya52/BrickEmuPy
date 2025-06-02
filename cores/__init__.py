@@ -8,6 +8,8 @@ from .EM73000 import *
 from .EM73000dasm import *
 from .KS56CX2X import *
 from .KS56CX2Xdasm import *
+from .KS57C2XX import *
+from .KS57C2XXdasm import *
 from .M37520 import *
 from .M37520dasm import *
 from .MSM50XX import *
@@ -18,6 +20,8 @@ from .LC5732 import *
 from .LC5732dasm import *
 from .T6770S import *
 from .T6770Sdasm import *
+from .D750X import *
+from .D750Xdasm import *
 
 __all__ = [
     "E0C6200",
@@ -30,6 +34,8 @@ __all__ = [
     "EM73000dasm",
     "KS56CX2X",
     "KS56CX2Xdasm",
+    "KS57C2XX",
+    "KS57C2XXdasm",
     "M37520",
     "M37520dasm",
     "MSM50XX",
@@ -40,6 +46,8 @@ __all__ = [
     "LC5732dasm",
     "T6770S",
     "T6770Sdasm",
+    "D750X",
+    "D750Xdasm",
     "cores_map"]
 
 cores_map = {
@@ -63,6 +71,10 @@ cores_map = {
         "core": KS56CX2X,
         "dasm": KS56CX2Xdasm
     },
+    "KS57C2XX": {
+        "core": KS57C2XX,
+        "dasm": KS57C2XXdasm
+    },
     "M37520": {
         "core": M37520,
         "dasm": M37520dasm
@@ -82,5 +94,9 @@ cores_map = {
     "T6770S": {
         "core": T6770S,
         "dasm": T6770Sdasm
+    },
+    "D750X": {
+        "core": D750X,
+        "dasm": D750Xdasm
     }
 }
