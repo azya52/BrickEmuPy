@@ -8,8 +8,6 @@ from .EM73000 import *
 from .EM73000dasm import *
 from .KS56CX2X import *
 from .KS56CX2Xdasm import *
-from .KS57C2XX import *
-from .KS57C2XXdasm import *
 from .M37520 import *
 from .M37520dasm import *
 from .MSM50XX import *
@@ -34,8 +32,6 @@ __all__ = [
     "EM73000dasm",
     "KS56CX2X",
     "KS56CX2Xdasm",
-    "KS57C2XX",
-    "KS57C2XXdasm",
     "M37520",
     "M37520dasm",
     "MSM50XX",
@@ -70,10 +66,6 @@ cores_map = {
     "KS56CX2X": {
         "core": KS56CX2X,
         "dasm": KS56CX2Xdasm
-    },
-    "KS57C2XX": {
-        "core": KS57C2XX,
-        "dasm": KS57C2XXdasm
     },
     "M37520": {
         "core": M37520,
