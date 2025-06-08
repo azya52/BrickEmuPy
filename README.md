@@ -15,7 +15,7 @@ The following handheld games are currently emulated:
   * Tamagotchi P1 (distributed without ROM)
   * Tamagotchi P2 (distributed without ROM)
   * Tamagotchi Mothra (distributed without ROM)
-  * Tamagotchi Angle (distributed without ROM)
+  * Tamagotchi Angel (distributed without ROM)
   * Tamagotchi Umino (distributed without ROM)
   * Tamagotchi Morino (distributed without ROM)
   * Tamagotchi Genjintch (distributed without ROM)
