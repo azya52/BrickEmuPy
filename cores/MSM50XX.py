@@ -180,6 +180,8 @@ class MSM50XX():
         self._RAM = [0] * RAM_SIZE
         self._GRAM = [0] * GRAM_SIZE
 
+        self._sound.set_sound(0)
+
     def reset(self):
         self._reset()
 
@@ -301,6 +303,10 @@ class MSM50XX():
     def _get_ap(self, opcode):
         a = opcode & 0xF
         return (self._PAGE << 4) | (self._AREG if (a == 0xF) else a)
+    
+    def _get_ax(self, opcode):
+        a = opcode & 0xF
+        return (opcode & 0x70) | (self._AREG if (a == 0xF) else a)
     
     def _nop(self, opcode):
         #00 0000 0000 0000
@@ -818,7 +824,7 @@ class MSM50XX():
 
     def _chg_ax(self, opcode):
         #11 1000 0XXX AAAA
-        a = opcode & 0x7F
+        a = self._get_ax(opcode)
         b = self._ACC
         self._ACC = self._RAM[a]
         self._RAM[a] = b
@@ -832,7 +838,7 @@ class MSM50XX():
 
     def _mov_acc_ax(self, opcode):
         #11 1100 0XXX AAAA
-        self._RAM[opcode & 0x7F] = self._ACC
+        self._RAM[self._get_ax(opcode)] = self._ACC
 
     def _mov_acc_ap(self, opcode):
         #11 1101 0000 AAAA
@@ -840,7 +846,7 @@ class MSM50XX():
 
     def _mov_ax_acc(self, opcode):
         #11 1110 0XXX AAAA
-        self._ACC = self._RAM[opcode & 0x7F]
+        self._ACC = self._RAM[self._get_ax(opcode)]
         self._ZF = not self._ACC
 
     def _mov_ap_acc(self, opcode):
