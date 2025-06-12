@@ -30,6 +30,7 @@ The following handheld games are currently emulated:
   * Epoch Chibi Pachi Alien Fever
   * Formel 1 (Hartung Spiele Berlin/Epoch)
   * The Legend of Zelda Game Watch (distributed without ROM)
+  * Super Mario Bros. Game Watch (distributed without ROM)
   * Space Intruder TK-150I
   * Mame Game Tamagotch (distributed without ROM)
   * Mame Galaxian (distributed without ROM)
