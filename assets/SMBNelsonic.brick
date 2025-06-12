@@ -1,0 +1,51 @@
+{
+	"id": "07a06264-2ea5-470a-a07e-a119bf330385",
+	"credits": "ROM photo and LCD vector image by Sean Riddle (https://seanriddle.com/)",
+	"core": "MSM50XX",
+	"face_path": "./assets/SMBNelsonic.svg",
+	"clock": 32768,
+	
+	"buttons": {
+		"btnLeft": {
+			"port": "PK",
+			"pin": 1,
+			"level": 1,
+			"hot_keys": [65, 16777234]
+		},
+		"btnRight": {
+			"port": "PK",
+			"pin": 0,
+			"level": 1,
+			"hot_keys": [68, 16777236]
+		},
+		"btnUp": {
+			"port": "PK",
+			"pin": 3,
+			"level": 1,
+			"hot_keys": [87, 16777235]
+		},
+		"btnDown": {
+			"port": "PK",
+			"pin": 2,
+			"level": 1,
+			"hot_keys": [83, 16777237]
+		},
+		"btnMode": {
+			"port": "PS",
+			"pin": 0,
+			"level": 1,
+			"hot_keys": [49, 77]
+		},
+		"btnSet": {
+			"port": "PS",
+			"pin": 1,
+			"level": 1,
+			"hot_keys": [50, 32]
+		}
+	},
+	
+	"mask_options": {
+		"rom_path": "./assets/SMBNelsonic.bin",
+		"sound_freq_div_tbl": [0, 6, 8, 5, 4, 7, 8, 6, 6.5, 5.5, 8, 6.5, 6, 7.5, 7, 8.5]
+	}
+}
