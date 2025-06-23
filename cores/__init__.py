@@ -18,6 +18,8 @@ from .LC5732 import *
 from .LC5732dasm import *
 from .T6770S import *
 from .T6770Sdasm import *
+from .T7741 import *
+from .T7741dasm import *
 from .D750X import *
 from .D750Xdasm import *
 
@@ -42,6 +44,8 @@ __all__ = [
     "LC5732dasm",
     "T6770S",
     "T6770Sdasm",
+    "T7741",
+    "T7741dasm",
     "D750X",
     "D750Xdasm",
     "cores_map"]
@@ -86,6 +90,10 @@ cores_map = {
     "T6770S": {
         "core": T6770S,
         "dasm": T6770Sdasm
+    },
+    "T7741": {
+        "core": T7741,
+        "dasm": T7741dasm
     },
     "D750X": {
         "core": D750X,
