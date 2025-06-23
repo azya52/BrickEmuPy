@@ -144,14 +144,14 @@ class T6770S():
         self._CF = 0
         self._nSF = 0
         
-        self._T64F = 0
-        self._T8F = 0
-        self._T1F = 0
+        self._PZF = 0
+        self._PYF = 0
+        self._PXF = 0
 
         self._INP = 0
         self._OUTP = 0
         self._IOP = 0
-        self._LD = 0
+        self._BZ = 0
         
         self._HALT = 0
 
@@ -176,14 +176,13 @@ class T6770S():
             "L": self._L,
             "CF": self._CF,
             "SF": self._nSF ^ 0x1,
-            "HALT": self._HALT,
-            "T64F": self._T64F,
-            "T8F": self._T8F,
-            "T1F": self._T1F,
+            "PZF": self._PZF,
+            "PYF": self._PYF,
+            "PXF": self._PXF,
             "INP": self._INP,
             "OUTP": self._OUTP,
             "IOP": self._IOP,
-            "LD": self._LD,
+            "BZ": self._BZ,
             "RAM": tuple(self._RAM),
             "GRAM": tuple(self._GRAM),
         }
@@ -203,22 +202,20 @@ class T6770S():
             self._CF = state["CF"] & 0x1
         if ("SF" in state):
             self._nSF = (state["SF"] & 0x1) ^ 0x1
-        if ("T64F" in state):
-            self._T64F = state["T64F"] & 0x1
-        if ("T8F" in state):
-            self._T8F = state["T8F"] & 0x1
-        if ("T1F" in state):
-            self._T1F = state["T1F"] & 0x1
-        if ("HALT" in state):
-            self._HALT = state["HALT"] & 0x1
+        if ("PZF" in state):
+            self._PZF = state["PZF"] & 0x1
+        if ("PYF" in state):
+            self._PYF = state["PYF"] & 0x1
+        if ("PXF" in state):
+            self._PXF = state["PXF"] & 0x1
         if ("INP" in state):
             self._INP = state["INP"] & 0xF
         if ("OUTP" in state):
             self._OUTP = state["OUTP"] & 0xF
         if ("IOP" in state):
             self._IOP = state["IOP"] & 0xF
-        if ("LD" in state):
-            self._LD = state["LD"] & 0xF
+        if ("BZ" in state):
+            self._BZ = state["BZ"] & 0xF
         if ("RAM" in state):
             for i, value in state["RAM"].items():
                 self._RAM[i] = value & 0xF
@@ -272,11 +269,11 @@ class T6770S():
             self._counter += exec_cycles * self._sub_clock_div
 
         if (self._counter % 512 < exec_cycles * self._sub_clock_div):
-            self._T64F = True
+            self._PZF = True
             if (self._counter % 4096 < exec_cycles * self._sub_clock_div):
-                self._T8F = True
+                self._PYF = True
                 if (self._counter % 32768 < exec_cycles * self._sub_clock_div):
-                    self._T1F = True
+                    self._PXF = True
 
         self._cycle_counter += exec_cycles
         return exec_cycles
@@ -328,14 +325,14 @@ class T6770S():
 
     def _tst_t1(self, opcode):
         #00 0000 0111 CF -, SF !t1; CC16; test 1 sec event
-        self._nSF = self._T1F
-        self._T1F = False
+        self._nSF = self._PXF
+        self._PXF = False
         return MCLOCK_DIV1
 
     def _tst_t8(self, opcode):
         #00 0000 1000 CF -, SF !t8; CC16; test 1/8 sec event
-        self._nSF = self._T8F
-        self._T8F = False
+        self._nSF = self._PYF
+        self._PYF = False
         return MCLOCK_DIV1
 
     def _mov_m1l_a(self, opcode):
@@ -419,8 +416,8 @@ class T6770S():
 
     def _out_ld_1(self, opcode):
         #00 0001 0110 LD = 1; CF -, SF 1; CC32; Set sound pin (0V)
-        self._LD = 1
-        self._sound.toggle(self._LD, 0, self._cycle_counter)
+        self._BZ = 1
+        self._sound.toggle(self._BZ, 0, self._cycle_counter)
         self._nSF = 0
         return MCLOCK_DIV1
 
@@ -519,8 +516,8 @@ class T6770S():
     
     def _tst_t64(self, opcode):
         #00 0010 1000 CF -, SF !t1; CC16; test 1/64 sec event
-        self._nSF = self._T64F
-        self._T64F = False
+        self._nSF = self._PZF
+        self._PZF = False
         return MCLOCK_DIV1
 
     def _mov_mhl_a(self, opcode):
@@ -607,8 +604,8 @@ class T6770S():
 
     def _out_ld_0(self, opcode):
         #00 0011 0110 LD = 0; CF -, SF 1; CC32, Reset sound pin (+3V)
-        self._LD = 0
-        self._sound.toggle(self._LD, 0, self._cycle_counter)
+        self._BZ = 0
+        self._sound.toggle(self._BZ, 0, self._cycle_counter)
         self._nSF = 0
         return MCLOCK_DIV4
 
