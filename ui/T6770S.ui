@@ -217,7 +217,7 @@
                 <property name="title">
                   <string> Flags </string>
                 </property>
-                <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0,0,0,0,0">
+                <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0,0,0,0">
                   <property name="spacing">
                   <number>4</number>
                   </property>
@@ -260,78 +260,59 @@
                   </widget>
                   </item>
                   <item>
-                  <widget class="QCheckBox" name="haltCheckBox">
+                  <widget class="QCheckBox" name="pxfCheckBox">
                     <property name="key" stdset="0">
-                      <string>HALT</string>
+                      <string>PXF</string>
                     </property>
                     <property name="type" stdset="0">
                       <string>boolean</string>
                     </property>
                     <property name="toolTip">
-                    <string>Halt mode</string>
+                    <string>Prescaler Event Flag X</string>
                     </property>
                     <property name="layoutDirection">
                     <enum>Qt::RightToLeft</enum>
                     </property>
                     <property name="text">
-                    <string>HALT</string>
+                    <string>PXF</string>
                     </property>
                   </widget>
                   </item>
                   <item>
-                  <widget class="QCheckBox" name="t1fCheckBox">
+                  <widget class="QCheckBox" name="pyfCheckBox">
                     <property name="key" stdset="0">
-                      <string>T1F</string>
+                      <string>PYF</string>
                     </property>
                     <property name="type" stdset="0">
                       <string>boolean</string>
                     </property>
                     <property name="toolTip">
-                    <string>1 sec event</string>
+                    <string>Prescaler Event Flag Y</string>
                     </property>
                     <property name="layoutDirection">
                     <enum>Qt::RightToLeft</enum>
                     </property>
                     <property name="text">
-                    <string>T1F</string>
+                    <string>PYF</string>
                     </property>
                   </widget>
                   </item>
                   <item>
-                  <widget class="QCheckBox" name="t8fCheckBox">
+                  <widget class="QCheckBox" name="pzfCheckBox">
                     <property name="key" stdset="0">
-                      <string>T8F</string>
+                      <string>PZF</string>
                     </property>
                     <property name="type" stdset="0">
                       <string>boolean</string>
                     </property>
                     <property name="toolTip">
-                    <string>1/8 sec event</string>
+                    <string>Prescaler Event Flag Z</string>
                     </property>
                     <property name="layoutDirection">
                     <enum>Qt::RightToLeft</enum>
                     </property>
                     <property name="text">
-                    <string>T8F</string>
-                    </property>
-                  </widget>
-                  </item>
-                  <item>
-                  <widget class="QCheckBox" name="t64fCheckBox">
-                    <property name="key" stdset="0">
-                      <string>T64F</string>
-                    </property>
-                    <property name="type" stdset="0">
-                      <string>boolean</string>
-                    </property>
-                    <property name="toolTip">
-                    <string>1/64 sec event</string>
-                    </property>
-                    <property name="layoutDirection">
-                    <enum>Qt::RightToLeft</enum>
-                    </property>
-                    <property name="text">
-                    <string>T64F</string>
+                    <string>PZF</string>
                     </property>
                   </widget>
                   </item>
@@ -429,16 +410,16 @@
                   </widget>
                   </item>
                   <item>
-                  <widget class="QLabel" name="ldLabel">
+                  <widget class="QLabel" name="bzLabel">
                     <property name="text">
-                    <string>LD</string>
+                    <string>BZ</string>
                     </property>
                   </widget>
                   </item>
                   <item>
-                  <widget class="QLineEdit" name="ldEdit">
+                  <widget class="QLineEdit" name="bzEdit">
                     <property name="key" stdset="0">
-                      <string>LD</string>
+                      <string>BZ</string>
                     </property>
                     <property name="type" stdset="0">
                       <string>integer</string>
@@ -826,7 +807,7 @@
                             <string>table</string>
                           </property>
                           <property name="mask" stdset="0">
-                            <string>%0.2X</string>
+                            <string>%0.1X</string>
                           </property>
                           <property name="alternatingRowColors">
                           <bool>true</bool>
@@ -848,12 +829,7 @@
                           </attribute>
                           <row>
                           <property name="text">
-                            <string>COM0</string>
-                          </property>
-                          </row>
-                          <row>
-                          <property name="text">
-                            <string>COM1</string>
+                            <string>COM2</string>
                           </property>
                           </row>
                           <row>
@@ -863,52 +839,57 @@
                           </row>
                           <row>
                           <property name="text">
-                            <string>COM3</string>
+                            <string>COM1</string>
+                          </property>
+                          </row>
+                          <row>
+                          <property name="text">
+                            <string>COM0</string>
                           </property>
                           </row>
                           <column>
                           <property name="text">
-                            <string>00</string>
+                            <string>S3-S0</string>
                           </property>
                           </column>
                           <column>
                           <property name="text">
-                            <string>01</string>
+                            <string></string>
                           </property>
                           </column>
                           <column>
                           <property name="text">
-                            <string>02</string>
+                            <string></string>
                           </property>
                           </column>
                           <column>
                           <property name="text">
-                            <string>03</string>
+                            <string></string>
                           </property>
                           </column>
                           <column>
                           <property name="text">
-                            <string>04</string>
+                            <string></string>
                           </property>
                           </column>
                           <column>
                           <property name="text">
-                            <string>05</string>
+                            <string></string>
                           </property>
                           </column>
                           <column>
                           <property name="text">
-                            <string>06</string>
+                            <string></string>
                           </property>
                           </column>
                           <column>
                           <property name="text">
-                            <string>07</string>
+                            <string></string>
                           </property>
                           </column>
                           <column>
                           <property name="text">
-                            <string>08</string>
+                            <string>S36-S33</string>
                           </property>
                           </column>
                           <item row="0" column="0">
@@ -1239,25 +1220,19 @@
    <slot>checkBoxStateChanged()</slot>
   </connection>
   <connection>
-   <sender>haltCheckBox</sender>
+   <sender>pxfCheckBox</sender>
    <signal>stateChanged(int)</signal>
    <receiver>DebugWidget</receiver>
    <slot>checkBoxStateChanged()</slot>
   </connection>
   <connection>
-   <sender>t1fCheckBox</sender>
+   <sender>pyfCheckBox</sender>
    <signal>stateChanged(int)</signal>
    <receiver>DebugWidget</receiver>
    <slot>checkBoxStateChanged()</slot>
   </connection>
   <connection>
-   <sender>t8fCheckBox</sender>
-   <signal>stateChanged(int)</signal>
-   <receiver>DebugWidget</receiver>
-   <slot>checkBoxStateChanged()</slot>
-  </connection>
-  <connection>
-   <sender>t64fCheckBox</sender>
+   <sender>pzfCheckBox</sender>
    <signal>stateChanged(int)</signal>
    <receiver>DebugWidget</receiver>
    <slot>checkBoxStateChanged()</slot>
@@ -1293,7 +1268,7 @@
    <slot>lineEditFinished()</slot>
   </connection>
   <connection>
-   <sender>ldEdit</sender>
+   <sender>bzEdit</sender>
    <signal>editingFinished()</signal>
    <receiver>DebugWidget</receiver>
    <slot>lineEditFinished()</slot>
