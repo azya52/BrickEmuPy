@@ -53,7 +53,7 @@ class T6770S():
             T6770S._inc_b,                        #00 0001 0011 B = B + 1; CF -, SF !c; CC16
             T6770S._nop,                          #00 0001 0100 CF -, SF 1; CC16; no operation
             T6770S._osc_ext,                      #00 0001 0101 ?clock from external oscillator (32k)
-            T6770S._out_ld_1,                     #00 0001 0110 LD = 1; CF -, SF 1; CC32; Set sound pin (0V)
+            T6770S._out_bz_1,                     #00 0001 0110 BZ = 1; CF -, SF 1; CC32; Set buzzer pin (0V)
             T6770S._delay_b,                      #00 0001 0111 B = 0xF; CF -, SF 0; CC8 * (n - 1) + CC16; Delay (B * CC8 + CC16)
             T6770S._wait_frame,                   #00 0001 1000 ?wait next frame
             T6770S._mov_b_a,                      #00 0001 1001 B = A; CF -, SF 1; CC16
@@ -85,7 +85,7 @@ class T6770S():
             T6770S._dec_b,                        #00 0011 0011 B = B - 1; CF -, SF !b; CC16 
             T6770S._movp_mhl_a,                   #00 0011 0100 M[HL] = M[H:L+1] = A, L = L + 2; CF -, SF 1; CC16
             T6770S._osc_int,                      #00 0011 0101 ?clock from interlal oscillation (resistor)
-            T6770S._out_ld_0,                     #00 0011 0110 LD = 0; CF -, SF 1; CC32; Reset sound pin (+3V)
+            T6770S._out_bz_0,                     #00 0011 0110 BZ = 0; CF -, SF 1; CC32; Reset buzzer pin (+3V)
             T6770S._0037,                         #00 0011 0111 ?IOP direction; CF -, SF 1; CC16
             T6770S._wait_com,                     #00 0011 1000 ?wait next com
             T6770S._mov_b_l,                      #00 0011 1001 B = L; CF -, SF 1; CC16
@@ -414,8 +414,8 @@ class T6770S():
         self._nSF = 0
         return MCLOCK_DIV1
 
-    def _out_ld_1(self, opcode):
-        #00 0001 0110 LD = 1; CF -, SF 1; CC32; Set sound pin (0V)
+    def _out_bz_1(self, opcode):
+        #00 0001 0110 BZ = 1; CF -, SF 1; CC32; Set buzzer pin (0V)
         self._BZ = 1
         self._sound.toggle(self._BZ, 0, self._cycle_counter)
         self._nSF = 0
@@ -602,8 +602,8 @@ class T6770S():
         self._nSF = 0
         return MCLOCK_DIV1
 
-    def _out_ld_0(self, opcode):
-        #00 0011 0110 LD = 0; CF -, SF 1; CC32, Reset sound pin (+3V)
+    def _out_bz_0(self, opcode):
+        #00 0011 0110 BZ = 0; CF -, SF 1; CC32, Reset buzzer pin (+3V)
         self._BZ = 0
         self._sound.toggle(self._BZ, 0, self._cycle_counter)
         self._nSF = 0

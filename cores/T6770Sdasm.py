@@ -39,7 +39,7 @@ class T6770Sdasm():
             T6770Sdasm._inc_b,                        #00 0001 0011 B = B + 1; CF -, SF !c; CC16
             T6770Sdasm._nop,                          #00 0001 0100 CF -, SF 1; CC16; no operation
             T6770Sdasm._osc_ext,                      #00 0001 0101 ?clock from external oscillator (32k)
-            T6770Sdasm._out_soundp_1,                 #00 0001 0110 SOUNDP = 1; CF -, SF 1; CC32; Set sound pin (0V)
+            T6770Sdasm._out_bz_1,                     #00 0001 0110 BZ = 1; CF -, SF 1; CC32; Set buzzer pin (0V)
             T6770Sdasm._delay_b,                      #00 0001 0111 B = 0xF; CF -, SF 0; CC8 * (n - 1) + CC16; Delay (B * CC8 + CC16)
             T6770Sdasm._wait_frame,                   #00 0001 1000 ?wait next frame
             T6770Sdasm._mov_b_a,                      #00 0001 1001 B = A; CF -, SF 1; CC16
@@ -71,7 +71,7 @@ class T6770Sdasm():
             T6770Sdasm._dec_b,                        #00 0011 0011 B = B - 1; CF -, SF !b; CC16 
             T6770Sdasm._movp_mhl_a,                   #00 0011 0100 M[HL] = M[H:L+1] = A, L = L + 2; CF -, SF 1; CC16
             T6770Sdasm._osc_int,                      #00 0011 0101 ?clock from interlal oscillation (resistor)
-            T6770Sdasm._out_soundp_0,                 #00 0011 0110 SOUNDP = 0; CF -, SF 1; CC32; Reset sound pin (+3V)
+            T6770Sdasm._out_bz_0,                     #00 0011 0110 BZ = 0; CF -, SF 1; CC32; Reset buzzer pin (+3V)
             T6770Sdasm._0037,                         #00 0011 0111 ?IOP direction; CF -, SF 1; CC16
             T6770Sdasm._wait_com,                     #00 0011 1000 ?wait next com
             T6770Sdasm._mov_b_l,                      #00 0011 1001 B = L; CF -, SF 1; CC16
@@ -226,9 +226,9 @@ class T6770Sdasm():
         #00 0001 0101 ?clock from external oscillator (32k); CF -, SF 1; CC16
         return ("osc ext", "?clock from external oscillator (32k); CF -, SF 1")
 
-    def _out_soundp_1(self, pc, opcode):
-        #00 0001 0110 SOUNDP = 1; CF -, SF 1; CC32; Set sound pin (0V)
-        return ("out SOUNDP, 1", "SOUNDP = 1; CF -, SF 1; Set sound pin (0V)")
+    def _out_bz_1(self, pc, opcode):
+        #00 0001 0110 BZ = 1; CF -, SF 1; CC32; Set buzzer pin (0V)
+        return ("out BZ, 1", "BZ = 1; CF -, SF 1; Set buzzer pin (0V)")
 
     def _delay_b(self, pc, opcode):
         #00 0001 0111 B = 0xF; CF -, SF 0; CC8 * (n - 1) + CC16; Delay (B * CC8 + CC16)
@@ -330,9 +330,9 @@ class T6770Sdasm():
         #00 0011 0101 ?clock from interlal oscillation (resistor); CF -, SF 1; CC16
         return ("osc int", "?clock from interlal oscillation (resistor); CF -, SF 1")
 
-    def _out_soundp_0(self, pc, opcode):
-        #00 0011 0110 SOUNDP = 0; CF -, SF 1; CC32, Reset sound pin (+3V)
-        return ("out SOUNDP, 0", "SOUNDP = 0; CF -, SF 1; Reset sound pin (+3V)")
+    def _out_bz_0(self, pc, opcode):
+        #00 0011 0110 BZ = 0; CF -, SF 1; CC32, Reset buzzer pin (+3V)
+        return ("out BZ, 0", "BZ = 0; CF -, SF 1; Reset buzzer pin (+3V)")
 
     def _0037(self, pc, opcode):
         #00 0011 0111 ?IOP direction; CF -, SF 1; CC16

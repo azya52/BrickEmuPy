@@ -121,29 +121,30 @@ class T7741dasm():
 
     def disassemble(self, rom):
         if (rom.size() > 0):
-            return {"LISTING": tuple(self._disassemble(0, rom))}
+            return {"LISTING": tuple(self._disassemble(0, rom, False))}
         else:
             return {}
     
     def disassemble2text(self, rom, file_path):
-        listing = self.disassemble(rom)["LISTING"]
-        result = ""
-        for i, line in enumerate(listing):
-            if (type(line[1]) is tuple):
-                result += (self._addrbase % i) + ":\t" + ((line[1][0] + "\t;" + line[0]).expandtabs(38) + "\t" + line[1][1]).expandtabs(10) + "\n"
-            else:
-                result += (self._addrbase % i) + ":\t" + line[1] + "\n"
-        with open(file_path, 'w') as f:
-            f.write(result)
+        if (rom.size() > 0):
+            listing = tuple(self._disassemble(0, rom, True))
+            result = ""
+            for i, line in enumerate(listing):
+                if (type(line[1]) is tuple):
+                    result += (self._addrbase % i) + ":\t" + ((line[1][0] + "\t;" + line[0]).expandtabs(38) + "\t" + line[1][1]).expandtabs(10) + "\n"
+                else:
+                    result += (self._addrbase % i) + ":\t" + line[1] + "\n"
+            with open(file_path, 'w') as f:
+                f.write(result)
     
-    def _disassemble(self, pc, rom):
+    def _disassemble(self, pc, rom, comments):
         listing = []
         self._prev_opcode = 0
         while ((pc * 2) < rom.size()):
             opcode = rom.getWord(pc * 2)
             instr = self._instructions[opcode](self, pc, opcode)
             self._prev_opcode = opcode
-            if (type(instr) is tuple):
+            if ((type(instr) is tuple) and (not comments)):
                 listing.append((self._opbase % opcode, instr[0]))
             else:
                 listing.append((self._opbase % opcode, instr))

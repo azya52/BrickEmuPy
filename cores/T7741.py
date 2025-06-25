@@ -188,7 +188,7 @@ class T7741():
             "INP": self._INP,
             "OUTP": self._OUTP,
             "IOP": self._IOP,
-            "LD": self._BZ,
+            "BZ": self._BZ,
             "RAM": tuple(self._RAM),
             "GRAM": tuple(self._GRAM),
         }
@@ -222,8 +222,8 @@ class T7741():
             self._OUTP = state["OUTP"] & 0xF
         if ("IOP" in state):
             self._IOP = state["IOP"] & 0xF
-        if ("LD" in state):
-            self._BZ = state["LD"] & 0xF
+        if ("BZ" in state):
+            self._BZ = state["BZ"] & 0xF
         if ("RAM" in state):
             for i, value in state["RAM"].items():
                 self._RAM[i] = value & 0xF
@@ -422,7 +422,7 @@ class T7741():
         return MCLOCK_DIV1
 
     def _out_bz_1(self, opcode):
-        #00 0001 0110 LD = 1; CF -, SF 1; CC32; Set buzzer pin (0V)
+        #00 0001 0110 BZ = 1; CF -, SF 1; CC32; Set buzzer pin (0V)
         self._BZ = 1
         self._sound.toggle(not self._BZ, 0, self._cycle_counter)
         self._nSF = 0
@@ -601,7 +601,7 @@ class T7741():
         return MCLOCK_DIV1
 
     def _out_bz_0(self, opcode):
-        #00 0011 0110 LD = 0; CF -, SF 1; CC32, Reset buzzer pin (+3V)
+        #00 0011 0110 BZ = 0; CF -, SF 1; CC32, Reset buzzer pin (+3V)
         self._BZ = 0
         self._sound.toggle(not self._BZ, 0, self._cycle_counter)
         self._nSF = 0
