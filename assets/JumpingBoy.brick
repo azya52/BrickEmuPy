@@ -1,0 +1,47 @@
+{
+	"id": "2a328592-5dcd-4e83-9dde-6abd22ba8f61",
+	"core": "T7741",
+	"face_path": "./assets/JumpingBoy.svg",
+	"clock": 188000,
+	
+	"buttons": {
+		"btnGameA": {
+			"port": "INP",
+			"pin": 0,
+			"level": 1,
+			"hot_keys": [65, 16777234, 83, 16777237]
+		},
+		"btnGameB": {
+			"port": "INP",
+			"pin": 1,
+			"level": 1,
+			"hot_keys": [68, 16777236, 87, 16777235]
+		},
+		"btnTime": {
+			"port": "INP",
+			"pin": 2,
+			"level": 1,
+			"hot_keys": [84]
+		},
+		"btnAlarm": {
+			"port": "INP",
+			"pin": 3,
+			"level": 1,
+			"hot_keys": [65]
+		},
+		"btnACL": {
+			"port": "RES",
+			"pin": 0,
+			"level": 1,
+			"hot_keys": [82]
+		}
+	},
+	
+	"mask_options": {
+		"rom_path": "./assets/JumpingBoy.bin",
+		"prescaler_div": [2, 8, 32],
+		"sub_clock": 32768,
+		"com_div": 768,
+		"sound_gnd": 0
+	}
+}
