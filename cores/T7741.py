@@ -24,6 +24,8 @@ class T7741():
         self._com_div = mask['com_div']
         self._frame_div = self._com_div * COM_COUNT
 
+        self._sound_gnd = mask['sound_gnd']
+
         self._sub_clock_div = mask['sub_clock'] / clock
         
         self._px_div = mask['sub_clock'] / mask['prescaler_div'][0]
@@ -424,7 +426,7 @@ class T7741():
     def _out_bz_1(self, opcode):
         #00 0001 0110 BZ = 1; CF -, SF 1; CC32; Set buzzer pin (0V)
         self._BZ = 1
-        self._sound.toggle(not self._BZ, 0, self._cycle_counter)
+        self._sound.toggle(self._sound_gnd ^ self._BZ, 0, self._cycle_counter)
         self._nSF = 0
         return MCLOCK_DIV1
 
@@ -535,11 +537,11 @@ class T7741():
 
     def _exe_cf_a(self, opcode):
         #00 0010 1010 ?exe(PC + 1), exe(CF:A); CF -, SF 1; CC32; Execute the following instruction and then CF:A
-        addr = (self._CF << 4) | self._A
+        addr = ((self._PC & 0xFE0) | ((self._CF << 4) | self._A)) << 1
         opcode = self._ROM.getWord(self._PC << 1)
         exec_cycles = self._execute[opcode & 0x3FF](self, opcode)
         self._PC = (self._PC & 0xF00) | ((self._PC + 1) & 0xFF)
-        opcode = self._ROM.getWord(((self._PC & 0xFE0) | addr) << 1)
+        opcode = self._ROM.getWord(addr)
         exec_cycles += self._execute[opcode & 0x3FF](self, opcode)
         return exec_cycles + MCLOCK_DIV4
 
@@ -603,7 +605,7 @@ class T7741():
     def _out_bz_0(self, opcode):
         #00 0011 0110 BZ = 0; CF -, SF 1; CC32, Reset buzzer pin (+3V)
         self._BZ = 0
-        self._sound.toggle(not self._BZ, 0, self._cycle_counter)
+        self._sound.toggle(self._sound_gnd ^ self._BZ, 0, self._cycle_counter)
         self._nSF = 0
         return MCLOCK_DIV4
 

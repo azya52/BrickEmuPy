@@ -47,6 +47,7 @@
 		"rom_path": "./assets/Pengo.bin",
 		"prescaler_div": [2, 8, 32],
 		"sub_clock": 32768,
-		"com_div": 768
+		"com_div": 768,
+		"sound_gnd": 1
 	}
 }

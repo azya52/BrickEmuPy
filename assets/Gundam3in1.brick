@@ -38,6 +38,7 @@
 	},
 	
 	"mask_options": {
-		"rom_path": "./assets/Gundam3in1.bin"
+		"rom_path": "./assets/Gundam3in1.bin",
+		"sound_gnd": 0
 	}
 }
