@@ -39,6 +39,7 @@ The following handheld games are currently emulated:
   * Gundam Space Combat 3 in 1
   * Epoch Monster Panic
   * Bandai Pengo
+  * Gakken Jumping Boy / Pyonkichi / Lansay La Traversée
 
 ## Compiling
 Tested with Ubuntu 24.
