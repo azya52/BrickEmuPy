@@ -1,5 +1,6 @@
 {
 	"id": "2a328592-5dcd-4e83-9dde-6abd22ba8f61",
+	"credits": "ROM dump by Milan Galcik (https://www.septimus.sk/KB1013dbg/index.html)",
 	"core": "T7741",
 	"face_path": "./assets/JumpingBoy.svg",
 	"clock": 188000,
