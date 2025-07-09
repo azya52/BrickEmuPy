@@ -189,9 +189,6 @@ class T7741():
         self._SCAN = 1
         self._PCHTMP = -1
 
-        self._STACK0 = 0
-        self._STACK1 = 0
-
         self._RAM = [0] * RAM_SIZE
         self._GRAM = [0] * GRAM_SIZE
 
@@ -353,7 +350,7 @@ class T7741():
 
     def _ret0(self, opcode):
         #00 0000 0110 ?PC = STACK0, L = 0; CF -, SF 1; CC32
-        self._PC = self._STACK0
+        self._PC = (self._RAM[0x70] << 8) | (self._RAM[0x71] << 4) | self._RAM[0x72]
         self._L = 0
         self._nSF = 0
         return MCLOCK_DIV4
@@ -539,7 +536,7 @@ class T7741():
 
     def _ret1(self, opcode):
         #00 0010 0110 ?PC = STACK1, L = 0; CF -, SF 1; CC32
-        self._PC = self._STACK1
+        self._PC = (self._RAM[0x73] << 8) | (self._RAM[0x74] << 4) | self._RAM[0x75]
         self._L = 0
         self._nSF = 0
         return MCLOCK_DIV4
@@ -873,7 +870,9 @@ class T7741():
 
     def _call0(self, opcode):
         #10 hh01 iiii ?STACK0 = PC, PC = hh:0b011111:IMM, L = 0; CF -, SF 1; CC32
-        self._STACK0 = self._PC
+        self._RAM[0x70] = (self._PC >> 8) & 0xF
+        self._RAM[0x71] = (self._PC >> 4) & 0xF
+        self._RAM[0x72] = (self._PC) & 0xF
         self._PC = ((opcode & 0xC0) << 4) | 0x1F0 | (opcode & 0xF)
         self._L = 0
         self._nSF = 0
@@ -887,7 +886,9 @@ class T7741():
 
     def _call1(self, opcode):
         #10 hh11 iiii ?STACK1 = PC, PC = hh:0b111111:IMM, L = 0; CF -, SF 1; CC32
-        self._STACK1 = self._PC
+        self._RAM[0x73] = (self._PC >> 8) & 0xF
+        self._RAM[0x74] = (self._PC >> 4) & 0xF
+        self._RAM[0x75] = (self._PC) & 0xF
         self._PC = ((opcode & 0xC0) << 4) | 0x3F0 | (opcode & 0xF)
         self._L = 0
         self._nSF = 0

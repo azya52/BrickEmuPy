@@ -5,7 +5,9 @@ class T6770Sdasm():
         self._opbase = '%0.3X'
         
         """
-        A, B, H, L - 4-bit registers (H - 3-bit),
+        A, B - 4-bit registers
+        H - RAM Address Register, upper 3 bit
+        L - RAM Address Register, lower 4 bit
         M[] - 128 nibbles RAM
         CF - carry/borrow flag
         SF - status flag
