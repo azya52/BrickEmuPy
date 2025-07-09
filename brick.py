@@ -12,6 +12,7 @@ EXAMINE_UPDTE_NS = 1000000000 / EXAMINE_RATE
 
 class Brick(QObject):
     btnPressSignal = pyqtSignal(str, int, int)
+    btnMatrixPressSignal = pyqtSignal(str, int, dict)
     btnReleaseSignal = pyqtSignal(str, int)
     stepSignal = pyqtSignal()
     pauseSignal = pyqtSignal()
@@ -30,6 +31,7 @@ class Brick(QObject):
         self._config = config
 
         self.btnPressSignal.connect(self._btnPressed)
+        self.btnMatrixPressSignal.connect(self._btnMatrixPressed)
         self.btnReleaseSignal.connect(self._btnReleased)
         self.setBreakpointSignal.connect(self._setBreakpoint)
         self.runSignal.connect(self._run)
@@ -40,13 +42,14 @@ class Brick(QObject):
         self.setSpeedSignal.connect(self._setSpeed)
         self.editStateSignal.connect(self._editState)
 
-        
     @pyqtSlot()
     def run(self):
         self._breakpoints = {}
         self._debug = False
         self._cycleTimeNs = self._getCicleTimeNs()
         self._icounterOnStop = 0
+        self._btn_matrix_out = {}
+        self._btn_matrix_in = {}
 
         try:
             self._setConfig(self._config)
@@ -97,6 +100,11 @@ class Brick(QObject):
 
             QtCore.QCoreApplication.processEvents()
 
+    def _set_pin_state(self, port, pin, level):
+        self._btn_matrix_out[(port, pin)] = level
+        for port, pin in self._btn_matrix_in.get((port, pin), ()):
+            self._CPU.pin_set(port, pin, level)
+
     @pyqtSlot()
     def _run(self):
         self._debug = False
@@ -139,6 +147,9 @@ class Brick(QObject):
             self._CPU = cores_map[core]["core"](config['mask_options'], config["clock"])
             self.examineSignal.emit(cores_map[core]["dasm"]().disassemble(self._CPU.get_ROM()))
 
+            if (hasattr(self._CPU, "set_pin_state_callback")):
+                self._CPU.set_pin_state_callback(self._set_pin_state)
+
     def _uiDisplayUpdate(self):
         self.uiDisplayUpdateSignal.emit(self._CPU.get_VRAM()) 
 
@@ -154,7 +165,16 @@ class Brick(QObject):
 
     @pyqtSlot(str, int)
     def _btnReleased(self, port, pin):
+        for _, item in self._btn_matrix_in.items():
+            item.discard((port, pin))
         self._CPU.pin_release(port, pin)
+
+    @pyqtSlot(str, int, dict)
+    def _btnMatrixPressed(self, port, pin, level):
+        key = (level["port"], level["pin"])
+        self._btn_matrix_in.setdefault(key, set()).add((port, pin))
+        if key in self._btn_matrix_out:
+            self._CPU.pin_set(port, pin, self._btn_matrix_out[key])
 
     @pyqtSlot(float)
     def _setSpeed(self, speed):
@@ -176,7 +196,10 @@ class Brick(QObject):
         self.stopSignal.emit()
 
     def btnPressed(self, port, pin, level):
-        self.btnPressSignal.emit(port, pin, level)
+        if (type(level) is dict):
+            self.btnMatrixPressSignal.emit(port, pin, level)
+        else:
+            self.btnPressSignal.emit(port, pin, level)
 
     def btnReleased(self, port, pinMask):
         self.btnReleaseSignal.emit(port, pinMask)
@@ -192,3 +215,6 @@ class Brick(QObject):
 
     def setBreakpoint(self, pc, add):
         self.setBreakpointSignal.emit(pc, add)
+
+    def close(self):
+        del self._CPU

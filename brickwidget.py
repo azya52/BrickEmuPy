@@ -49,6 +49,7 @@ class BrickWidget(QtWidgets.QGraphicsView):
             self._brickThread.wait(1000)
             self._brickThread.terminate()
             self._brickThread.wait()
+            self._brick.close()
             del self._brick
         except:
             pass

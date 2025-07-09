@@ -8,31 +8,46 @@
 		"btnLeft": {
 			"port": "INP",
 			"pin": 3,
-			"level": 1,
+			"level": {
+				"port": "OUTP",
+				"pin": 1
+			},
 			"hot_keys": [65, 16777234]
 		},
 		"btnRight": {
 			"port": "INP",
 			"pin": 1,
-			"level": 1,
+			"level": {
+				"port": "OUTP",
+				"pin": 1
+			},
 			"hot_keys": [68, 16777236]
 		},
 		"btnUp": {
 			"port": "INP",
 			"pin": 0,
-			"level": 1,
+			"level": {
+				"port": "OUTP",
+				"pin": 1
+			},
 			"hot_keys": [87, 16777235]
 		},
 		"btnDown": {
 			"port": "INP",
 			"pin": 2,
-			"level": 1,
+			"level": {
+				"port": "OUTP",
+				"pin": 1
+			},
 			"hot_keys": [83, 16777237]
 		},
 		"btnStart": {
 			"port": "IOP",
 			"pin": 0,
-			"level": 1,
+			"level": {
+				"port": "OUTP",
+				"pin": 1
+			},
 			"hot_keys": [49, 32]
 		},
 		"btnReset": {

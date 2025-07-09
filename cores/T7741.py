@@ -17,6 +17,8 @@ class T7741():
         self._ROM = ROM(mask['rom_path'])
         self._sound = PinTogglingSound(clock)
 
+        self._set_pin_state = None
+        
         self._instr_counter = 0
         self._cycle_counter = 0
         self._counter = 0
@@ -32,6 +34,9 @@ class T7741():
         self._py_div = mask['sub_clock'] / mask['prescaler_div'][1]
         self._pz_div = mask['sub_clock'] / mask['prescaler_div'][2]
 
+        self._OUTP = 0
+        self._IOP = 0
+        
         self._reset()
 
         self._execute = (
@@ -137,6 +142,27 @@ class T7741():
             *([T7741._bs_imm] * 256)             #11 iiii iiii if SF (PC<7:0> = IMM); CF -, SF 1; CC16
         )
 
+    def __del__(self):
+        self._set_pin_state = None
+
+    def set_pin_state_callback(self, set_pin_state):
+        self._set_pin_state = set_pin_state
+
+    def _set_out(self, port, value):
+        prev_value = 0
+        if (port == "OUTP"):
+            prev_value = self._OUTP
+            self._OUTP = value
+        elif (port == "IOP"):
+            prev_value = self._IOP
+            self._IOP = value
+
+        if (value != prev_value and self._set_pin_state):
+            changed_bits = value ^ prev_value
+            for bit in range(4):
+                if changed_bits & (1 << bit):
+                    self._set_pin_state(port, bit, (value >> bit) & 0x1)
+
     def _reset(self):
         self._PC = 0xF00
         self._A = 0
@@ -153,9 +179,9 @@ class T7741():
         self._PXF = 0
 
         self._INP = 0
-        self._OUTP = 0
-        self._IOP = 0
         self._BZ = 0
+        self._set_out("OUTP", self._OUTP)
+        self._set_out("IOP", self._IOP)
         
         self._HALT = 0
 
@@ -221,9 +247,9 @@ class T7741():
         if ("INP" in state):
             self._INP = state["INP"] & 0xF
         if ("OUTP" in state):
-            self._OUTP = state["OUTP"] & 0xF
+            self._set_out("OUTP", state["OUTP"] & 0xF)
         if ("IOP" in state):
-            self._IOP = state["IOP"] & 0xF
+            self._set_out("IOP", state["IOP"] & 0xF)
         if ("BZ" in state):
             self._BZ = state["BZ"] & 0xF
         if ("RAM" in state):
@@ -741,13 +767,15 @@ class T7741():
 
     def _out_outp_imm(self, opcode):
         #00 1110 iiii A = OUTP = IMM; CF 0, SF 1, CC16
-        self._A = self._OUTP = opcode & 0xF
+        self._A = opcode & 0xF
+        self._set_out("OUTP", self._A)
         self._CF = self._nSF = 0 
         return MCLOCK_DIV1
 
     def _out_iop_imm(self, opcode):
         #00 1111 iiii A = IOP = IMM; CF 0, SF 1, CC16
-        self._A = self._IOP = opcode & 0xF
+        self._A = opcode & 0xF
+        self._set_out("IOP", self._A)
         self._CF = self._nSF = 0 
         return MCLOCK_DIV1
 
