@@ -1,0 +1,59 @@
+{
+	"id": "4f9dc08e-55bd-447b-99ff-1d7ca040b60f",
+	"core": "T7741",
+	"face_path": "./assets/PowerFishing.svg",
+	"clock": 185000,
+	
+	"buttons": {
+		"btnThrow": {
+			"port": "INP",
+			"pin": 3,
+			"level": {
+				"port": "OUTP",
+				"pin": 3
+			},
+			"hot_keys": [49, 32]
+		},
+		"btnStart": {
+			"port": "INP",
+			"pin": 2,
+			"level": {
+				"port": "OUTP",
+				"pin": 2
+			},
+			"hot_keys": [50, 77]
+		},
+		"btnRotateCCW": {
+			"port": "INP",
+			"pin": 1,
+			"level": {
+				"port": "OUTP",
+				"pin": 1
+			},
+			"hot_keys": [83, 16777237]
+		},
+		"btnRotateCW": {
+			"port": "INP",
+			"pin": 0,
+			"level": {
+				"port": "OUTP",
+				"pin": 0
+			},
+			"hot_keys": [87, 16777235]
+		},
+		"btnReset": {
+			"port": "RES",
+			"pin": 0,
+			"level": 1,
+			"hot_keys": [82]
+		}
+	},
+	
+	"mask_options": {
+		"rom_path": "./assets/PowerFishing.bin",
+		"prescaler_div": [16, 32, 64],
+		"sub_clock": 32768,
+		"com_div": 768,
+		"sound_gnd": 1
+	}
+}
