@@ -40,6 +40,7 @@ The following handheld games are currently emulated:
   * Epoch Monster Panic
   * Bandai Pengo
   * Gakken Jumping Boy / Pyonkichi / Lansay La Traversée
+  * Bandai Power Fishing, 1984 (Toshiba 7790)
 
 ## Compiling
 Tested with Ubuntu 24.
