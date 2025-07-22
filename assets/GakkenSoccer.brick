@@ -1,0 +1,98 @@
+{
+	"id": "b5f0e4f1-cec3-4bc6-8cf5-65ec45362ccb",
+	"core": "T7741",
+	"face_path": "./assets/GakkenSoccer.svg",
+	"clock": 180000,
+	
+	"buttons": {
+		"btnLeft": {
+			"port": "INP",
+			"pin": 1,
+			"level": {
+				"port": "OUTP",
+				"pin": 0
+			},
+			"hot_keys": [65, 16777234]
+		},
+		"btnRight": {
+			"port": "INP",
+			"pin": 0,
+			"level": {
+				"port": "OUTP",
+				"pin": 0
+			},
+			"hot_keys": [68, 16777236]
+		},
+		"btnUp": {
+			"port": "INP",
+			"pin": 3,
+			"level": {
+				"port": "OUTP",
+				"pin": 0
+			},
+			"hot_keys": [87, 16777235]
+		},
+		"btnDown": {
+			"port": "INP",
+			"pin": 2,
+			"level": {
+				"port": "OUTP",
+				"pin": 0
+			},
+			"hot_keys": [83, 16777237]
+		},
+		"btnShoot": {
+			"port": "INP",
+			"pin": 2,
+			"level": {
+				"port": "OUTP",
+				"pin": 1
+			},
+			"hot_keys": [49, 32]
+		},
+		"btnPass": {
+			"port": "INP",
+			"pin": 1,
+			"level": {
+				"port": "OUTP",
+				"pin": 1
+			},
+			"hot_keys": [50, 90]
+		},
+		"btnTime": {
+			"port": "INP",
+			"pin": 0,
+			"level": {
+				"port": "OUTP",
+				"pin": 1
+			},
+			"hot_keys": [51, 84]
+		},
+		"btnAlarm": {
+			"port": "INP",
+			"pin": 3,
+			"level": {
+				"port": "OUTP",
+				"pin": 1
+			},
+			"hot_keys": [52]
+		},
+		"btnACL": {
+			"port": "RES",
+			"pin": 0,
+			"level": {
+				"port": "OUTP",
+				"pin": 0
+			},
+			"hot_keys": [51, 82]
+		}
+	},
+	
+	"mask_options": {
+		"rom_path": "./assets/GakkenSoccer.bin",
+		"prescaler_div": [2, 8, 32],
+		"sub_clock": 32768,
+		"com_div": 768,
+		"sound_gnd": 0
+	}
+}
