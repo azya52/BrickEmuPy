@@ -41,6 +41,7 @@ The following handheld games are currently emulated:
   * Bandai Pengo
   * Gakken Jumping Boy / Pyonkichi / Lansay La Traversée
   * Bandai Power Fishing, 1984 (Toshiba 7790)
+  * Gakken Soccer LCD Card Game, 1981 (Toshiba 6814)
 
 ## Compiling
 Tested with Ubuntu 24.
