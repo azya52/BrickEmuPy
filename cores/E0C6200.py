@@ -234,7 +234,7 @@ class E0C6200():
             0xF30: (E0C6200._get_io_sd30, E0C6200._set_io_sd30),
             0xF31: (E0C6200._get_io_sd74, E0C6200._set_io_sd74),
             0xF40: (E0C6200._get_io_k0, E0C6200._set_io_dummy),
-            0xF41: (E0C6200._get_io_dfk0, E0C6200._set_io_dummy),
+            0xF41: (E0C6200._get_io_dfk0, E0C6200._set_io_dfk0),
             0xF42: (E0C6200._get_io_k1, E0C6200._set_io_dummy),
             0xF50: (E0C6200._get_io_r0, E0C6200._set_io_r0),
             0xF51: (E0C6200._get_io_r1, E0C6200._set_io_r1),
@@ -937,7 +937,7 @@ class E0C6200():
             return EMPTY_VRAM
         elif (self._CTRL_LCD & IO_ALON):
             return FULL_VRAM
-        return tuple(self._VRAM)
+        return tuple(self._VRAM) + (self._P0, self._P1, self._P2, self._P3, self._R0, self._R1, self._R2, self._R4)
 
     def get_ROM(self):
         return self._ROM

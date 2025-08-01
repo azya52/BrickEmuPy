@@ -1,0 +1,73 @@
+{
+	"id": "fbdd6952-910b-41fc-b93d-55315ed4aa14",
+	"core": "E0C6200",
+	"face_path": "./assets/TamagotchiYasashii.svg",
+	"clock": 1060000,
+	"RAM": 768,
+	
+	"buttons": {
+		"btnFood": {
+			"port": "K1",
+			"pin": 3,
+			"level": 0,
+			"hot_keys": [49, 81]
+		},
+		"btnSmile": {
+			"port": "K1",
+			"pin": 2,
+			"level": 0,
+			"hot_keys": [50, 87]
+		},
+		"btnHeart": {
+			"port": "K1",
+			"pin": 1,
+			"level": 0,
+			"hot_keys": [51, 69]
+		},
+		"btnClean": {
+			"port": "K1",
+			"pin": 0,
+			"level": 0,
+			"hot_keys": [52, 65]
+		},
+		"btnBulb": {
+			"port": "K0",
+			"pin": 3,
+			"level": 0,
+			"hot_keys": [53, 83]
+		},
+		"btnWeight": {
+			"port": "K0",
+			"pin": 2,
+			"level": 0,
+			"hot_keys": [54, 68]
+		},
+		"btnSelect": {
+			"port": "K0",
+			"pin": 1,
+			"level": 0,
+			"hot_keys": [55, 90]
+		},
+		"btnCancel": {
+			"port": "K0",
+			"pin": 0,
+			"level": 0,
+			"hot_keys": [56, 88]
+		},
+		"btnReset": {
+			"port": "RES",
+			"pin": 0,
+			"level": 1,
+			"hot_keys": [82]
+		}
+	},
+	
+	"mask_options": {
+		"rom_path": "./assets/TamagotchiYasashii.bin",
+		"port_pullup": {
+			"K0": 15,
+			"K1": 15
+		},
+		"p3_dedicated": 1
+	}
+}
