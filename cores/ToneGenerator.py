@@ -1,17 +1,16 @@
 import random, math
 
 from PyQt6.QtCore import QIODeviceBase, QByteArray, QIODevice
-from PyQt6.QtMultimedia import QAudioFormat, QAudioSink
+from PyQt6.QtMultimedia import QAudioFormat, QAudioSink, QMediaDevices
 
 BUFFER_SIZE = 4096
-SOUND_LEVEL = (int) (32767 * 0.001)
+SOUND_LEVEL = (int) (32767 * 0.0005)
 SAMPLES_PART_SIZE = 4096
-DATA_PART_SIZE = SAMPLES_PART_SIZE * 2
 SQUARENESS_FACTOR = 6
 SAMPLE_RATE = 44100
 
 class AudioData(QIODevice):
-    def __init__(self, sampleRate, bytesPerSample):
+    def __init__(self, sampleRate, bytesPerSample, channelCount):
         super().__init__()
         self._toneStarts = []
         self._toneEnds = []
@@ -19,6 +18,7 @@ class AudioData(QIODevice):
         self._phase = 0
         self._sampleRate = sampleRate
         self._bytesPerSample = bytesPerSample
+        self._channelCount = channelCount
         self.open(QIODeviceBase.OpenModeFlag.ReadOnly | QIODeviceBase.OpenModeFlag.Unbuffered)
         
     def readData(self, maxlen):
@@ -52,8 +52,9 @@ class AudioData(QIODevice):
         phase = self._phase
         mul = math.pi * freq / self._sampleRate * 2
         waveData = QByteArray()
+        channelCount = self._channelCount
         bytesPerSample = self._bytesPerSample
-        size //= bytesPerSample
+        size //= bytesPerSample * channelCount
         prevSample = rand = 1
         dutyRatio = dutyRatio * 2 - 1
         for i in range(size):
@@ -61,17 +62,17 @@ class AudioData(QIODevice):
             if (noise and (newSample * prevSample < 0)):
                 rand = random.choice([-1, 1])
                 prevSample = newSample
-            waveData.append(int(SOUND_LEVEL * newSample * rand).to_bytes(bytesPerSample, 'big', signed=True))
+            waveData.append(int(SOUND_LEVEL * newSample * rand).to_bytes(bytesPerSample, 'big', signed=True) * channelCount)
         self._phase += size * mul
         return waveData
    
     def bytesAvailable(self):
-        return DATA_PART_SIZE
+        return SAMPLES_PART_SIZE * self._channelCount * self._bytesPerSample
         
     def start(self, freq, noise, dutyRatio, goalTime):
         if (len(self._toneStarts) == 0):
-            self._currentByte = round(self._sampleRate * goalTime) * self._bytesPerSample
-        goalSample = DATA_PART_SIZE + round(self._sampleRate * goalTime) * self._bytesPerSample
+            self._currentByte = round(self._sampleRate * goalTime) * self._bytesPerSample * self._channelCount
+        goalSample = (SAMPLES_PART_SIZE + round(self._sampleRate * goalTime)) * self._bytesPerSample * self._channelCount
         if (len(self._toneStarts) > len(self._toneEnds)):
             self._toneEnds.append(goalSample)
         if (freq > 0):
@@ -79,34 +80,34 @@ class AudioData(QIODevice):
 
     def startFor(self, freq, noise, duration, dutyRatio, goalTime):
         if (len(self._toneStarts) == 0):
-            self._currentByte = round(self._sampleRate * goalTime) * self._bytesPerSample
-        goalSample = DATA_PART_SIZE + round(self._sampleRate * goalTime) * self._bytesPerSample           
+            self._currentByte = round(self._sampleRate * goalTime) * self._bytesPerSample * self._channelCount
+        goalSample = (SAMPLES_PART_SIZE + round(self._sampleRate * goalTime)) * self._bytesPerSample * self._channelCount
         self._toneEnds = []
         if (len(self._toneStarts) > len(self._toneEnds)):
             self._toneEnds.append(goalSample)
         if (freq > 0):
             self._toneStarts.append([goalSample, freq, noise, dutyRatio])
             goalTime += duration
-            goalSample = DATA_PART_SIZE + round(self._sampleRate * goalTime) * self._bytesPerSample
+            goalSample = (SAMPLES_PART_SIZE + round(self._sampleRate * goalTime)) * self._bytesPerSample * self._channelCount
             self._toneEnds.append(goalSample)
         
     def stop(self, goalTime):
         if (len(self._toneStarts) > len(self._toneEnds)):
-            goalSample = DATA_PART_SIZE + round(self._sampleRate * goalTime) * self._bytesPerSample
+            goalSample = (SAMPLES_PART_SIZE + round(self._sampleRate * goalTime)) * self._bytesPerSample * self._channelCount
             self._toneEnds.append(goalSample)
 
 class ToneGenerator(QAudioSink):
     def __init__(self):
         
-        audioFormat = QAudioFormat()
+        device = QMediaDevices.defaultAudioOutput()
+        audioFormat = device.preferredFormat()
         audioFormat.setSampleRate(SAMPLE_RATE)
-        audioFormat.setChannelCount(1)
         audioFormat.setSampleFormat(QAudioFormat.SampleFormat.Int16)
 
         super().__init__(audioFormat)
         self.setBufferSize(BUFFER_SIZE)
 
-        self._audioData = AudioData(audioFormat.sampleRate(), audioFormat.bytesPerSample())
+        self._audioData = AudioData(audioFormat.sampleRate(), audioFormat.bytesPerSample(), audioFormat.channelCount())
         self.start(self._audioData)
         
     def play(self, freq, noise, dutyRatio, goalTime):
