@@ -6,11 +6,11 @@ SEG_COUNT = 36
 COM_COUNT = 4
 GRAM_SIZE = (SEG_COUNT // 4) * COM_COUNT
 
-MCLOCK_DIV0 = 4
-MCLOCK_DIV1 = 16
-MCLOCK_DIV2 = 20
-MCLOCK_DIV3 = 24
-MCLOCK_DIV4 = 32
+MCLOCK_DIV0 = 2
+MCLOCK_DIV1 = 8
+MCLOCK_DIV2 = 10
+MCLOCK_DIV3 = 12
+MCLOCK_DIV4 = 16
 
 class T7741():
     def __init__(self, mask, clock):
@@ -683,7 +683,6 @@ class T7741():
         self._B = b & 0xF
         self._H = b & 0x7
         self._nSF = b > 15
-        self._A = self._CF = 0
         return MCLOCK_DIV1
 
     def _movm_mhlsubi_mhl(self, opcode):
