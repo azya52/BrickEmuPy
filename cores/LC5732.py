@@ -289,8 +289,8 @@ class LC5732():
             self._100ms_counter += self._100ms_div
             if (self._CSTF):
                 self._STS |= STS_SCF4_CHRONO
-                if (self._HEF & HEF_4_CHRONO):
-                    self._HALT = 0
+            if (self._HEF & HEF_4_CHRONO):
+                self._HALT = 0
 
         while (self._32ms_counter <= 0):
             self._32ms_counter += self._32ms_div
@@ -300,7 +300,6 @@ class LC5732():
             self._STS |= STS_SCF0_PREDIV_OVFW | STS_SCF1_PREDIV
             if (self._HEF & HEF_0_PREDIV_OVFW):
                 self._HALT = 0
-
 
     def clock(self):
         exec_cycles = MCLOCK_DIV
@@ -854,6 +853,7 @@ class LC5732():
         #11111010 XXXXXXXX   ALM <- X
         self._ALM = self._ROM.getByte(self._PC)
         self._sound.set_alm(self._ALM, self._cycle_counter)
+        self._PC += 1
         return MCLOCK_DIV
 
     def _csec(self, opcode):
