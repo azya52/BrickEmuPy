@@ -1,9 +1,10 @@
 import argparse
 import json
 
-from PyQt6 import uic, QtCore, QtGui, QtWidgets
+from PyQt6 import uic, QtCore, QtWidgets
 from PyQt6.QtCore import pyqtSlot, QByteArray
 from PyQt6.QtWidgets import QFileDialog, QMessageBox
+from PyQt6.QtGui import QShortcut
 
 from debugwidget import DebugWidget
 from brickwidget import BrickWidget
@@ -33,6 +34,10 @@ class Window(QtWidgets.QMainWindow):
         self.iCounterLabel = QtWidgets.QLabel("0")
         self.iCounterLabel.setToolTip("Instructions from previous pause")
         self.statusBar().addPermanentWidget(self.iCounterLabel)
+
+        QShortcut(QtCore.Qt.Key.Key_F11, self).activated.connect(self._toggle_fullscreen)
+        QShortcut("Ctrl+Meta+F", self).activated.connect(self._toggle_fullscreen)
+        QShortcut(QtCore.Qt.Key.Key_Escape, self).activated.connect(self._exit_fullscreen)
 
     def _setDeviceUI(self, config):
         if (self._brickWidget):
@@ -138,3 +143,16 @@ class Window(QtWidgets.QMainWindow):
 
         if ("ICTR" in info):
             self.iCounterLabel.setText("%d" % info["ICTR"])
+
+    def _toggle_fullscreen(self):  
+        if self.isFullScreen():
+            self._exit_fullscreen()
+        else:
+            self.showFullScreen()
+            self.menuBar().hide()
+            self.statusBar().hide()
+
+    def _exit_fullscreen(self):
+        self.showNormal()
+        self.menuBar().show()
+        self.statusBar().show()
