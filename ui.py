@@ -39,6 +39,12 @@ class Window(QtWidgets.QMainWindow):
         QShortcut("Ctrl+Meta+F", self).activated.connect(self._toggle_fullscreen)
         QShortcut(QtCore.Qt.Key.Key_Escape, self).activated.connect(self._exit_fullscreen)
 
+        for act in self.menuBar().actions():
+            self.addAction(act)
+            if act.menu():
+                for subact in act.menu().actions():
+                    self.addAction(subact)
+
     def _setDeviceUI(self, config):
         if (self._brickWidget):
             self._brickWidget.deleteLater()
