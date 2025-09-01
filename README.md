@@ -42,6 +42,7 @@ The following handheld games are currently emulated:
   * Gakken Jumping Boy / Pyonkichi / Lansay La Traversée
   * Bandai Power Fishing, 1984 (Toshiba 7790)
   * Gakken Soccer LCD Card Game, 1981 (Toshiba 6814)
+  * Popy Animest Dorayaki House DO-01, 1983 (Toshiba 6922)
 
 ## Compiling
 Tested with Ubuntu 24.
