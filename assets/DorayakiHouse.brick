@@ -1,0 +1,80 @@
+{
+	"id": "44fac13e-0043-4042-a894-e23ccef690f0",
+	"core": "T7741",
+	"face_path": "./assets/DorayakiHouse.svg",
+	"clock": 180000,
+	
+	"buttons": {
+		"btnDown": {
+			"port": "INP",
+			"pin": 3,
+			"level": {
+				"port": "OUTP",
+				"pin": 1
+			},
+			"hot_keys": [83, 16777237]
+		},
+		"btnLeft": {
+			"port": "INP",
+			"pin": 2,
+			"level": {
+				"port": "OUTP",
+				"pin": 1
+			},
+			"hot_keys": [65, 16777234]
+		},
+		"btnRight": {
+			"port": "INP",
+			"pin": 0,
+			"level": {
+				"port": "OUTP",
+				"pin": 1
+			},
+			"hot_keys": [68, 16777236]
+		},
+		"btnJump": {
+			"port": "INP",
+			"pin": 1,
+			"level": {
+				"port": "OUTP",
+				"pin": 1
+			},
+			"hot_keys": [87, 16777235]
+		},
+		"btnMode": {
+			"port": "INP",
+			"pin": 0,
+			"level": {
+				"port": "OUTP",
+				"pin": 0
+			},
+			"hot_keys": [49, 77]
+		},
+		"btnAction": {
+			"port": "INP",
+			"pin": 3,
+			"level": {
+				"port": "OUTP",
+				"pin": 0
+			},
+			"hot_keys": [50, 32]
+		},
+		"btnACL": {
+			"port": "RES",
+			"pin": 0,
+			"level": {
+				"port": "OUTP",
+				"pin": 0
+			},
+			"hot_keys": [82]
+		}
+	},
+	
+	"mask_options": {
+		"rom_path": "./assets/DorayakiHouse.bin",
+		"prescaler_div": [2, 8, 32],
+		"sub_clock": 32768,
+		"com_div": 768,
+		"sound_gnd": 0
+	}
+}
