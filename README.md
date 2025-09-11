@@ -19,6 +19,7 @@ The following handheld games are currently emulated:
   * Tamagotchi Umino (distributed without ROM)
   * Tamagotchi Morino (distributed without ROM)
   * Tamagotchi Genjintch (distributed without ROM)
+  * Tamagotchi Yasashii (distributed without ROM)
   * Digimon Ver. 1 (distributed without ROM)
   * Digimon Ver. 2 (distributed without ROM)
   * Digimon Ver. 3 (distributed without ROM)
@@ -26,6 +27,7 @@ The following handheld games are currently emulated:
   * Pocket Pikachu (distributed without ROM)
   * Mickey Deluxe Virtual Game virtual pet
   * Apollo 2 in 1 virtual pet
+  * Elfin Twins GM-021
 * Other LCD Games
   * Epoch Chibi Pachi Alien Fever
   * Formel 1 (Hartung Spiele Berlin/Epoch)
@@ -43,7 +45,8 @@ The following handheld games are currently emulated:
   * Bandai Power Fishing, 1984 (Toshiba 7790)
   * Gakken Soccer LCD Card Game, 1981 (Toshiba 6814)
   * Popy (Bandai) Animest Dorayaki House DO-01, 1983 (Toshiba 6922)
-  * Popy (Bandai) Animest Parman Dai-Pinch, 1983 (Toshiba 6923)
+  * Popy (Bandai) Animest Parman Dai-Pinch PA-01, 1983 (Toshiba 6923)
+  * Popy (Bandai) Animest Isoge! Doraemon DO-02, 1983 (Toshiba 6981)
 
 ## Compiling
 Tested with Ubuntu 24.
