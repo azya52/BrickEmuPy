@@ -46,7 +46,7 @@ class T7741dasm():
             T7741dasm._wait_frame,                   #00 0001 1000 ?wait next frame
             T7741dasm._mov_b_a,                      #00 0001 1001 B = A; CF -, SF 1; CC16
             T7741dasm._clearm_mhl_dec,               #00 0001 1010 (L = L - 1, M[HL] = A = 0, B = B - 1)WHILE(B >= 0); CF 0, SF 0; CC16 * (n - 1) + CC32
-            T7741dasm._out_bz_1,                     #00 0001 1011 BZ = 1; CF -, SF 1; CC32; Set buzzer pin (0V)
+            T7741dasm._out_bz_1,                     #00 0001 1011 BZ = 1; CF -, SF 1; CC16; Set buzzer pin (0V)
             T7741dasm._nop2,                         #00 0001 1100 CF -, SF 1; CC32; no operation
             T7741dasm._in_a_iop,                     #00 0001 1101 A = IOP; CF 0, SF 1; CC16; Read input/output port to A
             T7741dasm._nop2,                         #00 0001 1110 CF -, SF 1; CC32; no operation
@@ -78,7 +78,7 @@ class T7741dasm():
             T7741dasm._wait_com,                     #00 0011 1000 ?wait next com
             T7741dasm._mov_b_l,                      #00 0011 1001 B = L; CF -, SF 1; CC16
             T7741dasm._clearm_mhl_inc,               #00 0011 1010 (L = L + 1, M[HL] = A = 0, B = B - 1)WHILE(B >= 0); CF 0, SF 1; CC16 * (n - 1) + CC32
-            T7741dasm._out_bz_0,                     #00 0011 1011 BZ = 0; CF -, SF 1; CC32; Reset buzzer pin (+3V)
+            T7741dasm._out_bz_0,                     #00 0011 1011 BZ = 0; CF -, SF 1; CC16; Reset buzzer pin (+3V)
             T7741dasm._nop2,                         #00 0011 1100 CF -, SF 1; CC32; no operation
             T7741dasm._dec_mhl,                      #00 0011 1101 A = M[HL] = M[HL] - 1; CF b, SF !b; CC16
             T7741dasm._nop2,                         #00 0011 1110 CF -, SF 1; CC32; no operation
@@ -230,7 +230,7 @@ class T7741dasm():
         return ("osc ext", "?clock from external oscillator (32k); CF -, SF 1")
 
     def _out_bz_1(self, pc, opcode):
-        #00 0001 1011 BZ = 1; CF -, SF 1; CC32; Set buzzer pin (0V)
+        #00 0001 1011 BZ = 1; CF -, SF 1; CC16; Set buzzer pin (0V)
         return ("out BZ, 1", "BZ = 1; CF -, SF 1; Set buzzer pin (0V)")
 
     def _wait_frame(self, pc, opcode):
@@ -330,7 +330,7 @@ class T7741dasm():
         return ("osc int", "?clock from interlal oscillation (resistor); CF -, SF 1")
 
     def _out_bz_0(self, pc, opcode):
-        #00 0011 1011 BZ = 0; CF -, SF 1; CC32, Reset buzzer pin (+3V)
+        #00 0011 1011 BZ = 0; CF -, SF 1; CC16, Reset buzzer pin (+3V)
         return ("out BZ, 0", "BZ = 0; CF -, SF 1; Reset buzzer pin (+3V)")
 
     def _0037(self, pc, opcode):

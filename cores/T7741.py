@@ -6,11 +6,11 @@ SEG_COUNT = 36
 COM_COUNT = 4
 GRAM_SIZE = (SEG_COUNT // 4) * COM_COUNT
 
-MCLOCK_DIV0 = 2
-MCLOCK_DIV1 = 8
-MCLOCK_DIV2 = 10
-MCLOCK_DIV3 = 12
-MCLOCK_DIV4 = 16
+MCLOCK_DIV0 = 4
+MCLOCK_DIV1 = 16
+MCLOCK_DIV2 = 20
+MCLOCK_DIV3 = 24
+MCLOCK_DIV4 = 32
 
 class T7741():
     def __init__(self, mask, clock):
@@ -67,7 +67,7 @@ class T7741():
             T7741._wait_frame,                   #00 0001 1000 ?wait next frame
             T7741._mov_b_a,                      #00 0001 1001 B = A; CF -, SF 1; CC16
             T7741._clearm_mhl_dec,               #00 0001 1010 (L = L - 1, M[HL] = A = 0, B = B - 1)WHILE(B >= 0); CF 0, SF 0; CC16 * (n - 1) + CC32
-            T7741._out_bz_1,                     #00 0001 1011 BZ = 1; CF -, SF 1; CC32; Set buzzer pin (0V)
+            T7741._out_bz_1,                     #00 0001 1011 BZ = 1; CF -, SF 1; CC16; Set buzzer pin (0V)
             T7741._nop2,                         #00 0001 1100 CF -, SF 1; CC32; no operation
             T7741._in_a_iop,                     #00 0001 1101 A = IOP; CF 0, SF 1; CC16; Read input/output port to A
             T7741._nop2,                         #00 0001 1110 CF -, SF 1; CC32; no operation
@@ -99,7 +99,7 @@ class T7741():
             T7741._wait_com,                     #00 0011 1000 ?wait next com
             T7741._mov_b_l,                      #00 0011 1001 B = L; CF -, SF 1; CC16
             T7741._clearm_mhl_inc,               #00 0011 1010 (L = L + 1, M[HL] = A = 0, B = B - 1)WHILE(B >= 0); CF 0, SF 1; CC16 * (n - 1) + CC32
-            T7741._out_bz_0,                     #00 0011 1011 BZ = 0; CF -, SF 1; CC32; Reset buzzer pin (+3V)
+            T7741._out_bz_0,                     #00 0011 1011 BZ = 0; CF -, SF 1; CC16; Reset buzzer pin (+3V)
             T7741._nop2,                         #00 0011 1100 CF -, SF 1; CC32; no operation
             T7741._dec_mhl,                      #00 0011 1101 A = M[HL] = M[HL] - 1; CF b, SF !b; CC16
             T7741._nop2,                         #00 0011 1110 CF -, SF 1; CC32; no operation
@@ -447,7 +447,7 @@ class T7741():
         return MCLOCK_DIV1
 
     def _out_bz_1(self, opcode):
-        #00 0001 0110 BZ = 1; CF -, SF 1; CC32; Set buzzer pin (0V)
+        #00 0001 1011 BZ = 1; CF -, SF 1; CC16; Set buzzer pin (0V)
         self._BZ = 1
         self._sound.toggle(self._sound_gnd ^ self._BZ, 0, self._cycle_counter)
         self._nSF = 0
@@ -626,11 +626,11 @@ class T7741():
         return MCLOCK_DIV1
 
     def _out_bz_0(self, opcode):
-        #00 0011 0110 BZ = 0; CF -, SF 1; CC32, Reset buzzer pin (+3V)
+        #00 0011 1011 BZ = 0; CF -, SF 1; CC16, Reset buzzer pin (+3V)
         self._BZ = 0
         self._sound.toggle(self._sound_gnd ^ self._BZ, 0, self._cycle_counter)
         self._nSF = 0
-        return MCLOCK_DIV4
+        return MCLOCK_DIV1
 
     def _0037(self, opcode):
         #00 0011 0111 ?IOP direction; CF -, SF 1; CC16
