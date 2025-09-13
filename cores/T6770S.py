@@ -421,7 +421,7 @@ class T6770S():
         self._BZ = 1
         self._sound.toggle(self._sound_gnd ^ self._BZ, 0, self._cycle_counter)
         self._nSF = 0
-        return MCLOCK_DIV1
+        return MCLOCK_DIV4
 
     def _delay_b(self, opcode):
         #00 0001 0111 B = 0xF; CF -, SF 0; CC8 * (n - 1) + CC16; Delay (B * CC8 + CC16)
