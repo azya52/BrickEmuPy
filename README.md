@@ -38,15 +38,16 @@ The following handheld games are currently emulated:
   * Mame Galaxian (distributed without ROM)
   * Keychain Pin Ball
   * Hiro Pocket Boy No.2
-  * Gundam Space Combat 3 in 1
+  * Gundam Space Combat 3 in 1 (Toshiba 6770S)
   * Epoch Monster Panic
-  * Bandai Pengo
-  * Gakken Jumping Boy / Pyonkichi / Lansay La Traversée
+  * Bandai Pengo (Toshiba 6941)
+  * Gakken Jumping Boy / Pyonkichi / Lansay La Traversée (Toshiba T6813)
   * Bandai Power Fishing, 1984 (Toshiba 7790)
   * Gakken Soccer LCD Card Game, 1981 (Toshiba 6814)
   * Popy (Bandai) Animest Dorayaki House DO-01, 1983 (Toshiba 6922)
   * Popy (Bandai) Animest Parman Dai-Pinch PA-01, 1983 (Toshiba 6923)
   * Popy (Bandai) Animest Isoge! Doraemon DO-02, 1983 (Toshiba 6981)
+  * Gakken Tom & Jerry Prank, 1983 (Toshiba 6909)
 
 ## Compiling
 Tested with Ubuntu 24.
