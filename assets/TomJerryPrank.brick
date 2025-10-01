@@ -6,7 +6,7 @@
 	"clock": 175000,
 	
 	"buttons": {
-		"btnLeft": {
+		"btnGameA": {
 			"port": "INP",
 			"pin": 2,
 			"level": {
@@ -15,7 +15,7 @@
 			},
 			"hot_keys": [65, 16777234]
 		},
-		"btnRight": {
+		"btnGameB": {
 			"port": "INP",
 			"pin": 1,
 			"level": {
@@ -31,7 +31,7 @@
 				"port": "OUTP",
 				"pin": 0
 			},
-			"hot_keys": [87, 16777235]
+			"hot_keys": [49]
 		},
 		"btnAlarm": {
 			"port": "INP",
@@ -40,7 +40,7 @@
 				"port": "OUTP",
 				"pin": 0
 			},
-			"hot_keys": [83, 16777237]
+			"hot_keys": [50]
 		},
 		"btnACL": {
 			"port": "RES",
@@ -49,7 +49,7 @@
 				"port": "OUTP",
 				"pin": 0
 			},
-			"hot_keys": [82]
+			"hot_keys": [51, 82]
 		}
 	},
 	
