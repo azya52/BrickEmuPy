@@ -48,6 +48,7 @@ The following handheld games are currently emulated:
   * Popy (Bandai) Animest Parman Dai-Pinch PA-01, 1983 (Toshiba 6923)
   * Popy (Bandai) Animest Isoge! Doraemon DO-02, 1983 (Toshiba 6981)
   * Gakken Tom & Jerry Prank, 1983 (Toshiba 6909)
+  * Animest (Bandai) Dr. Slump Arale Ncha! Bycha AR-03, 1982 (Toshiba 6815)
 
 ## Compiling
 Tested with Ubuntu 24.
