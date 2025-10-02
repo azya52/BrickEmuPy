@@ -1,0 +1,86 @@
+{
+	"id": "f4273aa6-4a6b-416c-b5ea-8885e4b119e9",
+	"core": "T7741",
+	"face_path": "./assets/DrSlumpAraleNchaBycha.svg",
+	"clock": 200000,
+	
+	"buttons": {
+		"btnNcha": {
+			"port": "INP",
+			"pin": 2,
+			"level": {
+				"port": "OUTP",
+				"pin": 0
+			},
+			"hot_keys": [49, 32]
+		},
+		"btnLeftTurn": {
+			"port": "INP",
+			"pin": 0,
+			"level": {
+				"port": "OUTP",
+				"pin": 0
+			},
+			"hot_keys": [65, 16777234]
+		},
+		"btnRightTurn": {
+			"port": "INP",
+			"pin": 1,
+			"level": {
+				"port": "OUTP",
+				"pin": 0
+			},
+			"hot_keys": [68, 16777236]
+		},
+		"btnGame1": {
+			"port": "INP",
+			"pin": 1,
+			"level": {
+				"port": "OUTP",
+				"pin": 1
+			},
+			"hot_keys": [50]
+		},
+		"btnGame2": {
+			"port": "INP",
+			"pin": 0,
+			"level": {
+				"port": "OUTP",
+				"pin": 1
+			},
+			"hot_keys": [51]
+		},
+		"btnMode": {
+			"port": "INP",
+			"pin": 2,
+			"level": {
+				"port": "OUTP",
+				"pin": 1
+			},
+			"hot_keys": [52]
+		},
+		"btnAlarm": {
+			"port": "INP",
+			"pin": 3,
+			"level": {
+				"port": "OUTP",
+				"pin": 1
+			},
+			"hot_keys": [53]
+		},
+		"btnACL": {
+			"port": "RES",
+			"pin": 0,
+			"level": 1,
+			"hot_keys": [82]
+		}
+	},
+	
+	"mask_options": {
+		"rom_path": "./assets/DrSlumpAraleNchaBycha.bin",
+		"prescaler_div": [2, 8, 32],
+		"sub_clock": 32768,
+		"com_div": 768,
+		"sound_gnd": 0
+	}
+}
