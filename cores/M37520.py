@@ -153,7 +153,7 @@ class M37520():
             0x3A: (M37520._get_io_intedge, M37520._set_io_intedge),
             0x3B: (M37520._get_io_cpum, M37520._set_io_cpum),
             0x3C: (M37520._get_io_ireq1, M37520._set_io_ireq1),
-            0x3D: (M37520._get_io_ireq2, M37520._set_io_ireq1),
+            0x3D: (M37520._get_io_ireq2, M37520._set_io_ireq2),
             0x3E: (M37520._get_io_icon1, M37520._set_io_icon1),
             0x3F: (M37520._get_io_icon2, M37520._set_io_icon2)
         }
