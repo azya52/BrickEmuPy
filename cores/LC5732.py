@@ -29,10 +29,7 @@ class LC5732():
 
         self._instr_counter = 0
         self._cycle_counter = 0
-        self._32ms_counter = 0
-        self._100ms_counter = 0
-        self._500ms_counter = 0
-
+        
         self._15bit_div = 32768
         self._500ms_div = self._15bit_div / 2
         self._100ms_div = self._15bit_div / 10
@@ -276,31 +273,22 @@ class LC5732():
         return self._instr_counter
             
     def _timers_clock(self, exec_cycles):
-        self._32ms_counter -= exec_cycles
-        self._100ms_counter -= exec_cycles
-        self._500ms_counter -= exec_cycles
-
-        if (self._32ms_counter <=0 or self._100ms_counter <= 0):
+        if (self._cycle_counter % self._32ms_div <= exec_cycles):
             self._STS |= STS_SCF1_PREDIV
             if (self._HEF & HEF_1_PREDIV):
                 self._HALT = 0
 
-        while (self._100ms_counter <= 0):
-            self._100ms_counter += self._100ms_div
+        if (self._cycle_counter % self._100ms_div <= exec_cycles):
             if (self._CSTF):
                 self._STS |= STS_SCF4_CHRONO
-            if (self._HEF & HEF_4_CHRONO):
-                self._HALT = 0
+                if (self._HEF & HEF_4_CHRONO):
+                    self._HALT = 0
 
-        while (self._32ms_counter <= 0):
-            self._32ms_counter += self._32ms_div
-
-        while (self._500ms_counter <= 0):
-            self._500ms_counter += self._500ms_div
-            self._STS |= STS_SCF0_PREDIV_OVFW | STS_SCF1_PREDIV
+        if (self._cycle_counter % self._500ms_div <= exec_cycles):
+            self._STS |= STS_SCF0_PREDIV_OVFW
             if (self._HEF & HEF_0_PREDIV_OVFW):
                 self._HALT = 0
-
+            
     def clock(self):
         exec_cycles = MCLOCK_DIV
         if (not self._HALT):
@@ -309,21 +297,18 @@ class LC5732():
             exec_cycles = self._execute[opcode](self, opcode)
             self._instr_counter += 1
 
-        self._timers_clock(exec_cycles)
         self._cycle_counter += exec_cycles
+        self._timers_clock(exec_cycles)
         return exec_cycles
     
     def _get_ram(self):
         if (self._DP < RAM_SIZE):
             return self._RAM[self._DP]
-        print("%X: DP outside of memory read" % self._PC)
         return 0
 
     def _set_ram(self, value):
         if (self._DP < RAM_SIZE):
             self._RAM[self._DP] = value
-        else:
-            print("%X: DP outside of memory wrute" % self._PC)
 
     def _halt(self, opcode):
         #00000000
@@ -478,6 +463,7 @@ class LC5732():
             self._PC = ((opcode & 0x7) << 8) | self._ROM.getByte(self._PC)
         else:
             self._PC += 1
+            return MCLOCK_DIV
         return MCLOCKx2_DIV
 
     def _bab0_x(self, opcode):
@@ -486,6 +472,7 @@ class LC5732():
             self._PC = ((opcode & 0x7) << 8) | self._ROM.getByte(self._PC)
         else:
             self._PC += 1
+            return MCLOCK_DIV
         return MCLOCKx2_DIV
 
     def _banz_x(self, opcode):
@@ -494,6 +481,7 @@ class LC5732():
             self._PC = ((opcode & 0x7) << 8) | self._ROM.getByte(self._PC)
         else:
             self._PC += 1
+            return MCLOCK_DIV
         return MCLOCKx2_DIV
 
     def _bab1_x(self, opcode):
@@ -502,6 +490,7 @@ class LC5732():
             self._PC = ((opcode & 0x7) << 8) | self._ROM.getByte(self._PC)
         else:
             self._PC += 1
+            return MCLOCK_DIV
         return MCLOCKx2_DIV
 
     def _bcnh_x(self, opcode):
@@ -510,6 +499,7 @@ class LC5732():
             self._PC = ((opcode & 0x7) << 8) | self._ROM.getByte(self._PC)
         else:
             self._PC += 1
+            return MCLOCK_DIV
         return MCLOCKx2_DIV
 
     def _bab2_x(self, opcode):
@@ -518,6 +508,7 @@ class LC5732():
             self._PC = ((opcode & 0x7) << 8) | self._ROM.getByte(self._PC)
         else:
             self._PC += 1
+            return MCLOCK_DIV
         return MCLOCKx2_DIV
 
     def _bch_x(self, opcode):
@@ -526,6 +517,7 @@ class LC5732():
             self._PC = ((opcode & 0x7) << 8) | self._ROM.getByte(self._PC)
         else:
             self._PC += 1
+            return MCLOCK_DIV
         return MCLOCKx2_DIV
 
     def _bab3_x(self, opcode):
@@ -534,6 +526,7 @@ class LC5732():
             self._PC = ((opcode & 0x7) << 8) | self._ROM.getByte(self._PC)
         else:
             self._PC += 1
+            return MCLOCK_DIV
         return MCLOCKx2_DIV
 
     def _adc(self, opcode):
@@ -642,7 +635,7 @@ class LC5732():
 
     def _adci(self, opcode):
         #10010000 ----XXXX   AC <- (AC) + X + (CF); CF
-        x = self._ROM.getByte(self._PC)
+        x = self._ROM.getByte(self._PC) & 0xF
         result = self._AC + x + self._CF
         self._AC = result & 0xF
         self._CF = result > 0xF
@@ -651,7 +644,7 @@ class LC5732():
 
     def _sbci(self, opcode):
         #10010001 ----XXXX   AC <- (AC) + ~X + (CF); CF
-        x = self._ROM.getByte(self._PC)
+        x = self._ROM.getByte(self._PC) & 0xF
         result = self._AC + (x ^ 0xF) + self._CF
         self._AC = result & 0xF
         self._CF = result > 0xF
@@ -660,7 +653,7 @@ class LC5732():
 
     def _addi(self, opcode):
         #10010010 ----XXXX   AC <- (AC) + X; CF
-        x = self._ROM.getByte(self._PC)
+        x = self._ROM.getByte(self._PC) & 0xF
         result = self._AC + x
         self._AC = result & 0xF
         self._CF = result > 0xF
@@ -669,7 +662,7 @@ class LC5732():
 
     def _subi(self, opcode):
         #10010011 ----XXXX   AC <- (AC) + ~X + 1; CF
-        x = self._ROM.getByte(self._PC)
+        x = self._ROM.getByte(self._PC) & 0xF
         result = self._AC + (x ^ 0xF) + 1
         self._AC = result & 0xF
         self._CF = result > 0xF
@@ -678,28 +671,28 @@ class LC5732():
 
     def _adni(self, opcode):
         #10010100 ----XXXX   AC <- (AC) + X
-        x = self._ROM.getByte(self._PC)
+        x = self._ROM.getByte(self._PC) & 0xF
         self._AC = (self._AC + x) & 0xF
         self._PC += 1
         return MCLOCKx2_DIV
 
     def _andi(self, opcode):
         #10010101 ----XXXX   AC <- (AC) and X
-        x = self._ROM.getByte(self._PC)
+        x = self._ROM.getByte(self._PC) & 0xF
         self._AC = self._AC & x
         self._PC += 1
         return MCLOCKx2_DIV
 
     def _eori(self, opcode):
         #10010110 ----XXXX   AC <- (AC) xor X
-        x = self._ROM.getByte(self._PC)
+        x = self._ROM.getByte(self._PC) & 0xF
         self._AC = self._AC ^ x
         self._PC += 1
         return MCLOCKx2_DIV
 
     def _ori(self, opcode):
         #10010111 ----XXXX   AC <- (AC) or X
-        x = self._ROM.getByte(self._PC)
+        x = self._ROM.getByte(self._PC) & 0xF
         self._AC = self._AC | x
         self._PC += 1
         return MCLOCKx2_DIV
@@ -854,7 +847,7 @@ class LC5732():
         self._ALM = self._ROM.getByte(self._PC)
         self._sound.set_alm(self._ALM, self._cycle_counter)
         self._PC += 1
-        return MCLOCK_DIV
+        return MCLOCKx2_DIV
 
     def _csec(self, opcode):
         #11111011 11111111  PREDIV15-11 <- 0; SCF0,1,4 <- 0; SCF0,1,4 
