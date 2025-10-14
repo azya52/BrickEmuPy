@@ -4,97 +4,100 @@ from PyQt6.QtCore import QIODeviceBase, QByteArray, QIODevice
 from PyQt6.QtMultimedia import QAudioFormat, QAudioSink, QMediaDevices
 
 BUFFER_SIZE = 4096
-SOUND_LEVEL = (int) (32767 * 0.0005)
+SOUND_LEVEL = (int) (32767 * 0.15)
 SAMPLES_PART_SIZE = 4096
-SQUARENESS_FACTOR = 6
 SAMPLE_RATE = 44100
 
 class AudioData(QIODevice):
     def __init__(self, sampleRate, bytesPerSample, channelCount):
         super().__init__()
-        self._toneStarts = []
-        self._toneEnds = []
+        self._toneQueue = []
         self._currentByte = 0
         self._phase = 0
         self._sampleRate = sampleRate
         self._bytesPerSample = bytesPerSample
         self._channelCount = channelCount
+        self._sampleSize = bytesPerSample * channelCount
         self.open(QIODeviceBase.OpenModeFlag.ReadOnly | QIODeviceBase.OpenModeFlag.Unbuffered)
         
     def readData(self, maxlen):
         data = QByteArray()
-
         while maxlen:
-            chunk = maxlen
-            if (len(self._toneStarts) > 0):
-                if (self._currentByte < self._toneStarts[0][0]):
-                    chunk = min(maxlen, self._toneStarts[0][0] - self._currentByte)
-                    data.append(chunk, b'\0')
-                    self._phase = 0
-                elif (len(self._toneEnds) == 0):
-                    data.append(self.getWaveData(chunk, self._toneStarts[0][1], self._toneStarts[0][2], self._toneStarts[0][3]))
-                elif (self._currentByte < self._toneEnds[0]):
-                    chunk = min(maxlen, self._toneEnds[0] - self._currentByte)
-                    data.append(self.getWaveData(chunk, self._toneStarts[0][1], self._toneStarts[0][2], self._toneStarts[0][3]))
+            if (len(self._toneQueue) > 0):
+                if (self._currentByte < self._toneQueue[0][0]):
+                    chunk = min(maxlen, self._toneQueue[0][0] - self._currentByte)
+                    data.append(b'\0' * chunk)
+                elif (len(self._toneQueue) == 1):
+                    chunk = maxlen
+                    data.append(self.getWaveData(chunk, self._toneQueue[0][1]))
+                elif (self._currentByte < self._toneQueue[1][0]):
+                    chunk = min(maxlen, self._toneQueue[1][0] - self._currentByte)
+                    data.append(self.getWaveData(chunk, self._toneQueue[0][1]))
                 else:
-                    self._toneStarts.pop(0)
-                    self._toneEnds.pop(0)
+                    self._toneQueue.pop(0)
+                    while (self._toneQueue and self._toneQueue[0][1] == None):
+                        self._toneQueue.pop(0)
                     continue
             else:
-                return data.append(chunk, b'\0')
-
+                return data.append(b'\0' * maxlen)
+                
             self._currentByte += chunk
             maxlen -= chunk
 
         return data
 
-    def getWaveData(self, size, freq, noise, dutyRatio):
-        phase = self._phase
-        mul = math.pi * freq / self._sampleRate * 2
+    def getWaveData(self, size, tone):
+        freq, noise, amplitude = tone
+        bps = self._bytesPerSample
+        
+        if (freq == 0):
+            return QByteArray(int(amplitude * SOUND_LEVEL).to_bytes(bps, 'little', signed=True) * (size // bps)) 
+        
         waveData = QByteArray()
+        phase = self._phase
         channelCount = self._channelCount
-        bytesPerSample = self._bytesPerSample
-        size //= bytesPerSample * channelCount
-        prevSample = rand = 1
-        dutyRatio = dutyRatio * 2 - 1
-        for i in range(size):
-            newSample = max(-1, min(1, (math.sin(mul * i + phase) + dutyRatio) * SQUARENESS_FACTOR))
-            if (noise and (newSample * prevSample < 0)):
-                rand = random.choice([-1, 1])
-                prevSample = newSample
-            waveData.append(int(SOUND_LEVEL * newSample * rand).to_bytes(bytesPerSample, 'big', signed=True) * channelCount)
+        size //= bps * channelCount
+        mul = math.pi * freq * 2 / self._sampleRate
+
+        if (not noise):
+            for i in range(size):
+                waveData.append(int(max(-1, min(1, math.sin(mul * i + phase) * amplitude)) * SOUND_LEVEL)
+                    .to_bytes(bps, 'little', signed=True) * channelCount)
+        else:
+            prevSample = rand = 1
+            for i in range(size):
+                newSample = int(max(-1, min(1, math.sin(mul * i + phase) * amplitude)) * SOUND_LEVEL)
+                if (newSample * prevSample < 0):
+                    rand = random.choice([-1, 1])
+                    prevSample = newSample
+                waveData.append((newSample * rand)
+                    .to_bytes(bps, 'little', signed=True) * channelCount)
+
         self._phase += size * mul
         return waveData
    
     def bytesAvailable(self):
         return SAMPLES_PART_SIZE * self._channelCount * self._bytesPerSample
         
-    def start(self, freq, noise, dutyRatio, goalTime):
-        if (len(self._toneStarts) == 0):
-            self._currentByte = round(self._sampleRate * goalTime) * self._bytesPerSample * self._channelCount
-        goalSample = (SAMPLES_PART_SIZE + round(self._sampleRate * goalTime)) * self._bytesPerSample * self._channelCount
-        if (len(self._toneStarts) > len(self._toneEnds)):
-            self._toneEnds.append(goalSample)
-        if (freq > 0):
-            self._toneStarts.append([goalSample, freq, noise, dutyRatio])
+    def start(self, freq, noise, amplitude, goalTime):
+        if (len(self._toneQueue) == 0):
+            self._currentByte = round(self._sampleRate * goalTime) * self._sampleSize
+        goalSample = (SAMPLES_PART_SIZE + round(self._sampleRate * goalTime)) * self._sampleSize
+        self._toneQueue.append((goalSample, (freq, noise, amplitude)))
 
-    def startFor(self, freq, noise, duration, dutyRatio, goalTime):
-        if (len(self._toneStarts) == 0):
-            self._currentByte = round(self._sampleRate * goalTime) * self._bytesPerSample * self._channelCount
-        goalSample = (SAMPLES_PART_SIZE + round(self._sampleRate * goalTime)) * self._bytesPerSample * self._channelCount
-        self._toneEnds = []
-        if (len(self._toneStarts) > len(self._toneEnds)):
-            self._toneEnds.append(goalSample)
-        if (freq > 0):
-            self._toneStarts.append([goalSample, freq, noise, dutyRatio])
-            goalTime += duration
-            goalSample = (SAMPLES_PART_SIZE + round(self._sampleRate * goalTime)) * self._bytesPerSample * self._channelCount
-            self._toneEnds.append(goalSample)
+    def startFor(self, freq, noise, duration, amplitude, goalTime):
+        if (len(self._toneQueue) == 0):
+            self._currentByte = round(self._sampleRate * goalTime) * self._sampleSize
+        goalSample = (SAMPLES_PART_SIZE + round(self._sampleRate * goalTime)) * self._sampleSize
+        self._toneQueue.append((goalSample, (freq, noise, amplitude)))
+        goalTime += duration
+        goalSample = (SAMPLES_PART_SIZE + round(self._sampleRate * goalTime)) * self._sampleSize
+        self._toneQueue.append((goalSample, None))
         
     def stop(self, goalTime):
-        if (len(self._toneStarts) > len(self._toneEnds)):
-            goalSample = (SAMPLES_PART_SIZE + round(self._sampleRate * goalTime)) * self._bytesPerSample * self._channelCount
-            self._toneEnds.append(goalSample)
+        if (len(self._toneQueue) > 0):
+            goalSample = (SAMPLES_PART_SIZE + round(self._sampleRate * goalTime)) * self._sampleSize
+            self._toneQueue.append((goalSample, None))
 
 class ToneGenerator(QAudioSink):
     def __init__(self):
@@ -110,11 +113,11 @@ class ToneGenerator(QAudioSink):
         self._audioData = AudioData(audioFormat.sampleRate(), audioFormat.bytesPerSample(), audioFormat.channelCount())
         self.start(self._audioData)
         
-    def play(self, freq, noise, dutyRatio, goalTime):
-        self._audioData.start(freq, noise, dutyRatio, goalTime)
+    def play(self, freq, noise, amplitude, goalTime):
+        self._audioData.start(freq, noise, amplitude, goalTime)
 
-    def playFor(self, freq, noise, duration, dutyRatio, goalTime):
-        self._audioData.startFor(freq, noise, duration, dutyRatio, goalTime)
+    def playFor(self, freq, noise, duration, amplitude, goalTime):
+        self._audioData.startFor(freq, noise, duration, amplitude, goalTime)
         
     def stop(self, goalTime):
         self._audioData.stop(goalTime)

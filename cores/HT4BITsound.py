@@ -11,6 +11,8 @@ LFSR2DIV = (
     20, 94, 24, 104, 114, 98, 33, 18, 16, 14, 54, 88, 38, 59, 51, 56, 90, 29, 46, 79, 121, 73, 109, 40, 61, 84,
     93, 23, 97, 32, 13, 53, 58, 50, 28, 45, 72, 108, 83, 92, 31, 12, 49, 27, 107, 82, 11, 48, 81, 10, 9, 8
 )
+
+SQUARENESS_FACTOR = 5
     
 class HT4BITsound():
     def __init__(self, mask, clock):
@@ -44,7 +46,11 @@ class HT4BITsound():
             if (self._clock_counter <= 0):
                 self._clock_counter += LFSR2DIV[self._speed_div[self._channel]] * self._freq_div * 16
                 chanel_size = SINGLE_SIZE_CHANNEL_SIZE * ((self._channel >= SINGLE_SIZE_CHANNEL_COUNT) + 1)
-                self._toneGenerator.play(self._get_freq(), self._channel_effect[self._channel] & 0x1, 0.5, self._cycle_counter / self._system_clock)
+                freq = self._get_freq()
+                if (freq > 0):
+                    self._toneGenerator.play(freq, self._channel_effect[self._channel] & 0x1, SQUARENESS_FACTOR, self._cycle_counter / self._system_clock)
+                else:
+                    self._toneGenerator.stop(self._cycle_counter / self._system_clock)
                 self._note_counter = (self._note_counter + 1) % chanel_size
                 if ((self._note_counter == 0) and (not self._repeat_cycle)):
                     self._sound_on = False

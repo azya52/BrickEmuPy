@@ -1,5 +1,7 @@
 from .ToneGenerator import ToneGenerator
 
+SQUARENESS_FACTOR = 5
+
 class MSM50XXsound():
     def __init__(self, mask, clock):
         self._tone_generator = ToneGenerator()
@@ -28,7 +30,7 @@ class MSM50XXsound():
                     self._tone_generator.stop(self._current_cycle / self._system_clock)
                     self._Freg = 0
                 elif (self._state & self._Mreg == self._Mreg and self._sound_freq_div[self._Freg]):
-                    self._tone_generator.play(self._system_clock / self._sound_freq_div[self._Freg], False, 1/2, self._current_cycle / self._system_clock)
+                    self._tone_generator.play(self._system_clock / self._sound_freq_div[self._Freg], False, SQUARENESS_FACTOR, self._current_cycle / self._system_clock)
                 else:
                     self._tone_generator.stop(self._current_cycle / self._system_clock)
         else:

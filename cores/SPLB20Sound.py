@@ -1,10 +1,7 @@
 from .ToneGenerator import ToneGenerator
 
-MODE_DISABLE = 0
-MODE_TONE = 1
-MODE_RANDOM = 2
-MODE_TONE_RANDOM = 3
-    
+SQUARENESS_FACTOR = 5
+
 class SPLB20sound():
     def __init__(self, clock):
         self._system_clock = clock
@@ -29,7 +26,7 @@ class SPLB20sound():
     def _tone(self, current_cycle):
         if (self._tc_div > 0 and self._enable):
             freq = self._system_clock / self._clock_div / self._tc_div / 2
-            self._toneGenerator.play(freq, False, 0.5, current_cycle / self._system_clock)
+            self._toneGenerator.play(freq, False, SQUARENESS_FACTOR, current_cycle / self._system_clock)
         else:
             self._stop(current_cycle)
     

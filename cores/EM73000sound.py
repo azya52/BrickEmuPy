@@ -4,6 +4,8 @@ MODE_DISABLE = 0
 MODE_TONE = 1
 MODE_RANDOM = 2
 MODE_TONE_RANDOM = 3
+
+SQUARENESS_FACTOR = 5
     
 class EM73000sound():
     def __init__(self, clock):
@@ -17,7 +19,7 @@ class EM73000sound():
     def update(self, current_cycle):
         if (self._mode != MODE_DISABLE and (self._freq_div > 1)):
             freq = self._system_clock / self._basic_freq_div / self._freq_div / 2
-            self._toneGenerator.play(freq, self._mode != MODE_TONE, 0.5, current_cycle / self._system_clock)
+            self._toneGenerator.play(freq, self._mode != MODE_TONE, SQUARENESS_FACTOR, current_cycle / self._system_clock)
         else:
             self._toneGenerator.stop(current_cycle / self._system_clock)
 

@@ -1,5 +1,7 @@
 from .ToneGenerator import ToneGenerator
-   
+
+SQUARENESS_FACTOR = 5
+
 class LC5732sound():
     def __init__(self, mask, clock):
         self._system_clock = clock
@@ -14,6 +16,6 @@ class LC5732sound():
         if (scal != 0xF and octave != 0x3):
             freq = self._sound_freq_tbl[octave][scal]
             duration = self._sound_duration_tbl[duration]
-            self._toneGenerator.playFor(freq, False, duration, 0.5, current_cycle / self._system_clock)
+            self._toneGenerator.playFor(freq, False, duration, SQUARENESS_FACTOR, current_cycle / self._system_clock)
         else:
             self._toneGenerator.stop(current_cycle / self._system_clock)
