@@ -7,8 +7,8 @@ from cores import *
 FPS = 60
 EXAMINE_RATE = 30
 
-DISPLAY_UPDTE_NS = 1000000000 / FPS
-EXAMINE_UPDTE_NS = 1000000000 / EXAMINE_RATE
+DISPLAY_UPDTE_NS = 1e9 / FPS
+EXAMINE_UPDTE_NS = 1e9 / EXAMINE_RATE
 
 class Brick(QObject):
     btnPressSignal = pyqtSignal(str, int, int)
@@ -93,12 +93,11 @@ class Brick(QObject):
                 lastExamine += EXAMINE_UPDTE_NS
                 self._uiExamineUpdate()
 
-            if (lastTick > ns):
-                time.sleep((lastTick - ns) / 1000000000)
+            if (lastTick > ns + 1000):
+                time.sleep((lastTick - ns) / 1e9)
             else:
                 lastTick = ns
-
-            QtCore.QCoreApplication.processEvents()
+                QtCore.QCoreApplication.processEvents()
 
     def _set_pin_state(self, port, pin, level):
         self._btn_matrix_out[(port, pin)] = level
@@ -181,7 +180,7 @@ class Brick(QObject):
         self._cycleTimeNs = int(self._getCicleTimeNs() * speed)
 
     def _getCicleTimeNs(self):
-        return 1000000000 / self._config["clock"]
+        return 1e9 / self._config["clock"]
 
     def debugRun(self):
         self.runSignal.emit()
