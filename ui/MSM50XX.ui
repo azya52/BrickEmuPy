@@ -765,36 +765,6 @@
                             <string>10</string>
                           </property>
                           </row>
-                          <row>
-                          <property name="text">
-                            <string>20</string>
-                          </property>
-                          </row>
-                          <row>
-                          <property name="text">
-                            <string>30</string>
-                          </property>
-                          </row>
-                          <row>
-                          <property name="text">
-                            <string>40</string>
-                          </property>
-                          </row>
-                          <row>
-                          <property name="text">
-                            <string>50</string>
-                          </property>
-                          </row>
-                          <row>
-                          <property name="text">
-                            <string>60</string>
-                          </property>
-                          </row>
-                          <row>
-                          <property name="text">
-                            <string>70</string>
-                          </property>
-                          </row>
                           <column>
                           <property name="text">
                             <string>00</string>

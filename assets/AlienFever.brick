@@ -9,25 +9,25 @@
 			"port": "K0",
 			"pin": 0,
 			"level": 0,
-			"hot_keys": [48]
+			"hot_keys": [49]
 		},
 		"btnSelect": {
 			"port": "K0",
 			"pin": 1,
 			"level": 0,
-			"hot_keys": [49]
+			"hot_keys": [50]
 		},
 		"btnSound": {
 			"port": "K0",
 			"pin": 2,
 			"level": 0,
-			"hot_keys": [50]
+			"hot_keys": [51]
 		},
 		"btnHandle": {
 			"port": "K0",
 			"pin": 3,
 			"level": 0,
-			"hot_keys": [51]
+			"hot_keys": [52, 32]
 		}
 	},
 	

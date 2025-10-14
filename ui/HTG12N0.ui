@@ -579,12 +579,6 @@
               </item>
               <item row="5" column="0">
                 <widget class="QTabWidget" name="memTabWidget">
-                   <property name="sizePolicy">
-                    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                    </sizepolicy>
-                  </property>
                   <property name="currentIndex">
                     <number>0</number>
                   </property>

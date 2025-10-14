@@ -2,7 +2,7 @@
 	"id": "074910de-eff0-48fd-9dff-a314d0c00cc9",
 	"core": "T7741",
 	"face_path": "./assets/ParmanDaiPinch.svg",
-	"clock": 180000,
+	"clock": 200000,
 	
 	"buttons": {
 		"btnDown": {
