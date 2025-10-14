@@ -44,7 +44,8 @@ class SPLB20():
         self._cycle_counter = 0
 
         self._pullup_ext = {
-            **{"PA": 0xFF}
+            **{"PA": 0},
+            **mask['port_pullup']
         }
 
         self._port_input = {
@@ -412,7 +413,7 @@ class SPLB20():
                 else:
                     self._timer_counter += self._sub_clock_div
                 self._TC -= 1
-                if (self._TC < 0):
+                if (self._TC == 0):
                     self._TC = self._TC_PRESET
                     if (self._INT_CFG & IO_INT_CFG_COUNTER_INT):
                         self._IREQ |= IO_INT_CFG_COUNTER_INT

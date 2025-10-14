@@ -51,6 +51,9 @@
 	
 	"mask_options": {
 		"rom_path": "./assets/ElfinTwins.bin",
-		"non_crystal_mode": 0
+		"non_crystal_mode": 0,
+		"port_pullup": {
+			"PA": 255
+		}
 	}
 }

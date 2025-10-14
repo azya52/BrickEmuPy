@@ -502,7 +502,7 @@
               <attribute name="verticalHeaderMinimumSectionSize">
                <number>0</number>
               </attribute>
-<column>
+              <column>
                <property name="text">
                 <string>00</string>
                </property>

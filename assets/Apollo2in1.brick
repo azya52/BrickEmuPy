@@ -33,6 +33,9 @@
 	
 	"mask_options": {
 		"rom_path": "./assets/Apollo2in1.bin",
-		"non_crystal_mode": 0
+		"non_crystal_mode": 0,
+		"port_pullup": {
+			"PA": 255
+		}
 	}
 }
