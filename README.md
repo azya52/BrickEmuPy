@@ -11,6 +11,8 @@ The following handheld games are currently emulated:
   * Keychain 55 in 1 (HT-943I0)
   * Keychain GA-878 (BJ6220A)
   * Micon KC-32 (BJ6220A)
+  * Apollo 128 in 1 B0202 (SPL02)
+  * Apollo 18 in 1 B0302 (SPL03)
 * Virtual Pets
   * Tamagotchi P1 (distributed without ROM)
   * Tamagotchi P2 (distributed without ROM)
