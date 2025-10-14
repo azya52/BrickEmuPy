@@ -22,6 +22,9 @@ from .T7741 import *
 from .T7741dasm import *
 from .D750X import *
 from .D750Xdasm import *
+from .SPL02 import *
+from .SPL0Xdasm import *
+from .SPL03 import *
 
 __all__ = [
     "E0C6200",
@@ -48,6 +51,9 @@ __all__ = [
     "T7741dasm",
     "D750X",
     "D750Xdasm",
+    "SPL02",
+    "SPL0Xdasm",
+    "SPL03",
     "cores_map"]
 
 cores_map = {
@@ -98,5 +104,13 @@ cores_map = {
     "D750X": {
         "core": D750X,
         "dasm": D750Xdasm
+    },
+    "SPL02": {
+        "core": SPL02,
+        "dasm": SPL0Xdasm
+    },
+    "SPL03": {
+        "core": SPL03,
+        "dasm": SPL0Xdasm
     }
 }
