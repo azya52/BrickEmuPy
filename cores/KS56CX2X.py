@@ -411,7 +411,7 @@ class KS56CX2X():
             *([KS56CX2X._subc_xa_rpe] * 8),                #10101010 | 11111 P2 P1 P0
         )
 
-        self.v_10101100 = (
+        self._execute_10101100 = (
             KS56CX2X._and1_cy_hmembit,                     #10101100 | 00 B1 B0 D3 D2 D1 D0
             KS56CX2X._and1_cy_pmeml,                       #10101100 | 0100 G3 G2 G1 G0
             KS56CX2X._and1_cy_fmembit,                     #10101100 | 10 B1 B0 F3 F2 F1 F0
@@ -1176,8 +1176,6 @@ class KS56CX2X():
     def _stack_pop(self):
         sp = ((self._SBS & 0x1) << 8) + self._SP
         self._SP = (self._SP + 1) & 0xFF
-        if (self._SP == 2):
-            print("%0X" % self._PC)
         return self._RAM[sp]
 
     def _stack_pop_byte(self):
@@ -1261,7 +1259,6 @@ class KS56CX2X():
     def _geti_taddr(self, opcode):
         #00 T5 T4 T3 T2 T1 T0
         taddr = opcode << 1
-        #print("geti: %0X" % taddr)
         byte = self._ROM.getByte(taddr)
         bytes_count = self._execute[byte][1]
         execute_time = 1
