@@ -26,7 +26,7 @@
 		"btnReset": {
 			"port": "RES",
 			"pin": 0,
-			"level": 1,
+			"level": 0,
 			"hot_keys": [82]
 		},
 		"btnLeft": {
