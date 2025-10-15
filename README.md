@@ -1,7 +1,9 @@
 # BrickEmuPy
-Handheld LCD games emulator in Python with PyQt6.<br/>
+Handheld LCD games emulator in Python with PyQt6.
 
-The following handheld games are currently emulated: 
+<img width="1435" height="1032" alt="image" src="https://github.com/user-attachments/assets/1d30dc62-a6be-480c-872f-1c8654f775cb" />
+
+## List of emulated handheld games:
 * Brick Games
   * Brick Game E-23 PLUS MARK II 96 in 1 (HT-943D0) (An [article](https://habr.com/ru/articles/773040/) describing the reverse engineering.)
   * Brick Game E-88 8 in 1 (HT-943E5)
@@ -52,7 +54,24 @@ The following handheld games are currently emulated:
   * Gakken Tom & Jerry Prank, 1983 (Toshiba 6909)
   * Animest (Bandai) Dr. Slump Arale Ncha! Bycha AR-03, 1982 (Toshiba 6815)
 
-## Compiling
+## Running on Windows
+* Install Python ([latest version](https://www.python.org/downloads/)) and make sure to add it to PATH.
+* Install pyqt6:
+```
+python -m pip install pyqt6
+```
+* Install Git if not already installed. Clone the repo and enter its folder:
+```
+git clone https://github.com/azya52/BrickEmuPy.git
+```
+Or just download the [ZIP](https://github.com/azya52/BrickEmuPy/archive/refs/heads/main.zip) from GitHub.
+* Enter the project folder and run the emulator:
+```
+cd BrickEmuPy
+python main.py
+```
+
+## Running on Linux
 Tested with Ubuntu 24.
 ```
 sudo apt install pip
@@ -61,5 +80,4 @@ git clone https://github.com/azya52/BrickEmuPy && cd BrickEmuPy
 python3 main.py
 ```
 
-<img src="https://github.com/azya52/BrickEmuPy/assets/31337838/65dc8c6c-7998-48c9-b351-383522dd8171" width=100%>
-<img src="https://github.com/azya52/BrickEmuPy/assets/31337838/d8c25a9f-c2df-4ae0-add2-3d3134eb6a5e" width=100%>
+<img width="1435" height="1032" alt="image" src="https://github.com/user-attachments/assets/3c7628b6-2de6-4da0-868a-ba9c1edd9e7f" />
