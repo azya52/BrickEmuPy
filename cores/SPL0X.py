@@ -18,15 +18,10 @@ IO_CTRL_CPU_CLOCK = 0x20
 IO_CTRL_LCD_DUTY = 0xC0
 
 IO_INT_CFG_T2HZ_INT = 0x01
-IO_INT_CFG_T128HZ_INT = 0x02
+IO_INT_CFG_T256HZ_INT = 0x02
 IO_INT_CFG_POWERKEY_INT = 0x04
-IO_INT_CFG_COUNTER_INT = 0x10
 IO_INT_CFG_NMI_ENBL = 0x80
 
-IO_SYS_CTRL_STATUS = 0x03
-IO_SYS_CTRL_LCD_ENBL = 0x04
-IO_SYS_CTRL_LCD_ON = 0x08
-IO_SYS_CTRL_TIMER_ENBL = 0x10
 IO_SYS_CTRL_32K_ENBL = 0x20
 IO_SYS_CTRL_CPU_STOP = 0x40
 IO_SYS_CTRL_ROSC_STOP = 0x80
@@ -279,7 +274,7 @@ class SPL0X():
 
     def reset(self):
         self._T2HZ_counter = 0
-        self._T128HZ_counter = 0
+        self._T256HZ_counter = 0
 
         self._PC = 0
         self._SP = 0
@@ -399,11 +394,11 @@ class SPL0X():
                 self._IREQ |= IO_INT_CFG_T2HZ_INT
                 self._NMI()
 
-        self._T128HZ_counter -= exec_cycles
-        while (self._T128HZ_counter <= 0):
-            self._T128HZ_counter += self._sub_clock_div * (SUB_CLOCK // 256)
-            if (self._INT_CFG & IO_INT_CFG_T128HZ_INT):
-                self._IREQ |= IO_INT_CFG_T128HZ_INT
+        self._T256HZ_counter -= exec_cycles
+        while (self._T256HZ_counter <= 0):
+            self._T256HZ_counter += self._sub_clock_div * (SUB_CLOCK // 256)
+            if (self._INT_CFG & IO_INT_CFG_T256HZ_INT):
+                self._IREQ |= IO_INT_CFG_T256HZ_INT
                 self._NMI()
 
     def clock(self):
