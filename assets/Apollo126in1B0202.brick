@@ -1,7 +1,7 @@
 {
 	"id": "bd6a27cf-bc6c-4ad4-973a-6403e62551e9",
 	"core": "SPL02",
-	"face_path": "./assets/Apollo128in1B0202.svg",
+	"face_path": "./assets/Apollo126in1B0202.svg",
 	"clock": 690000,
 	
 	"buttons": {
@@ -56,7 +56,7 @@
 	},
 	
 	"mask_options": {
-		"rom_path": "./assets/Apollo128in1B0202.bin",
+		"rom_path": "./assets/Apollo126in1B0202.bin",
 		"non_crystal_div": 16,
 		"port_pullup": {
 			"PA": 0
