@@ -1,6 +1,8 @@
 from .rom import ROM
 from .PinTogglingSound import PinTogglingSound
 
+PRESCALER_SIZE = 32768
+
 RAM_SIZE = 128
 SEG_COUNT = 36
 COM_COUNT = 4
@@ -30,9 +32,9 @@ class T7741():
 
         self._sub_clock_div = mask['sub_clock'] / clock
         
-        self._px_div = mask['sub_clock'] / mask['prescaler_div'][0]
-        self._py_div = mask['sub_clock'] / mask['prescaler_div'][1]
-        self._pz_div = mask['sub_clock'] / mask['prescaler_div'][2]
+        self._px_div = PRESCALER_SIZE / mask['prescaler_div'][0]
+        self._py_div = PRESCALER_SIZE / mask['prescaler_div'][1]
+        self._pz_div = PRESCALER_SIZE / mask['prescaler_div'][2]
 
         self._OUTP = 0
         self._IOP = 0

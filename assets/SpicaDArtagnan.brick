@@ -1,0 +1,62 @@
+{
+	"id": "c5c6a926-8383-4940-8948-c96bec662fbf",
+	"core": "T7741",
+	"face_path": "./assets/SpicaDArtagnan.svg",
+	"clock": 170000,
+	
+	"buttons": {
+		"btnRight": {
+			"port": "INP",
+			"pin": 3,
+			"level": {
+				"port": "IOP",
+				"pin": 0
+			},
+			"hot_keys": [68, 16777236]
+		},
+		"btnLeft": {
+			"port": "INP",
+			"pin": 1,
+			"level": {
+				"port": "IOP",
+				"pin": 0
+			},
+			"hot_keys": [65, 16777234]
+		},
+		"btnDown": {
+			"port": "INP",
+			"pin": 2,
+			"level": {
+				"port": "IOP",
+				"pin": 0
+			},
+			"hot_keys": [83, 16777237]
+		},
+		"btnJump": {
+			"port": "INP",
+			"pin": 0,
+			"level": {
+				"port": "IOP",
+				"pin": 0
+			},
+			"hot_keys": [87, 16777235]
+		},
+		"btnStart": {
+			"port": "INP",
+			"pin": 0,
+			"level": {
+				"port": "IOP",
+				"pin": 1
+			},
+			"hot_keys": [49, 32]
+		}
+	},
+	
+	"mask_options": {
+		"rom_path": "./assets/SpicaDArtagnan.bin",
+		"prescaler_div": [2, 8, 16],
+		"sub_clock": 170000,
+		"com_div": 768,
+		"sound_gnd": 0
+	}
+}
