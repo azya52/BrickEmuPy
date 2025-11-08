@@ -72,9 +72,9 @@ python main.py
 ```
 
 ## Running on Linux
-Tested with Ubuntu 24.
 ```
-sudo apt install pip
+sudo apt update
+sudo apt install python3-pip libxcb-cursor0
 pip install pyqt6 --break-system-packages
 git clone https://github.com/azya52/BrickEmuPy && cd BrickEmuPy
 python3 main.py
