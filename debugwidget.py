@@ -103,6 +103,10 @@ class DebugWidget(QtWidgets.QWidget):
     def checkBoxStateChanged(self, state):
         self.editStateSignal.emit({self.sender().property("key"): int(state == Qt.CheckState.Checked.value)})
 
+    @pyqtSlot(int)
+    def comboBoxItemChanged(self, index):
+        self.editStateSignal.emit({self.sender().property("key"): index})
+
     def examine(self, state):
         if not self.isHidden():
             for key, value in state.items():

@@ -1,0 +1,37 @@
+{
+	"id": "25c96140-2851-40d7-b3c2-ac0eab331cd7",
+	"core": "KS57C21308",
+	"face_path": "./assets/PocketPuppy.svg",
+	"clock": 1000000,
+	
+	"buttons": {
+		"btnCircle": {
+			"port": "PORT6",
+			"pin": 0,
+			"level": 0,
+			"hot_keys": [49, 80]
+		},
+		"btnLeft": {
+			"port": "PORT6",
+			"pin": 1,
+			"level": 0,
+			"hot_keys": [65, 16777234]
+		},
+		"btnRight": {
+			"port": "PORT6",
+			"pin": 2,
+			"level": 0,
+			"hot_keys": [68, 16777236]
+		},
+		"btnSquare": {
+			"port": "PORT6",
+			"pin": 3,
+			"level": 0,
+			"hot_keys": [32, 16777220]
+		}
+	},
+	
+	"mask_options": {
+		"rom_path": "./assets/PocketPuppy.bin"
+	}
+}
