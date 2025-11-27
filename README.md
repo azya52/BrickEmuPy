@@ -32,6 +32,7 @@ Handheld LCD games emulator in Python with PyQt6.
   * Mickey Deluxe Virtual Game virtual pet (HTGT43N0)
   * Apollo 2 in 1 virtual pet
   * Elfin Twins GM-021
+  * Pocket Puppy (KS57C21308)
 * Other LCD Games
   * Epoch Chibi Pachi Alien Fever
   * Formel 1 (Hartung Spiele Berlin/Epoch)
