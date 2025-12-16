@@ -56,7 +56,7 @@ REG_W = 5
 REG_Z = 6
 REG_Y = 7
 
-VRQ_INTBT = 1
+VRQ_INT4B = 1
 VRQ_INT4 = 1 
 VRQ_INT0 = 2
 VRQ_INT1 = 3
@@ -67,10 +67,10 @@ IO_WMODl_SUB_CLOCK = 0x1
 IO_WMODl_WATCH_ENABLE = 0x4
 IO_WMODl_WATCH_FAST_MODE = 0x2
 
-IO_INTB_IRQBT = 0x1
-IO_INTB_IEBT = 0x2
-IO_INTB_IRQ4 = 0x4
-IO_INTB_IE4 = 0x8
+IO_INT4B_IRQBT = 0x1
+IO_INT4B_IEBT = 0x2
+IO_INT4B_IRQ4 = 0x4
+IO_INT4B_IE4 = 0x8
 IO_INTW_IRQW = 0x1
 IO_INTW_IEW = 0x2
 IO_INTT0_IRQT0 = 0x1
@@ -175,7 +175,7 @@ class KS57C21308():
             0xFB5: (KS57C21308._get_io_im1, KS57C21308._set_io_im1),
             0xFB6: (KS57C21308._get_io_im2, KS57C21308._set_io_im2),
             0xFB7: (KS57C21308._get_io_dummy, KS57C21308._set_io_scmod),
-            0xFB8: (KS57C21308._get_io_intb, KS57C21308._set_io_intb),
+            0xFB8: (KS57C21308._get_io_int4b, KS57C21308._set_io_int4b),
             0xFBA: (KS57C21308._get_io_intw, KS57C21308._set_io_intw),
             0xFBC: (KS57C21308._get_io_intt0, KS57C21308._set_io_intt0),
             0xFBD: (KS57C21308._get_io_intp0, KS57C21308._set_io_intp0),
@@ -206,8 +206,8 @@ class KS57C21308():
         }
 
         self._execute = (
-            *([(KS57C21308._br_mraddr, 1)] * 16),         #0000AAAA
-            *([(KS57C21308._br_raddr, 1)] * 16),          #0001AAAA
+            *([(KS57C21308._jr_mraddr, 1)] * 16),         #0000AAAA
+            *([(KS57C21308._jr_raddr, 1)] * 16),          #0001AAAA
             *([(KS57C21308._ref, 1)] * 8),                #00100XXX
             (KS57C21308._pop_rp, 1),                      #00101000
             (KS57C21308._push_rp, 1),                     #00101001
@@ -556,7 +556,7 @@ class KS57C21308():
         self._IM0 = 0
         self._IM1 = 0
         self._IM2 = 0
-        self._INTB = 0
+        self._INT4B = 0
         self._INTW = 0
         self._INTT0 = 0
         self._INTP0 = 0
@@ -651,7 +651,7 @@ class KS57C21308():
     def _set_io_bmod(self, value):
         self._BMOD = value & 0x7
         if (value & 0x8):
-            self._INTB &= ~IO_INTB_IRQBT
+            self._INT4B &= ~IO_INT4B_IRQBT
             self._BCNT = 0
 
     def _get_io_bcntl(self):
@@ -676,6 +676,10 @@ class KS57C21308():
         self._WMODl = value & 0xF
 
     def _set_io_wmodh(self, value):
+        if (value & IO_WMODl_WATCH_ENABLE):
+            self._INTW |= IO_INTW_IRQW
+            if (not(self._WMODh & IO_WMODl_WATCH_ENABLE)):
+                self._watch_timer_counter = 0
         self._WMODh = (value & 0xB)
 
     def _get_io_pasrl(self):
@@ -775,11 +779,11 @@ class KS57C21308():
         self._SCMOD = value & 0x9
         self.update_cpu_clock_div()
 
-    def _get_io_intb(self):
-        return self._INTB
+    def _get_io_int4b(self):
+        return self._INT4B
 
-    def _set_io_intb(self, value):
-        self._INTB = value
+    def _set_io_int4b(self, value):
+        self._INT4B = value
 
     def _get_io_intw(self):
         return self._INTW
@@ -920,27 +924,27 @@ class KS57C21308():
         else:
             self._cpu_clock_div = MAIN_CLOCK_DIV[self._PCON_CLOCK]
             
-    def _process_basic_timer(self, exec_cycles):
-        self._basic_timer_counter -= exec_cycles
-        while (self._basic_timer_counter <= 0):
-            self._basic_timer_counter += BASIC_TIMER_DIV[self._BMOD]
-            self._BCNT = (self._BCNT + 1) & 0xFF
-            if (self._BCNT == 0):
-                self._INTB |= IO_INTB_IRQBT
+    def _process_timers(self, exec_cycles):
+        if (not(self._SCMOD & IO_SCMOD_DISABLE_FX)):
+            self._basic_timer_counter -= exec_cycles
+            while (self._basic_timer_counter <= 0):
+                self._basic_timer_counter += BASIC_TIMER_DIV[self._BMOD]
+                self._BCNT = (self._BCNT + 1) & 0xFF
+                if (self._BCNT == 0):
+                    self._INT4B |= IO_INT4B_IRQBT
 
-    def _process_t0_timer(self, exec_cycles):
-        if ((TIMER_T0_DIV[self._TMOD0h] > 0) and (self._TMOD0l & IO_TMOD0l_ENABLE)):
-            self._T0_timer_counter -= exec_cycles
-            while (self._T0_timer_counter <= 0):
-                self._T0_timer_counter += TIMER_T0_DIV[self._TMOD0h]
-                self._TCNT0 = (self._TCNT0 + 1) & 0xFF
-                if (self._TCNT0 == self._TREF0):
-                    self._INTT0 |= IO_INTT0_IRQT0
-                    self._TCNT0 = 0
-                    self._PORT4_TC0_OUT = ((self._TOE0 > 0) * 0xF) & (self._PORT4_TC0_OUT ^ PORT4_TC0_OUT_PIN)
-                    self._sound.toggle(self._PORT4_TC0_OUT, ~self._PORT4_TC0_OUT, self._cycle_counter)
+            if ((self._TMOD0h >= 4) and (self._TMOD0l & IO_TMOD0l_ENABLE)):
+                self._T0_timer_counter -= exec_cycles
+                while (self._T0_timer_counter <= 0):
+                    self._T0_timer_counter += TIMER_T0_DIV[self._TMOD0h]
+                    self._TCNT0 += 1
+                    if (self._TCNT0 > self._TREF0):
+                        self._INTT0 |= IO_INTT0_IRQT0
+                        self._TCNT0 = 0
+                        self._PORT4_TC0_OUT = ((self._TOE0 > 0) * 0xF) & (self._PORT4_TC0_OUT ^ PORT4_TC0_OUT_PIN)
+                        self._sound.toggle(self._PORT4_TC0_OUT, ~self._PORT4_TC0_OUT, self._cycle_counter)
 
-    def _process_watch_timer(self, exec_cycles):
+
         if (self._WMODl & IO_WMODl_WATCH_ENABLE):
             self._watch_timer_counter -= exec_cycles
             while (self._watch_timer_counter <= 0):
@@ -949,8 +953,6 @@ class KS57C21308():
                 else:
                     self._watch_timer_counter += WATCH_TIMER_DIV[self._WMODl & IO_WMODl_WATCH_FAST_MODE] * WATCH_TIMER_MAIN_CLOCK_DIV
                 self._INTW |= IO_INTW_IRQW
-        else:
-            self._watch_timer_counter = 0
 
     def _go_vector(self, addr):
         vector = self._ROM.getWord(addr)
@@ -968,11 +970,11 @@ class KS57C21308():
         self._stack_push((self._PC >> 8) & 0xF)
         self._go_vector(vector_addr)
         self._IST += 1
-        if (IRQn == VRQ_INTBT):
-            if ((self._INTB & IO_INTB_IEBT) == 0):
-                self._INTB &= ~IO_INTB_IRQ4
-            elif ((self._INTB & IO_INTB_IE4) == 0):
-                self._INTB &= ~IO_INTB_IRQBT
+        if (IRQn == VRQ_INT4B):
+            if ((self._INT4B & IO_INT4B_IEBT) == 0):
+                self._INT4B &= ~IO_INT4B_IRQ4
+            elif ((self._INT4B & IO_INT4B_IE4) == 0):
+                self._INT4B &= ~IO_INT4B_IRQBT
         elif (IRQn == VRQ_INTT0):
             self._INTT0 &= ~IO_INTT0_IRQT0
         elif (IRQn == VRQ_INTP0):
@@ -1004,16 +1006,16 @@ class KS57C21308():
                 return VRQ_INT0
             elif (self._IST == 0):
                 IRQn = VRQ_INT0
-        if ((self._INTB & IO_INTB_IE4) and (self._INTB & IO_INTB_IRQ4)):
+        if ((self._INT4B & IO_INT4B_IE4) and (self._INT4B & IO_INT4B_IRQ4)):
             if (VRQ_INT4 == self._IPR and self._IST <= 1):
                 return VRQ_INT4
             elif (self._IST == 0):
                 IRQn = VRQ_INT4
-        if ((self._INTB & IO_INTB_IEBT) and (self._INTB & IO_INTB_IRQBT)):
-            if (VRQ_INTBT == self._IPR and self._IST <= 1):
-                return VRQ_INTBT
+        if ((self._INT4B & IO_INT4B_IEBT) and (self._INT4B & IO_INT4B_IRQBT)):
+            if (VRQ_INT4B == self._IPR and self._IST <= 1):
+                return VRQ_INT4B
             elif (self._IST == 0):
-                IRQn = VRQ_INTBT
+                IRQn = VRQ_INT4B
         return IRQn
     
 
@@ -1033,19 +1035,16 @@ class KS57C21308():
             ((self._INT01 & IO_INT01_IRQ0) and (self._INT01 & IO_INT01_IE0) and (self._IM0 & IO_IM0_NOISE_ELIM_DISABLE)) |
             ((self._INT01 & IO_INT01_IRQ1) and (self._INT01 & IO_INT01_IE1)) |
             ((self._INTT0 & IO_INTT0_IRQT0) and (self._INTT0 & IO_INTT0_IET0)) |
-            ((self._INTB & IO_INTB_IRQ4) and (self._INTB & IO_INTB_IE4)) |
-            ((self._INTB & IO_INTB_IRQBT) and (self._INTB & IO_INTB_IEBT))):
+            ((self._INT4B & IO_INT4B_IRQ4) and (self._INT4B & IO_INT4B_IE4)) |
+            ((self._INT4B & IO_INT4B_IRQBT) and (self._INT4B & IO_INT4B_IEBT))):
             self._PCON_MODE = PCC_MODE_NORMAL
-
-        self._process_watch_timer(exec_cycles)
-        if (not(self._SCMOD & IO_SCMOD_DISABLE_FX)):
-            self._process_basic_timer(exec_cycles)
-            self._process_t0_timer(exec_cycles)
 
         if (self._IME):
             IRQn = self._get_interrupt_vector()
             if (IRQn > 0):
                 self._interrupt(IRQn)
+
+        self._process_timers(exec_cycles)
         
         self._cycle_counter += exec_cycles
         return exec_cycles
@@ -1248,11 +1247,11 @@ class KS57C21308():
         self._RAM[self._ERB * self._SRB * 8 + reg] = value
 
     def _get_rp(self, rp):
-        rp_offset = (self._ERB * self._SRB * 8 + (rp & 0x6)) ^ ((rp & 0x1) << 3)
+        rp_offset = self._ERB * self._SRB * 8 + (rp & 0x6)
         return (self._RAM[rp_offset + 1] << 4) | self._RAM[rp_offset]
 
     def _set_rp(self, rp, value):
-        rp_offset = (self._ERB * self._SRB * 8 + (rp & 0x6)) ^ ((rp & 0x1) << 3)
+        rp_offset = self._ERB * self._SRB * 8 + (rp & 0x6)
         self._RAM[rp_offset] = value & 0xF
         self._RAM[rp_offset + 1] = (value >> 4) & 0xF
 
@@ -1328,15 +1327,15 @@ class KS57C21308():
     def _execute_11111001(self, opcode):
         return self._execute_11111001_tbl[(opcode >> 6) & 0x3](self, opcode)
 
-    def _br_raddr(self, opcode):
+    def _jr_raddr(self, opcode):
         #0001AAAA
         self._PC += (opcode & 0x0F)
-        return 8
+        return 2
 
-    def _br_mraddr(self, opcode):
+    def _jr_mraddr(self, opcode):
         #0000AAAA
         self._PC -= (16 - (opcode & 0x0F))
-        return 8
+        return 2
 
     def _ref(self, opcode):
         #TTTTTTTT
@@ -1375,7 +1374,7 @@ class KS57C21308():
         self._stack_push((self._PC >> 12) & 0x0003)
         self._stack_push((self._PC >> 8) & 0x000F)
         self._PC = opcode & 0x7FF
-        return 2
+        return 3
 
     def _pop_rp(self, opcode):
         #00101PP0
@@ -1569,7 +1568,7 @@ class KS57C21308():
         self._stack_push((self._PC >> 12) & 0x0003)
         self._stack_push((self._PC >> 8) & 0x000F)
         self._PC = opcode & self._ROM.getMask()
-        return 3
+        return 4
 
     def _xor_a_ahl(self, opcode):
         #00111011
@@ -1826,11 +1825,6 @@ class KS57C21308():
     def _jr_awx(self, opcode):
         #11011101 01100100
         self._PC = ((self._PC & 0xFF00) | (self._get_reg(REG_W) << 4) | self._get_reg(REG_X)) & self._ROM.getMask()
-        return 3
-
-    def _br_yzde(self, opcode):
-        #10011001 | 00000101
-        self._PC = ((self._get_reg(REG_Y) << 12) | (self._get_reg(REG_Z) << 8) | (self._get_reg(REG_W) << 4) | self._get_reg(REG_X)) & self._ROM.getMask()
         return 3
 
     def _pop_sb(self, opcode):
