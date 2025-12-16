@@ -1,0 +1,55 @@
+{
+	"id": "0d3daa9e-df85-46b8-9d16-019b77af0d27",
+	"core": "KS57C2504",
+	"face_path": "./assets/KotoKunekunetchyo.svg",
+	"clock": 1150000,
+	
+	"buttons": {
+		"btnStart": {
+			"port": "PORT1",
+			"pin": 1,
+			"level": 0,
+			"hot_keys": [32, 16777220]
+		},
+		"btnSound": {
+			"port": "PORT1",
+			"pin": 2,
+			"level": 0,
+			"hot_keys": [49]
+		},
+		"btnSelect": {
+			"port": "PORT1",
+			"pin": 3,
+			"level": 0,
+			"hot_keys": [50]
+		},
+		"btnLeft": {
+			"port": "PORT0",
+			"pin": 1,
+			"level": 0,
+			"hot_keys": [65, 16777234]
+		},
+		"btnRight": {
+			"port": "PORT0",
+			"pin": 0,
+			"level": 0,
+			"hot_keys": [68, 16777236]
+		},
+		"btnUp": {
+			"port": "PORT0",
+			"pin": 3,
+			"level": 0,
+			"hot_keys": [87, 16777235]
+		},
+		"btnDown": {
+			"port": "PORT0",
+			"pin": 2,
+			"level": 0,
+			"hot_keys": [83, 16777237]
+		}
+	},
+	
+	"mask_options": {
+		"rom_path": "./assets/KotoKunekunetchyo.bin"
+	}
+}
