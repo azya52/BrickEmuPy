@@ -55,7 +55,7 @@ Handheld LCD games emulator in Python with PyQt6.
   * Gakken Tom & Jerry Prank, 1983 (Toshiba 6909)
   * Animest (Bandai) Dr. Slump Arale Ncha! Bycha AR-03, 1982 (Toshiba 6815)
   * Koto Laboratory & HIRO Kunekunetchyo, 1997 (Samsung KS57C2504)
-  * Spica D'Artagnan (Toshiba T7717S)
+  * Spica D'Artagnan SH-002B (Toshiba T7717S)
 
 ## Running on Windows
 * Install Python ([latest version](https://www.python.org/downloads/)) and make sure to add it to PATH.
