@@ -1,5 +1,6 @@
 {
 	"id": "f4273aa6-4a6b-416c-b5ea-8885e4b119e9",
+	"credits": "ROM dump by Milan Galcik (https://www.septimus.sk/KB1013dbg/index.html)",
 	"core": "T7741",
 	"face_path": "./assets/DrSlumpAraleNchaBycha.svg",
 	"clock": 200000,

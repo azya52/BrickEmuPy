@@ -1,5 +1,6 @@
 {
 	"id": "c5c6a926-8383-4940-8948-c96bec662fbf",
+	"credits": "ROM dump by Milan Galcik (https://www.septimus.sk/KB1013dbg/index.html)",
 	"core": "T7741",
 	"face_path": "./assets/SpicaDArtagnan.svg",
 	"clock": 170000,
