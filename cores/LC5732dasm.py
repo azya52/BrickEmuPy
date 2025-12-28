@@ -72,8 +72,8 @@ class LC5732dasm():
             LC5732dasm._ddpl,                   #10011011           1 1   DPL <- (DPL) - 1
             LC5732dasm._idph,                   #10011100           1 1   DPH <- (DPH) + 1
             LC5732dasm._ddph,                   #10011101           1 1   DPH <- (DPH) - 1
-            LC5732dasm._isph,                   #10011110           1 1   SP <- (SP) + 1
-            LC5732dasm._dsph,                   #10011111           1 1   SP <- (SP) - 1
+            LC5732dasm._isp,                    #10011110           1 1   SP <- (SP) + 1
+            LC5732dasm._dsp,                    #10011111           1 1   SP <- (SP) - 1
             *([LC5732dasm._jsr_x] * 8),         #10100XXX XXXXXXXX  2 2   STACK <- PC + 2; PC <- X
             LC5732dasm._ipm,                    #10101000           1 1   AC <- [P(M)]
             LC5732dasm._lda,                    #10101001           1 1   AC <- [M(DP)]
@@ -96,7 +96,7 @@ class LC5732dasm():
             LC5732dasm._sbak,                   #11111001           1 1   BCF <- 1
             LC5732dasm._sas_x,                  #11111010 XXXXXXXX  2 2   ALM <- X
             #LC5732dasm._ras,                   #11111010 11111111  2 2
-            LC5732dasm._csec,                   #11111011 11111111  1 1   PREDIV15-11 <- 0; SCF0,1,4 <- 0; SCF0,1,4 
+            LC5732dasm._csec,                   #11111011           1 1   PREDIV15-11 <- 0; SCF0,1,4 <- 0; SCF0,1,4 
             LC5732dasm._out,                    #11111100           1 1   PORT <- (AC, M(DP))
             LC5732dasm._ldpl,                   #11111101           1 1   AC <- (DPL)
             LC5732dasm._ldph,                   #11111110           1 1   AC <- (DPH)
@@ -153,7 +153,7 @@ class LC5732dasm():
 
     def _twrt(self, pc, opcode, rom):
         #00000010           1 2   PORT <- ROM(PGX, AC, M(DP))
-        return (pc + 1,), (1, opcode, "twrt", "PORT <- ROM(PGX, AC, M(DP)")
+        return (pc + 1,), (1, opcode, "twrt", "PORT <- ROM(PGX, AC, M(DP))")
 
     def _tmel(self, pc, opcode, rom):
         #00000011           1 2   ALM <- ROM(PGX, AC, M(DP))
@@ -422,13 +422,13 @@ class LC5732dasm():
         #10011101           1 1   DPH <- (DPH) - 1
         return (pc + 1,), (1, opcode, "ddph", "DPH <- (DPH) - 1")
 
-    def _isph(self, pc, opcode, rom):
+    def _isp(self, pc, opcode, rom):
         #10011110           1 1   SP <- (SP) + 1
-        return (pc + 1,), (1, opcode, "isph", "SP <- (SP) + 1")
+        return (pc + 1,), (1, opcode, "isp", "SP <- (SP) + 1")
 
-    def _dsph(self, pc, opcode, rom):
+    def _dsp(self, pc, opcode, rom):
         #10011111           1 1   SP <- (SP) - 1
-        return (pc + 1,), (1, opcode, "dsph", "SP <- (SP) - 1")
+        return (pc + 1,), (1, opcode, "dsp", "SP <- (SP) - 1")
 
     def _jsr_x(self, pc, opcode, rom):
         #10100XXX XXXXXXXX  2 2   STACK <- PC + 2; PC <- X
@@ -522,7 +522,7 @@ class LC5732dasm():
         return (pc + 2,), (2, opcode, "sas " + self._bytebase % x, "ALM <- 0x%0.1X" % x)
 
     def _csec(self, pc, opcode, rom):
-        #11111011 11111111  1 1   PREDIV15-11 <- 0; SCF0,1,4 <- 0; SCF0,1,4 
+        #11111011   1 1   PREDIV15-11 <- 0; SCF0,1,4 <- 0; SCF0,1,4 
         return (pc + 1,), (1, opcode, "csec", "PREDIV15-11 <- 0; SCF0,1,4 <- 0; SCF0,1,4 ")
 
     def _out(self, pc, opcode, rom):

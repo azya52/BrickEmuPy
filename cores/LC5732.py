@@ -30,10 +30,9 @@ class LC5732():
         self._instr_counter = 0
         self._cycle_counter = 0
         
-        self._15bit_div = 32768
-        self._500ms_div = self._15bit_div / 2
-        self._100ms_div = self._15bit_div / 10
-        self._32ms_div = self._15bit_div / (1000 / 32)
+        self._500ms_div = clock / 2
+        self._100ms_div = clock / 10
+        self._32ms_div = clock / (1000 / 32)
 
         self._reset()
 
@@ -103,8 +102,8 @@ class LC5732():
             LC5732._ddpl,                   #10011011           1 1   DPL <- (DPL) - 1
             LC5732._idph,                   #10011100           1 1   DPH <- (DPH) + 1
             LC5732._ddph,                   #10011101           1 1   DPH <- (DPH) - 1
-            LC5732._isph,                   #10011110           1 1   SP <- (SP) + 1
-            LC5732._dsph,                   #10011111           1 1   SP <- (SP) - 1
+            LC5732._isp,                    #10011110           1 1   SP <- (SP) + 1
+            LC5732._dsp,                    #10011111           1 1   SP <- (SP) - 1
             *([LC5732._jsr_x] * 8),         #10100XXX XXXXXXXX  2 2   STACK <- PC + 2; PC <- X
             LC5732._ipm,                    #10101000           1 1   AC <- [P(M)]
             LC5732._lda,                    #10101001           1 1   AC <- [M(DP)]
@@ -127,7 +126,7 @@ class LC5732():
             LC5732._sbak,                   #11111001           1 1   BCF <- 1
             LC5732._sas_x,                  #11111010 XXXXXXXX  2 2   ALM <- X
             #LC5732._ras,                   #11111010 11111111  2 2
-            LC5732._csec,                   #11111011 11111111  1 1   PREDIV15-11 <- 0; SCF0,1,4 <- 0; SCF0,1,4 
+            LC5732._csec,                   #11111011           1 1   PREDIV15-11 <- 0; SCF0,1,4 <- 0; SCF0,1,4 
             LC5732._out,                    #11111100           1 1   PORT <- (AC, M(DP))
             LC5732._ldpl,                   #11111101           1 1   AC <- (DPL)
             LC5732._ldph,                   #11111110           1 1   AC <- (DPH)
@@ -151,7 +150,7 @@ class LC5732():
 
         self._ALM = 0xFF
         self._CSTF = 0
-        self._HEF = 0
+        self._HEF = HEF_0_PREDIV_OVFW
         self._STS = 0
 
         self._PS = 0
@@ -160,7 +159,7 @@ class LC5732():
         self._PDF = 0
 
         self._RAM = [0] * RAM_SIZE
-        self._LCDRAM = [0] * LCDRAM_SIZE
+        self._LCDRAM = [0xFF] * LCDRAM_SIZE
 
         self._sound.set_alm(self._ALM, self._cycle_counter)
 
@@ -277,20 +276,25 @@ class LC5732():
             self._STS |= STS_SCF1_PREDIV
             if (self._HEF & HEF_1_PREDIV):
                 self._HALT = 0
-
-        if (self._cycle_counter % self._100ms_div <= exec_cycles):
-            if (self._CSTF):
+    
+        if (self._CSTF):
+            if (self._cycle_counter % self._100ms_div <= exec_cycles):
                 self._STS |= STS_SCF4_CHRONO
                 if (self._HEF & HEF_4_CHRONO):
                     self._HALT = 0
-
+                            
         if (self._cycle_counter % self._500ms_div <= exec_cycles):
             self._STS |= STS_SCF0_PREDIV_OVFW
             if (self._HEF & HEF_0_PREDIV_OVFW):
-                self._HALT = 0
-            
+                    self._HALT = 0
+                        
     def clock(self):
         exec_cycles = MCLOCK_DIV
+
+        if (self._PS == 0xF):
+            self._reset()
+            self._PS = 0xF
+
         if (not self._HALT):
             opcode = self._ROM.getByte(self._PC)
             self._PC += 1
@@ -729,12 +733,12 @@ class LC5732():
         self._DP = (self._DP - 0x10) & 0xFF
         return MCLOCK_DIV
 
-    def _isph(self, opcode):
+    def _isp(self, opcode):
         #10011110   SP <- (SP) + 1
         self._SP = (self._SP + 1) & 0xF
         return MCLOCK_DIV
 
-    def _dsph(self, opcode):
+    def _dsp(self, opcode):
         #10011111   SP <- (SP) - 1
         self._SP = (self._SP - 1) & 0xF
         return MCLOCK_DIV
@@ -850,7 +854,7 @@ class LC5732():
         return MCLOCKx2_DIV
 
     def _csec(self, opcode):
-        #11111011 11111111  PREDIV15-11 <- 0; SCF0,1,4 <- 0; SCF0,1,4 
+        #11111011   PREDIV15-11 <- 0; SCF0,1,4 <- 0; SCF0,1,4 
         self._STS &= ~(STS_SCF0_PREDIV_OVFW | STS_SCF1_PREDIV | STS_SCF4_CHRONO)
         #to-do
         return MCLOCK_DIV
