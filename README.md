@@ -42,7 +42,7 @@ Handheld LCD games emulator in Python with PyQt6.
   * Mame Game Tamagotch (HTGL43Q0) (distributed without ROM)
   * Mame Galaxian (HTB943R0) (distributed without ROM)
   * Keychain Pin Ball (HT-943I0)
-  * Hiro Pocket Boy No.2
+  * Hiro Pocket Boy No.2, 1993 (Sanyo LC5732)
   * Gundam Space Combat 3 in 1 (Toshiba 6770S)
   * Epoch Monster Panic
   * Bandai Pengo (Toshiba 6941)
@@ -56,6 +56,7 @@ Handheld LCD games emulator in Python with PyQt6.
   * Animest (Bandai) Dr. Slump Arale Ncha! Bycha AR-03, 1982 (Toshiba 6815)
   * Koto Laboratory & HIRO Kunekunetchyo, 1997 (Samsung KS57C2504)
   * Spica D'Artagnan SH-002B (Toshiba T7717S)
+  * Edla Game Space Rescue, 1989? (Sanyo LC5732)
 
 ## Running on Windows
 * Install Python ([latest version](https://www.python.org/downloads/)) and make sure to add it to PATH.
