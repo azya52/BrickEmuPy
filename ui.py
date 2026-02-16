@@ -31,7 +31,10 @@ class Window(QtWidgets.QMainWindow):
         self._loadSettingsUI()
 
     def _setupUI(self):
-        self.iCounterLabel = QtWidgets.QLabel("0")
+        self.iCredits = QtWidgets.QLabel()
+        self.statusBar().addPermanentWidget(self.iCredits, 1)
+
+        self.iCounterLabel = QtWidgets.QLabel()
         self.iCounterLabel.setToolTip("Instructions from previous pause")
         self.statusBar().addPermanentWidget(self.iCounterLabel)
 
@@ -71,6 +74,8 @@ class Window(QtWidgets.QMainWindow):
         self.actionStop.triggered.connect(self._brickWidget.stop)
         self.actionStep.triggered.connect(self._brickWidget.step)
         self.speedGroup.triggered.connect(self._brickWidget.setSpeed)
+
+        self.iCredits.setText(config.get("credits", ""))
 
         for addr in self._breakpoints:
             self._brickWidget.setBreakpoint(addr, True)
