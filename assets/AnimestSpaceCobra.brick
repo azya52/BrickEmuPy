@@ -1,0 +1,78 @@
+{
+	"id": "e581c559-a03c-4fb6-805a-568527ac1bca",
+	"credits": "ROM dump and photos for tracing courtesy of Milan Galcik. Game donated by MikeG.",
+	"core": "T7741",
+	"face_path": "./assets/AnimestSpaceCobra.svg",
+	"clock": 200000,
+	
+	"buttons": {
+		"btnMode": {
+			"port": "INP",
+			"pin": 0,
+			"level": {
+				"port": "OUTP",
+				"pin": 1
+			},
+			"hot_keys": [50, 77]
+		},
+		"btnFire": {
+			"port": "INP",
+			"pin": 0,
+			"level": {
+				"port": "OUTP",
+				"pin": 0
+			},
+			"hot_keys": [32]
+		},
+		"btnLeftDown": {
+			"port": "INP",
+			"pin": 1,
+			"level": {
+				"port": "OUTP",
+				"pin": 0
+			},
+			"hot_keys": [83, 16777237, 65, 16777234]
+		},
+		"btnGame": {
+			"port": "INP",
+			"pin": 1,
+			"level": {
+				"port": "OUTP",
+				"pin": 1
+			},
+			"hot_keys": [49]
+		},
+		"btnRightUp": {
+			"port": "INP",
+			"pin": 2,
+			"level": {
+				"port": "OUTP",
+				"pin": 0
+			},
+			"hot_keys": [68, 16777236, 87, 16777235]
+		},
+		"btnAlarm": {
+			"port": "INP",
+			"pin": 2,
+			"level": {
+				"port": "OUTP",
+				"pin": 1
+			},
+			"hot_keys": [51]
+		},
+		"btnACL": {
+			"port": "RES",
+			"pin": 0,
+			"level": 1,
+			"hot_keys": [52, 82]
+		}
+	},
+	
+	"mask_options": {
+		"rom_path": "./assets/AnimestSpaceCobra.bin",
+		"prescaler_div": [2, 8, 32],
+		"sub_clock": 32768,
+		"com_div": 768,
+		"sound_gnd": 0
+	}
+}
