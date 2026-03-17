@@ -92,11 +92,11 @@ class Brick(QObject):
             elif (ns > lastExamine):
                 lastExamine += EXAMINE_UPDTE_NS
                 self._uiExamineUpdate()
-
+            elif (lastTick < ns):
+                lastTick = ns
             if (lastTick > ns + 1000):
                 time.sleep((lastTick - ns) / 1e9)
             else:
-                lastTick = ns
                 QtCore.QCoreApplication.processEvents()
 
     def _set_pin_state(self, port, pin, level):
@@ -177,7 +177,7 @@ class Brick(QObject):
 
     @pyqtSlot(float)
     def _setSpeed(self, speed):
-        self._cycleTimeNs = int(self._getCicleTimeNs() * speed)
+        self._cycleTimeNs = self._getCicleTimeNs() * speed
 
     def _getCicleTimeNs(self):
         return 1e9 / self._config["clock"]
