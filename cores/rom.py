@@ -13,9 +13,11 @@ class ROM():
         return self._ROM[addres % self._rom_size] | (self._ROM[(addres + 1) % self._rom_size] << 8)
 
     def getBytes(self, addres, count):
+        size = self._rom_size
+        rom = self._ROM
         result = 0
         for i in range(count):
-            result |= self._ROM[(addres + i) % self._rom_size] << (8 * (count - i - 1))
+            result |= rom[(addres + i) % size] << (8 * (count - i - 1))
         return result
 
     def writeByte(self, addres, value):
