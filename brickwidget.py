@@ -148,7 +148,9 @@ class BrickWidget(QtWidgets.QGraphicsView):
         body.setSharedRenderer(faceRenderer)
         body.setElementId("body")
         self.scene().addItem(body)
-
+    
+        shadow_shift = self.scene().itemsBoundingRect().width() * 0.001
+        
         overlay = QtSvgWidgets.QGraphicsSvgItem()
         overlay.setSharedRenderer(faceRenderer)
         overlay.setElementId("overlay")
@@ -162,8 +164,20 @@ class BrickWidget(QtWidgets.QGraphicsView):
                     segment.setSharedRenderer(faceRenderer)
                     segment.setElementId(nextId)
                     segment.setPos(faceRenderer.boundsOnElement(nextId).topLeft())
-                    self.scene().addItem(segment)
-                    self._segments.append((ramNibble, ramBit, segment))
+
+                    segment_shadow = QtSvgWidgets.QGraphicsSvgItem()
+                    segment_shadow.setSharedRenderer(faceRenderer)
+                    segment_shadow.setElementId(nextId)
+                    segment_shadow.setPos(faceRenderer.boundsOnElement(nextId).topLeft().x() + shadow_shift,
+                                            faceRenderer.boundsOnElement(nextId).topLeft().y() + shadow_shift * 2)
+                    segment_shadow.setOpacity(0.1)
+                    
+                    group = QtWidgets.QGraphicsItemGroup()
+                    #group.addToGroup(segment_shadow)
+                    group.addToGroup(segment)
+                    self.scene().addItem(group)
+
+                    self._segments.append([ramNibble, ramBit, group, -1])
         
         overlay.setPos(faceRenderer.boundsOnElement("overlay").topLeft())
         self.scene().addItem(overlay)
@@ -182,11 +196,19 @@ class BrickWidget(QtWidgets.QGraphicsView):
 
     @pyqtSlot(tuple)
     def render(self, RAM):
-        for nibble, bit, segment in self._segments:
-            if (len(RAM) > nibble):
-                segment.setOpacity(0.40 * ((RAM[nibble] >> bit) & 0x1) + 0.60 * segment.opacity())
+        ramSize = len(RAM)
+        for seg in self._segments:
+            nibble, bit, segment, opacity = seg
+            if nibble < ramSize:
+                target = (RAM[nibble] >> bit) & 0x1
+                if (opacity != target):
+                    opacity += 0.4 * (target - opacity)
+                    if abs(opacity - target) < 1e-2:
+                        opacity = target
+                    segment.setOpacity(opacity)
+                    seg[-1] = opacity
             else:
-                segment.setOpacity(0 + 0.60 * segment.opacity())
+                segment.setOpacity(0)
 
     @pyqtSlot(str)
     def error(self, error):
