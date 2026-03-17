@@ -15,7 +15,7 @@ Handheld LCD games emulator in Python with PyQt6.
   * Micon KC-32 (BJ6220A)
   * Apollo 126 in 1 B0202 (SPL02)
   * Apollo 18 in 1 B0302 (SPL03)
-  * McDonald's Chicken Nugget, 2023 (SPL81408)
+  * McDonald's Chicken Nugget, 2023 (SPL81408) (distributed without ROM)
 * Virtual Pets
   * Tamagotchi P1 (distributed without ROM)
   * Tamagotchi P2 (distributed without ROM)
