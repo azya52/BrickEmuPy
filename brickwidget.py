@@ -208,6 +208,7 @@ class BrickWidget(QtWidgets.QGraphicsView):
                     segment.setOpacity(opacity)
                     seg[-1] = opacity
             else:
+                seg[-1] = 0
                 segment.setOpacity(0)
 
     @pyqtSlot(str)
