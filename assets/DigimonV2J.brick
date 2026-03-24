@@ -1,7 +1,7 @@
 {
 	"id": "afcccb86-1210-4526-be21-40d4f248717f",
 	"core": "E0C6200",
-	"face_path": "./assets/DigimonV2.svg",
+	"face_path": "./assets/DigimonV2J.svg",
 	"clock": 1060000,
 	
 	"buttons": {
@@ -32,7 +32,7 @@
 	},
 	
 	"mask_options": {
-		"rom_path": "./assets/DigimonV2.bin",
+		"rom_path": "./assets/DigimonV2J.bin",
 		"port_pullup": {
 			"K0": 15,
 			"K1": 15
