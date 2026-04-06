@@ -10,7 +10,7 @@ SFR_OFFSET = 0x40
 SFR_SIZE = 0x40
 CPU_RAM_OFFSET = 0x80
 CPURAM_SIZE = 0x80
-DATARAM_OFFSET = 0x1000
+DATARAM_OFFSET = 0x200
 DATARAM_SIZE = 0x800
 LCDRAM_OFFSET = 0x00
 LCDRAM_SIZE = 0x40
@@ -53,9 +53,6 @@ class SPLB20():
         }
     
         self._instr_counter = 0
-        self._timer_counter = 0
-        self._T2HZ_counter = 0
-        self._T128HZ_counter = 0
 
         self._non_crystal_mode = mask['non_crystal_mode']
 
@@ -87,125 +84,125 @@ class SPLB20():
         }
 
         self._execute = (
-            (SPLB20._brk, 1),
-            *([(SPLB20._dummy, 1)] * 4),
-            (SPLB20._ora_zp, 2),
-            *([(SPLB20._dummy, 1)] * 2),
-            (SPLB20._php, 1),
-            (SPLB20._ora_imm, 2),
-            *([(SPLB20._dummy, 1)] * 6),
-            (SPLB20._bpl, 2),
-            *([(SPLB20._dummy, 1)] * 7),
-            (SPLB20._clc, 1),
-            *([(SPLB20._dummy, 1)] * 7),
-            (SPLB20._jsr_abs, 3),
-            *([(SPLB20._dummy, 1)] * 3),
-            (SPLB20._bit_zp, 2),
-            (SPLB20._and_zp, 2),
-            (SPLB20._rol_zp, 2),
-            (SPLB20._dummy, 1),
-            (SPLB20._plp, 1),
-            (SPLB20._and_imm, 2),
-            (SPLB20._rol_a, 1),
-            (SPLB20._dummy, 1),
-            (SPLB20._bit_abs, 3),
-            *([(SPLB20._dummy, 1)] * 3),
-            (SPLB20._bmi, 2),
-            *([(SPLB20._dummy, 1)] * 7),
-            (SPLB20._sec, 1),
-            *([(SPLB20._dummy, 1)] * 7),
-            (SPLB20._rti, 1),
-            *([(SPLB20._dummy, 1)] * 4),
-            (SPLB20._eor_zp, 2),
-            *([(SPLB20._dummy, 1)] * 2),
-            (SPLB20._pha, 1),
-            (SPLB20._eor_imm, 2),
-            *([(SPLB20._dummy, 1)] * 2),
-            (SPLB20._jmp_abs, 3),
-            *([(SPLB20._dummy, 1)] * 3),
-            (SPLB20._bvc, 2),
-            *([(SPLB20._dummy, 1)] * 4),
-            (SPLB20._eor_zp_x, 2),
-            *([(SPLB20._dummy, 1)] * 2),
-            (SPLB20._cli, 1),
-            *([(SPLB20._dummy, 1)] * 7),
-            (SPLB20._rts, 1),
-            *([(SPLB20._dummy, 1)] * 4),
-            (SPLB20._adc_zp, 2),
-            (SPLB20._ror_zp, 2),
-            (SPLB20._dummy, 1),
-            (SPLB20._pla, 1),
-            (SPLB20._adc_imm, 2),
-            (SPLB20._ror_a, 1),
-            (SPLB20._dummy, 1),
-            (SPLB20._jmp_ind, 3),
-            *([(SPLB20._dummy, 1)] * 3),
-            (SPLB20._bvs, 2),
-            *([(SPLB20._dummy, 1)] * 7),
-            (SPLB20._sei, 1),
-            *([(SPLB20._dummy, 1)] * 8),
-            (SPLB20._sta_ind_x, 2),
-            *([(SPLB20._dummy, 1)] * 3),
-            (SPLB20._sta_zp, 2),
-            (SPLB20._stx_zp, 2),
-            *([(SPLB20._dummy, 1)] * 3),
-            (SPLB20._txa, 1),
-            *([(SPLB20._dummy, 1)] * 3),
-            (SPLB20._stx_abs, 3),
-            (SPLB20._dummy, 1),
-            (SPLB20._bcc, 2),
-            *([(SPLB20._dummy, 1)] * 4),
-            (SPLB20._sta_zp_x, 2),
-            *([(SPLB20._dummy, 1)] * 4),
-            (SPLB20._txs, 1),
-            *([(SPLB20._dummy, 1)] * 6),
-            (SPLB20._lda_ind_x, 2),
-            (SPLB20._ldx_imm, 2),
-            *([(SPLB20._dummy, 1)] * 2),
-            (SPLB20._lda_zp, 2),
-            (SPLB20._ldx_zp, 2),
-            *([(SPLB20._dummy, 1)] * 2),
-            (SPLB20._lda_imm, 2),
-            (SPLB20._tax, 1),
-            *([(SPLB20._dummy, 1)] * 2),
-            (SPLB20._lda_abs, 3),
-            (SPLB20._ldx_abs, 3),
-            (SPLB20._dummy, 1),
-            (SPLB20._bcs, 2),
-            *([(SPLB20._dummy, 1)] * 4),
-            (SPLB20._lda_zp_x, 2),
-            *([(SPLB20._dummy, 1)] * 2),
-            (SPLB20._clv, 1),
-            (SPLB20._dummy, 1),
-            (SPLB20._tsx, 1),
-            *([(SPLB20._dummy, 1)] * 2),
-            (SPLB20._lda_abs_x, 3),
-            *([(SPLB20._dummy, 1)] * 7),
-            (SPLB20._cmp_zp, 2),
-            (SPLB20._dec_zp, 2),
-            *([(SPLB20._dummy, 1)] * 2),
-            (SPLB20._cmp_imm, 2),
-            (SPLB20._dex, 1),
-            *([(SPLB20._dummy, 1)] * 5),
-            (SPLB20._bne, 2),
-            *([(SPLB20._dummy, 1)] * 4),
-            (SPLB20._cmp_zp_x, 2),
-            (SPLB20._dec_zp_x, 2),
-            *([(SPLB20._dummy, 1)] * 9),
-            (SPLB20._cpx_imm, 2),
-            *([(SPLB20._dummy, 1)] * 3),
-            (SPLB20._cpx_zp, 2),
-            (SPLB20._sbc_zp, 2),
-            (SPLB20._inc_zp, 2),
-            (SPLB20._dummy, 1),
-            (SPLB20._inx, 1),
-            (SPLB20._sbc_imm, 2),
-            (SPLB20._nop, 1),
-            *([(SPLB20._dummy, 1)] * 5),
-            (SPLB20._beq, 2),
-            *([(SPLB20._dummy, 1)] * 7),
-            (SPLB20._sed, 1),
-            *([(SPLB20._dummy, 1)] * 7)
+            SPLB20._brk,
+            *([SPLB20._dummy] * 4),
+            SPLB20._ora_zp,
+            *([SPLB20._dummy] * 2),
+            SPLB20._php,
+            SPLB20._ora_imm,
+            *([SPLB20._dummy] * 6),
+            SPLB20._bpl,
+            *([SPLB20._dummy] * 7),
+            SPLB20._clc,
+            *([SPLB20._dummy] * 7),
+            SPLB20._jsr_abs,
+            *([SPLB20._dummy] * 3),
+            SPLB20._bit_zp,
+            SPLB20._and_zp,
+            SPLB20._rol_zp,
+            SPLB20._dummy,
+            SPLB20._plp,
+            SPLB20._and_imm,
+            SPLB20._rol_a,
+            SPLB20._dummy,
+            SPLB20._bit_abs,
+            *([SPLB20._dummy] * 3),
+            SPLB20._bmi,
+            *([SPLB20._dummy] * 7),
+            SPLB20._sec,
+            *([SPLB20._dummy] * 7),
+            SPLB20._rti,
+            *([SPLB20._dummy] * 4),
+            SPLB20._eor_zp,
+            *([SPLB20._dummy] * 2),
+            SPLB20._pha,
+            SPLB20._eor_imm,
+            *([SPLB20._dummy] * 2),
+            SPLB20._jmp_abs,
+            *([SPLB20._dummy] * 3),
+            SPLB20._bvc,
+            *([SPLB20._dummy] * 4),
+            SPLB20._eor_zp_x,
+            *([SPLB20._dummy] * 2),
+            SPLB20._cli,
+            *([SPLB20._dummy] * 7),
+            SPLB20._rts,
+            *([SPLB20._dummy] * 4),
+            SPLB20._adc_zp,
+            SPLB20._ror_zp,
+            SPLB20._dummy,
+            SPLB20._pla,
+            SPLB20._adc_imm,
+            SPLB20._ror_a,
+            SPLB20._dummy,
+            SPLB20._jmp_ind,
+            *([SPLB20._dummy] * 3),
+            SPLB20._bvs,
+            *([SPLB20._dummy] * 7),
+            SPLB20._sei,
+            *([SPLB20._dummy] * 8),
+            SPLB20._sta_ind_x,
+            *([SPLB20._dummy] * 3),
+            SPLB20._sta_zp,
+            SPLB20._stx_zp,
+            *([SPLB20._dummy] * 3),
+            SPLB20._txa,
+            *([SPLB20._dummy] * 3),
+            SPLB20._stx_abs,
+            SPLB20._dummy,
+            SPLB20._bcc,
+            *([SPLB20._dummy] * 4),
+            SPLB20._sta_zp_x,
+            *([SPLB20._dummy] * 4),
+            SPLB20._txs,
+            *([SPLB20._dummy] * 6),
+            SPLB20._lda_ind_x,
+            SPLB20._ldx_imm,
+            *([SPLB20._dummy] * 2),
+            SPLB20._lda_zp,
+            SPLB20._ldx_zp,
+            *([SPLB20._dummy] * 2),
+            SPLB20._lda_imm,
+            SPLB20._tax,
+            *([SPLB20._dummy] * 2),
+            SPLB20._lda_abs,
+            SPLB20._ldx_abs,
+            SPLB20._dummy,
+            SPLB20._bcs,
+            *([SPLB20._dummy] * 4),
+            SPLB20._lda_zp_x,
+            *([SPLB20._dummy] * 2),
+            SPLB20._clv,
+            SPLB20._dummy,
+            SPLB20._tsx,
+            *([SPLB20._dummy] * 2),
+            SPLB20._lda_abs_x,
+            *([SPLB20._dummy] * 7),
+            SPLB20._cmp_zp,
+            SPLB20._dec_zp,
+            *([SPLB20._dummy] * 2),
+            SPLB20._cmp_imm,
+            SPLB20._dex,
+            *([SPLB20._dummy] * 5),
+            SPLB20._bne,
+            *([SPLB20._dummy] * 4),
+            SPLB20._cmp_zp_x,
+            SPLB20._dec_zp_x,
+            *([SPLB20._dummy] * 9),
+            SPLB20._cpx_imm,
+            *([SPLB20._dummy] * 3),
+            SPLB20._cpx_zp,
+            SPLB20._sbc_zp,
+            SPLB20._inc_zp,
+            SPLB20._dummy,
+            SPLB20._inx,
+            SPLB20._sbc_imm,
+            SPLB20._nop,
+            *([SPLB20._dummy] * 5),
+            SPLB20._beq,
+            *([SPLB20._dummy] * 7),
+            SPLB20._sed,
+            *([SPLB20._dummy] * 7)
         )
 
     def examine(self):
@@ -224,7 +221,7 @@ class SPLB20():
             "CF": self._CF,
             "RAM": self._RAM,
             "DATA_RAM": self._DATA_RAM,
-            "LCDRAM": self._LCDRAM,
+            "LCDRAM": self._LCD_RAM,
             "IORAM": (
                 self._LCD_CFG,
                 self._PDIR["PA"],
@@ -277,13 +274,14 @@ class SPLB20():
                 self._RAM[i] = value & 0xFF
         if ("LCDRAM" in state):
             for i, value in state["LCDRAM"].items():
-                self._LCDRAM[i] = value & 0xFF
+                self._LCD_RAM[i] = value & 0xFF
         if ("IORAM" in state):
             for i, value in state["IORAM"].items():
                 if i < len(self._io_tbl):
                     list(self._io_tbl.values())[i][1](self, value & 0xFF)
 
     def reset(self):
+        self._timer_counter = 0
         self._T2HZ_counter = 0
         self._T128HZ_counter = 0
 
@@ -302,7 +300,7 @@ class SPLB20():
 
         self._RAM = [0] * CPURAM_SIZE
         self._DATA_RAM = [0] * DATARAM_SIZE
-        self._LCDRAM = [0] * LCDRAM_SIZE
+        self._LCD_RAM = [0] * LCDRAM_SIZE
 
         self._PCFG = {
             "PA": 0
@@ -342,7 +340,7 @@ class SPLB20():
     
     def get_VRAM(self):
         if (self._SYS_CTRL & IO_SYS_CTRL_LCD_ENBL):
-            return tuple(self._LCDRAM)
+            return tuple(self._LCD_RAM)
         return ()
 
     def get_ROM(self):
@@ -376,9 +374,14 @@ class SPLB20():
                 self._port_input[port][level] |= pin
             if (prev_port != self._port_read(port)):
                 if (port == "PA" and level == 0):
-                    if (self._INT_CFG & IO_INT_CFG_NORMALKEY_INT):
-                        self._IREQ |= IO_INT_CFG_NORMALKEY_INT
-                        self._NMI()
+                    if (pin & 0xFE):
+                        if (self._INT_CFG & IO_INT_CFG_NORMALKEY_INT):
+                            self._IREQ |= IO_INT_CFG_NORMALKEY_INT
+                            self._NMI()
+                    if (pin & 0x01):
+                        if (self._INT_CFG & IO_INT_CFG_POWERKEY_INT):
+                            self._IREQ |= IO_INT_CFG_POWERKEY_INT
+                            self._NMI()
 
     def _IRQ(self, addr):
         self._write_mem(self._SP, self._PC >> 8)
@@ -400,8 +403,14 @@ class SPLB20():
                 self._write_mem(self._SP, self._ps())
                 self._SP = (self._SP - 1) & 0xFF
                 self._go_vector(VADDR_NMI)
+                self._SYS_CTRL &= ~0x3
             else:
+                if (self._SYS_CTRL & IO_SYS_CTRL_32K_ENBL):
+                    self._SYS_CTRL |= 0x1
+                else:
+                    self._SYS_CTRL |= 0x3
                 self._CPU_ENBL = self._ROSC_ENBL = 1
+                self._INT_CFG &= ~IO_INT_CFG_NMI_ENBL
                 self._go_vector(VADDR_RESET)
 
     def _timers_clock(self, exec_cycles):
@@ -413,7 +422,7 @@ class SPLB20():
                 else:
                     self._timer_counter += self._sub_clock_div
                 self._TC -= 1
-                if (self._TC == 0):
+                if (self._TC <= 0):
                     self._TC = self._TC_PRESET
                     if (self._INT_CFG & IO_INT_CFG_COUNTER_INT):
                         self._IREQ |= IO_INT_CFG_COUNTER_INT
@@ -438,16 +447,15 @@ class SPLB20():
             if (self._INT_CFG & IO_INT_CFG_T128HZ_INT):
                 self._IREQ |= IO_INT_CFG_T128HZ_INT
                 self._NMI()
+            
 
     def clock(self):
         exec_cycles = MCLOCK_DIV
         if (self._ROSC_ENBL):
             if (self._CPU_ENBL):
-                byte = self._ROM.getByte(self._PC - self._rom_offset)
-                bytes_count = self._execute[byte][1]
-                opcode = self._ROM.getBytes(self._PC - self._rom_offset, bytes_count)
-                self._PC += bytes_count
-                exec_cycles = self._execute[byte][0](self, opcode)
+                opcode = self._ROM.getByte(self._PC)
+                self._PC = (self._PC + 1) & 0xFFFF
+                exec_cycles = self._execute[opcode](self)
                 self._instr_counter += 1
             self._timers_clock(exec_cycles)
         elif (self._SYS_CTRL & IO_SYS_CTRL_32K_ENBL):
@@ -561,11 +569,11 @@ class SPLB20():
 
     def _write_mem(self, addr, value):
         if ((addr >= LCDRAM_OFFSET) and (addr < LCDRAM_SIZE + LCDRAM_OFFSET)):
-            self._LCDRAM[addr - LCDRAM_OFFSET] = value
+            self._LCD_RAM[addr - LCDRAM_OFFSET] = value
         elif ((addr >= CPU_RAM_OFFSET) and (addr < CPURAM_SIZE + CPU_RAM_OFFSET)):
             self._RAM[addr - CPU_RAM_OFFSET] = value
-        elif ((addr >= DATARAM_OFFSET) and (addr < DATARAM_SIZE + DATARAM_OFFSET)):
-            self._DATA_RAM[addr - DATARAM_OFFSET] = value
+        elif ((addr >= DATARAM_OFFSET) and ((addr & 0x8FFF) < DATARAM_SIZE)):
+            self._DATA_RAM[addr & 0xFFF] = value
         else:
             io = self._io_tbl.get(addr)
             if (io != None):
@@ -573,11 +581,11 @@ class SPLB20():
 
     def _read_mem(self, addr):
         if ((addr >= LCDRAM_OFFSET) and (addr < LCDRAM_SIZE + LCDRAM_OFFSET)):
-            return self._LCDRAM[addr - LCDRAM_OFFSET]
+            return self._LCD_RAM[addr - LCDRAM_OFFSET]
         elif ((addr >= CPU_RAM_OFFSET) and (addr < CPURAM_SIZE + CPU_RAM_OFFSET)):
             return self._RAM[addr - CPU_RAM_OFFSET]
-        elif ((addr >= DATARAM_OFFSET) and (addr < DATARAM_SIZE + DATARAM_OFFSET)):
-            return self._DATA_RAM[addr - DATARAM_OFFSET]
+        elif ((addr >= DATARAM_OFFSET) and ((addr & 0x8FFF) < DATARAM_SIZE)):
+            return self._DATA_RAM[addr & 0xFFF]
         elif ((addr >= SFR_OFFSET) and (addr < SFR_SIZE + SFR_OFFSET)):
             io = self._io_tbl.get(addr)
             if (io != None):
@@ -641,82 +649,92 @@ class SPLB20():
 
         self._A = new_value & 0xFF
 
-    def _brk(self, opcode):
+    def _brk(self):
         self._BF = 1
         self._PC = (self._PC + 1) & 0xFFFF
         self._IRQ()
         return 7
 
-    def _ora_zp(self, opcode):
-        self._A |= self._read_mem(opcode & 0xFF)
+    def _ora_zp(self):
+        self._A |= self._read_mem(self._ROM.getByte(self._PC))
+        self._PC = (self._PC + 1) & 0xFFFF
         self._NF = self._A >> 7
         self._ZF = not self._A
         return 3
 
-    def _php(self, opcode):
+    def _php(self):
         self._write_mem(self._SP, self._ps())
         self._SP = (self._SP - 1) & 0xFF
         return 3
 
-    def _ora_imm(self, opcode):
-        self._A |= opcode & 0xFF
+    def _ora_imm(self):
+        self._A |= self._ROM.getByte(self._PC)
+        self._PC = (self._PC + 1) & 0xFFFF
         self._NF = self._A >> 7
         self._ZF = not self._A
         return 2
 
-    def _bpl(self, opcode):
+    def _bpl(self):
         if (not self._NF):
+            opcode = self._ROM.getByte(self._PC)
+            self._PC = (self._PC + 1) & 0xFFFF
             prev_PC = self._PC
-            self._PC = (self._PC + (opcode & 0xFF) - ((opcode & 0x80) << 1)) & 0xFFFF
+            self._PC = (self._PC + opcode - ((opcode & 0x80) << 1)) & 0xFFFF
             return 3 + ((self._PC ^ prev_PC) > 255)
+        self._PC = (self._PC + 1) & 0xFFFF
         return 2
 
-    def _clc(self, opcode):
+    def _clc(self):
         self._CF = 0
         return 2
 
-    def _jsr_abs(self, opcode):
-        pc = self._PC - 1
-        self._write_mem(self._SP, (pc >> 8) & 0xFF)
+    def _jsr_abs(self):
+        pc = (self._PC + 1) & 0xFFFF
+        self._write_mem(self._SP, pc >> 8)
         self._SP = (self._SP - 1) & 0xFF
         self._write_mem(self._SP, pc & 0xFF)
         self._SP = (self._SP - 1) & 0xFF
-        self._PC = ((opcode >> 8) & 0xFF) | ((opcode & 0xFF) << 8)
+        self._PC = self._ROM.getWordLSB(self._PC)
         return 6
 
-    def _bit_zp(self, opcode):
-        m = self._read_mem(opcode & 0xFF)
+    def _bit_zp(self):
+        m = self._read_mem(self._ROM.getByte(self._PC))
+        self._PC = (self._PC + 1) & 0xFFFF
         self._NF = m >> 7
         self._VF = m & 0x40 > 0
         self._ZF = not(self._A & m)
         return 3
 
-    def _and_zp(self, opcode):
-        self._A &= self._read_mem(opcode & 0xFF)
+    def _and_zp(self):
+        self._A &= self._read_mem(self._ROM.getByte(self._PC))
+        self._PC = (self._PC + 1) & 0xFFFF
         self._NF = self._A >> 7
         self._ZF = not self._A
         return 3
 
-    def _rol_zp(self, opcode):
-        new_value = (self._read_mem(opcode & 0xFF) << 1) | self._CF
-        self._write_mem(opcode & 0xFF, new_value & 0xFF)
+    def _rol_zp(self):
+        opcode = self._ROM.getByte(self._PC)
+        self._PC = (self._PC + 1) & 0xFFFF
+        new_value = (self._read_mem(opcode) << 1) | self._CF
+        self._write_mem(opcode, new_value & 0xFF)
         self._NF = new_value & 0x80 > 0
         self._ZF = not(new_value & 0xFF)
         self._CF = new_value > 0xFF
         return 5
 
-    def _plp(self, opcode):
+    def _plp(self):
         self._SP = (self._SP + 1) & 0xFF
         self._set_ps(self._read_mem(self._SP))
         return 4
 
-    def _and_imm(self, opcode):
-        self._A &= opcode
+    def _and_imm(self):
+        self._A &= self._ROM.getByte(self._PC)
+        self._PC = (self._PC + 1) & 0xFFFF
         self._NF = self._A >> 7
         self._ZF = not self._A
         return 2
 
-    def _rol_a(self, opcode):
+    def _rol_a(self):
         new_value = (self._A << 1) | self._CF
         self._A = new_value & 0xFF
         self._NF = new_value & 0x80 > 0
@@ -724,26 +742,29 @@ class SPLB20():
         self._CF = new_value > 0xFF
         return 2
 
-    def _bit_abs(self, opcode):
-        addr = ((opcode & 0xFF) << 8) | ((opcode >> 8) & 0xFF)
-        m = self._read_mem(addr)
+    def _bit_abs(self):
+        m = self._read_mem(self._ROM.getWordLSB(self._PC))
+        self._PC = (self._PC + 2) & 0xFFFF
         self._NF = m >> 7
         self._VF = m & 0x40 > 0
         self._ZF = not(self._A & m)
         return 4
 
-    def _bmi(self, opcode):
+    def _bmi(self):
         if (self._NF):
+            opcode = self._ROM.getByte(self._PC)
+            self._PC = (self._PC + 1) & 0xFFFF
             prev_PC = self._PC
-            self._PC = (self._PC + (opcode & 0xFF) - ((opcode & 0x80) << 1)) & 0xFFFF
+            self._PC = (self._PC + opcode - ((opcode & 0x80) << 1)) & 0xFFFF
             return 3 + ((self._PC ^ prev_PC) > 255)
+        self._PC = (self._PC + 1) & 0xFFFF
         return 2
 
-    def _sec(self, opcode):
+    def _sec(self):
         self._CF = 1
         return 2
 
-    def _rti(self, opcode):
+    def _rti(self):
         self._SP = (self._SP + 1) & 0xFF
         self._set_ps(self._read_mem(self._SP))
         self._SP = (self._SP + 1) & 0xFF
@@ -752,54 +773,51 @@ class SPLB20():
         self._PC |= self._read_mem(self._SP) << 8
         return 6
 
-    def _eor_zp(self, opcode):
-        self._A ^= self._read_mem(opcode & 0xFF)
+    def _eor_zp(self):
+        self._A ^= self._read_mem(self._ROM.getByte(self._PC))
+        self._PC = (self._PC + 1) & 0xFFFF
         self._NF = self._A >> 7
         self._ZF = not self._A
         return 3
 
-    def _pha(self, opcode):
+    def _pha(self):
         self._write_mem(self._SP, self._A)
         self._SP = (self._SP - 1) & 0xFF
         return 3
 
-    def _eor_imm(self, opcode):
-        self._A ^= opcode & 0xFF
+    def _eor_imm(self):
+        self._A ^= self._ROM.getByte(self._PC) & 0xFF
+        self._PC = (self._PC + 1) & 0xFFFF
         self._NF = self._A >> 7
         self._ZF = not self._A
         return 2
 
-    def _jmp_abs(self, opcode):
-        self._PC = ((opcode & 0xFF) << 8) | ((opcode >> 8) & 0xFF)
+    def _jmp_abs(self):
+        self._PC = self._ROM.getWordLSB(self._PC)
         return 3
 
-    def _bvc(self, opcode):
+    def _bvc(self):
         if (not self._VF):
+            opcode = self._ROM.getByte(self._PC)
+            self._PC = (self._PC + 1) & 0xFFFF
             prev_PC = self._PC
-            self._PC = (self._PC + (opcode & 0xFF) - ((opcode & 0x80) << 1)) & 0xFFFF
+            self._PC = (self._PC + opcode - ((opcode & 0x80) << 1)) & 0xFFFF
             return 3 + ((self._PC ^ prev_PC) > 255)
+        self._PC = (self._PC + 1) & 0xFFFF
         return 2
 
-    def _eor_zp_x(self, opcode):
-        self._A ^= self._read_mem((opcode + self._X) & 0xFF)
+    def _eor_zp_x(self):
+        self._A ^= self._read_mem((self._ROM.getByte(self._PC) + self._X) & 0xFF)
+        self._PC = (self._PC + 1) & 0xFFFF
         self._NF = self._A >> 7
         self._ZF = not self._A
         return 4
 
-    def _lsr_zp_x(self, opcode):
-        addr = (opcode + self._X) & 0xFF
-        prev_value = self._read_mem(addr)
-        self._write_mem(addr, prev_value >> 1)
-        self._NF = 0
-        self._ZF = prev_value <= 1
-        self._CF = prev_value & 0x01
-        return 6
-
-    def _cli(self, opcode):
+    def _cli(self):
         self._IF = 0
         return 2
 
-    def _rts(self, opcode):
+    def _rts(self):
         self._SP = (self._SP + 1) & 0xFF
         self._PC = self._read_mem(self._SP)
         self._SP = (self._SP + 1) & 0xFF
@@ -807,30 +825,34 @@ class SPLB20():
         self._PC += 1
         return 6
 
-    def _adc_zp(self, opcode):
-        self._adc(self._read_mem(opcode & 0xFF))
+    def _adc_zp(self):
+        self._adc(self._read_mem(self._ROM.getByte(self._PC)))
+        self._PC = (self._PC + 1) & 0xFFFF
         return 3
 
-    def _ror_zp(self, opcode):
-        prev_value = self._read_mem(opcode & 0xFF)
-        self._write_mem(opcode & 0xFF, (prev_value >> 1) | (self._CF << 7))
+    def _ror_zp(self):
+        opcode = self._ROM.getByte(self._PC)
+        self._PC = (self._PC + 1) & 0xFFFF
+        prev_value = self._read_mem(opcode)
+        self._write_mem(opcode, (prev_value >> 1) | (self._CF << 7))
         self._NF = self._CF
         self._ZF = not(prev_value & 0xFE | self._CF)
         self._CF = prev_value & 0x01
         return 5
 
-    def _pla(self, opcode):
+    def _pla(self):
         self._SP = (self._SP + 1) & 0xFF
         self._A = self._read_mem(self._SP)
         self._NF = self._A >> 7
         self._ZF = not self._A
         return 4
 
-    def _adc_imm(self, opcode):
-        self._adc(opcode & 0xFF)
+    def _adc_imm(self):
+        self._adc(self._ROM.getByte(self._PC))
+        self._PC = (self._PC + 1) & 0xFFFF
         return 2
 
-    def _ror_a(self, opcode):
+    def _ror_a(self):
         prev_value = self._A
         self._A = (prev_value >> 1) | (self._CF << 7)
         self._NF = self._CF
@@ -838,239 +860,283 @@ class SPLB20():
         self._CF = prev_value & 0x01
         return 2
 
-    def _jmp_ind(self, opcode):
-        addr = ((opcode >> 8) & 0xFF) | ((opcode & 0xFF) << 8)
+    def _jmp_ind(self):
+        addr = self._ROM.getWordLSB(self._PC)
         self._PC = self._read_mem(addr)
         self._PC |= self._read_mem((addr + 1) & 0xFFFF) << 8
         return 6
 
-    def _bvs(self, opcode):
+    def _bvs(self):
         if (self._VF):
+            opcode = self._ROM.getByte(self._PC)
+            self._PC = (self._PC + 1) & 0xFFFF
             prev_PC = self._PC
-            self._PC = (self._PC + (opcode & 0xFF) - ((opcode & 0x80) << 1)) & 0xFFFF
+            self._PC = (self._PC + opcode - ((opcode & 0x80) << 1)) & 0xFFFF
             return 3 + ((self._PC ^ prev_PC) > 255)
+        self._PC = (self._PC + 1) & 0xFFFF
         return 2
 
-    def _sei(self, opcode):
+    def _sei(self):
         self._IF = 1
         return 2
 
-    def _sta_ind_x(self, opcode):
+    def _sta_ind_x(self):
+        opcode = self._ROM.getByte(self._PC)
+        self._PC = (self._PC + 1) & 0xFFFF
+    
         addr = self._read_mem((opcode + self._X) & 0xFF) | (self._read_mem((opcode + self._X + 1) & 0xFF) << 8)
         self._write_mem(addr, self._A)
         return 6
 
-    def _sta_zp(self, opcode):
-        self._write_mem(opcode & 0xFF, self._A)
+    def _sta_zp(self):
+        self._write_mem(self._ROM.getByte(self._PC), self._A)
+        self._PC = (self._PC + 1) & 0xFFFF
         return 3
 
-    def _stx_zp(self, opcode):
-        self._write_mem(opcode & 0xFF, self._X)
+    def _stx_zp(self):
+        self._write_mem(self._ROM.getByte(self._PC), self._X)
+        self._PC = (self._PC + 1) & 0xFFFF
         return 3
 
-    def _txa(self, opcode):
+    def _txa(self):
         self._A = self._X
         self._NF = self._A >> 7
         self._ZF = not self._A
         return 2
 
-    def _stx_abs(self, opcode):
-        addr = ((opcode & 0xFF) << 8) | ((opcode >> 8) & 0xFF)
-        self._write_mem(addr, self._X)
+    def _stx_abs(self):
+        self._write_mem(self._ROM.getWordLSB(self._PC), self._X)
+        self._PC = (self._PC + 2) & 0xFFFF
         return 4
 
-    def _bcc(self, opcode):
+    def _bcc(self):
         if (not self._CF):
+            opcode = self._ROM.getByte(self._PC)
+            self._PC = (self._PC + 1) & 0xFFFF
             prev_PC = self._PC
-            self._PC = (self._PC + (opcode & 0xFF) - ((opcode & 0x80) << 1)) & 0xFFFF
+            self._PC = (self._PC + opcode - ((opcode & 0x80) << 1)) & 0xFFFF
             return 3 + ((self._PC ^ prev_PC) > 255)
+        self._PC = (self._PC + 1) & 0xFFFF
         return 2
 
-    def _sta_zp_x(self, opcode):
-        self._write_mem((opcode + self._X) & 0xFF, self._A)
+    def _sta_zp_x(self):
+        self._write_mem((self._ROM.getByte(self._PC) + self._X) & 0xFF, self._A)
+        self._PC = (self._PC + 1) & 0xFFFF
         return 4
 
-    def _txs(self, opcode):
+    def _txs(self):
         self._SP = self._X
         return 2
 
-    def _lda_ind_x(self, opcode):
-        self._A = self._read_mem(self._read_mem((opcode + self._X) & 0xFF) | (self._read_mem((opcode + self._X + 1) & 0xFF) << 8))
+    def _lda_ind_x(self):
+        value = self._ROM.getByte(self._PC) + self._X
+        self._PC = (self._PC + 1) & 0xFFFF
+        self._A = self._read_mem(self._read_mem(value & 0xFF) | (self._read_mem((value + 1) & 0xFF) << 8))
         self._NF = self._A >> 7
         self._ZF = not self._A
         return 6
 
-    def _ldx_imm(self, opcode):
-        self._X = opcode & 0xFF
+    def _ldx_imm(self):
+        self._X = self._ROM.getByte(self._PC)
+        self._PC = (self._PC + 1) & 0xFFFF
         self._NF = self._X >> 7
         self._ZF = not self._X
         return 2
 
-    def _lda_zp(self, opcode):
-        self._A = self._read_mem(opcode & 0xFF)
+    def _lda_zp(self):
+        self._A = self._read_mem(self._ROM.getByte(self._PC))
+        self._PC = (self._PC + 1) & 0xFFFF
         self._NF = self._A >> 7
         self._ZF = not self._A
         return 3
 
-    def _ldx_zp(self, opcode):
-        self._X = self._read_mem(opcode & 0xFF)
+    def _ldx_zp(self):
+        self._X = self._read_mem(self._ROM.getByte(self._PC))
+        self._PC = (self._PC + 1) & 0xFFFF
         self._NF = self._X >> 7
         self._ZF = not self._X
         return 3
 
-    def _lda_imm(self, opcode):
-        self._A = opcode & 0xFF
+    def _lda_imm(self):
+        self._A = self._ROM.getByte(self._PC)
+        self._PC = (self._PC + 1) & 0xFFFF
         self._NF = self._A >> 7
         self._ZF = not self._A
         return 2
 
-    def _tax(self, opcode):
+    def _tax(self):
         self._X = self._A
         self._NF = self._X >> 7
         self._ZF = not self._X
         return 2
 
-    def _lda_abs(self, opcode):
-        self._A = self._read_mem(((opcode & 0xFF) << 8) | ((opcode >> 8) & 0xFF))
+    def _lda_abs(self):
+        self._A = self._read_mem(self._ROM.getWordLSB(self._PC))
+        self._PC = (self._PC + 2) & 0xFFFF
         self._NF = self._A >> 7
         self._ZF = not self._A
         return 4
 
-    def _ldx_abs(self, opcode):
-        addr = ((opcode & 0xFF) << 8) | ((opcode >> 8) & 0xFF)
-        self._X = self._read_mem(addr)
+    def _ldx_abs(self):
+        self._X = self._read_mem(self._ROM.getWordLSB(self._PC))
+        self._PC = (self._PC + 2) & 0xFFFF
         self._NF = self._X >> 7
         self._ZF = not self._X
         return 4
 
-    def _bcs(self, opcode):
+    def _bcs(self):
         if (self._CF):
+            opcode = self._ROM.getByte(self._PC)
+            self._PC = (self._PC + 1) & 0xFFFF
             prev_PC = self._PC
-            self._PC = (self._PC + (opcode & 0xFF) - ((opcode & 0x80) << 1)) & 0xFFFF
+            self._PC = (self._PC + opcode - ((opcode & 0x80) << 1)) & 0xFFFF
             return 3 + ((self._PC ^ prev_PC) > 255)
+        self._PC = (self._PC + 1) & 0xFFFF
         return 2
 
-    def _lda_zp_x(self, opcode):
-        self._A = self._read_mem((opcode + self._X) & 0xFF)
+    def _lda_zp_x(self):
+        self._A = self._read_mem((self._ROM.getByte(self._PC) + self._X) & 0xFF)
+        self._PC = (self._PC + 1) & 0xFFFF
         self._NF = self._A >> 7
         self._ZF = not self._A
         return 4
 
-    def _clv(self, opcode):
+    def _clv(self):
         self._VF = 0
         return 2
 
-    def _tsx(self, opcode):
+    def _tsx(self):
         self._X = self._SP
         self._NF = self._X >> 7
         self._ZF = not self._X
         return 2
 
-    def _lda_abs_x(self, opcode):
-        addr = (((opcode << 8) | ((opcode >> 8) & 0xFF)) + self._X) & 0xFFFF
+    def _lda_abs_x(self):   
+        base = self._ROM.getWordLSB(self._PC)
+        self._PC = (self._PC + 2) & 0xFFFF
+        addr = (base + self._X) & 0xFFFF
         self._A = self._read_mem(addr)
         self._NF = self._A >> 7
         self._ZF = not self._A
-        return 4 + ((self._PC ^ addr) > 255)
+        return 4 + ((base ^ addr) > 255)
+    
 
-    def _cmp_zp(self, opcode):
-        test_value = self._A - self._read_mem(opcode & 0xFF)
+    def _cmp_zp(self):
+        test_value = self._A - self._read_mem(self._ROM.getByte(self._PC))
+        self._PC = (self._PC + 1) & 0xFFFF
         self._NF = (test_value >> 7) & 0x1
         self._ZF = not test_value
         self._CF = test_value >= 0
         return 3
 
-    def _dec_zp(self, opcode):
-        new_value = (self._read_mem(opcode & 0xFF) - 1) & 0xFF
-        self._write_mem(opcode & 0xFF, new_value)
+    def _dec_zp(self):
+        opcode = self._ROM.getByte(self._PC)
+        self._PC = (self._PC + 1) & 0xFFFF
+        new_value = (self._read_mem(opcode) - 1) & 0xFF
+        self._write_mem(opcode, new_value)
         self._NF = new_value >> 7
         self._ZF = not new_value
         return 5
 
-    def _cmp_imm(self, opcode):
-        test_value = self._A - (opcode & 0xFF)
+    def _cmp_imm(self):
+        test_value = self._A - (self._ROM.getByte(self._PC))
+        self._PC = (self._PC + 1) & 0xFFFF
         self._NF = (test_value >> 7) & 0x1
         self._ZF = not test_value
         self._CF = test_value >= 0
         return 2
 
-    def _dex(self, opcode):
+    def _dex(self):
         self._X = (self._X - 1) & 0xFF
         self._NF = self._X >> 7
         self._ZF = not self._X
         return 2
 
-    def _bne(self, opcode):
+    def _bne(self):
         if (not self._ZF):
+            opcode = self._ROM.getByte(self._PC)
+            self._PC = (self._PC + 1) & 0xFFFF
             prev_PC = self._PC
-            self._PC = (self._PC + (opcode & 0xFF) - ((opcode & 0x80) << 1)) & 0xFFFF
+            self._PC = (self._PC + opcode - ((opcode & 0x80) << 1)) & 0xFFFF
             return 3 + ((self._PC ^ prev_PC) > 255)
+        self._PC = (self._PC + 1) & 0xFFFF
         return 2
 
-    def _cmp_zp_x(self, opcode):
-        test_value = self._A - self._read_mem((opcode + self._X) & 0xFF)
+    def _cmp_zp_x(self):
+        test_value = self._A - self._read_mem((self._ROM.getByte(self._PC) + self._X) & 0xFF)
+        self._PC = (self._PC + 1) & 0xFFFF
         self._NF = (test_value >> 7) & 0x1
         self._ZF = not test_value
         self._CF = test_value >= 0
         return 4
 
-    def _dec_zp_x(self, opcode):
-        addr = (opcode + self._X) & 0xFF
+    def _dec_zp_x(self):
+        addr = (self._ROM.getByte(self._PC) + self._X) & 0xFF
+        self._PC = (self._PC + 1) & 0xFFFF
         new_value = (self._read_mem(addr) - 1) & 0xFF
         self._write_mem(addr, new_value)
         self._NF = new_value >> 7
         self._ZF = not new_value
         return 6
 
-    def _cpx_imm(self, opcode):
-        test_value = self._X - (opcode & 0xFF)
+    def _cpx_imm(self):
+        test_value = self._X - self._ROM.getByte(self._PC)
+        self._PC = (self._PC + 1) & 0xFFFF
         self._NF = (test_value >> 7) & 0x1
         self._ZF = not test_value
         self._CF = test_value >= 0
         return 2
 
-    def _cpx_zp(self, opcode):
-        test_value = self._X - self._read_mem(opcode & 0xFF)
+    def _cpx_zp(self):
+        test_value = self._X - self._read_mem(self._ROM.getByte(self._PC))
+        self._PC = (self._PC + 1) & 0xFFFF
         self._NF = (test_value >> 7) & 0x1
         self._ZF = not test_value
         self._CF = test_value >= 0
         return 3
 
-    def _sbc_zp(self, opcode):
-        self._sbc(self._read_mem(opcode & 0xFF))
+    def _sbc_zp(self):
+        self._sbc(self._read_mem(self._ROM.getByte(self._PC)))
+        self._PC = (self._PC + 1) & 0xFFFF
         return 3
 
-    def _inc_zp(self, opcode):
-        new_value = (self._read_mem(opcode & 0xFF) + 1) & 0xFF
-        self._write_mem(opcode & 0xFF, new_value)
+    def _inc_zp(self):
+        opcode = self._ROM.getByte(self._PC)
+        self._PC = (self._PC + 1) & 0xFFFF
+        new_value = (self._read_mem(opcode) + 1) & 0xFF
+        self._write_mem(opcode, new_value)
         self._NF = new_value >> 7
         self._ZF = not new_value
         return 5
 
-    def _inx(self, opcode):
+    def _inx(self):
         self._X = (self._X + 1) & 0xFF
         self._NF = self._X >> 7
         self._ZF = not self._X
         return 2
 
-    def _sbc_imm(self, opcode):
-        self._sbc(opcode & 0xFF)
+    def _sbc_imm(self):
+        self._sbc(self._ROM.getByte(self._PC))
+        self._PC = (self._PC + 1) & 0xFFFF
         return 2
 
-    def _nop(self, opcode):
+    def _nop(self):
         return 2
 
-    def _beq(self, opcode):
+    def _beq(self):
         if (self._ZF):
+            opcode = self._ROM.getByte(self._PC)
+            self._PC = (self._PC + 1) & 0xFFFF
             prev_PC = self._PC
-            self._PC = (self._PC + (opcode & 0xFF) - ((opcode & 0x80) << 1)) & 0xFFFF
+            self._PC = (self._PC + opcode - ((opcode & 0x80) << 1)) & 0xFFFF
             return 3 + ((self._PC ^ prev_PC) > 255)
+        self._PC = (self._PC + 1) & 0xFFFF
         return 2
 
-    def _sed(self, opcode):
+    def _sed(self):
         self._DF = 1
         return 2
     
-    def _dummy(self, opcode):
-        print("illegal instruction %0.4X: %0.4X" % (self._PC, opcode))
+    def _dummy(self):
+        print("illegal instruction %0.4X" % (self._PC))
         return 2
