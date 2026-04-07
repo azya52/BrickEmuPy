@@ -1,0 +1,35 @@
+{
+	"id": "d3350175-5103-4bed-ab70-db69de633ac6",
+	"core": "SPLB20",
+	"face_path": "./assets/Gyaoppi9in1.svg",
+	"clock": 850000,
+	
+	"buttons": {
+		"btnA": {
+			"port": "PA",
+			"pin": 2,
+			"level": 0,
+			"hot_keys": [49]
+		},
+		"btnB": {
+			"port": "PA",
+			"pin": 4,
+			"level": 0,
+			"hot_keys": [50]
+		},
+		"btnC": {
+			"port": "PA",
+			"pin": 8,
+			"level": 0,
+			"hot_keys": [51]
+		}
+	},
+	
+	"mask_options": {
+		"rom_path": "./assets/Gyaoppi9in1.bin",
+		"non_crystal_mode": 0,
+		"port_pullup": {
+			"PA": 255
+		}
+	}
+}
