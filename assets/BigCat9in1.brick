@@ -35,7 +35,7 @@
 		"rom_path": "./assets/BigCat9in1.bin",
 		"non_crystal_mode": 0,
 		"port_pullup": {
-			"PA": 255
+			"PA": 222
 		}
 	}
 }
