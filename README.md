@@ -38,6 +38,7 @@ Handheld LCD games emulator in Python with PyQt6.
   * Elfin Twins GM-021
   * Pocket Puppy (KS57C21308)
   * Big Cat 9-in-1 (SPLB20)
+  * Super Gyaoppi 9-in-1, 1997 (SPLB20)
 * Other LCD Games
   * Epoch Chibi Pachi Alien Fever
   * Formel 1 (Hartung Spiele Berlin/Epoch)
