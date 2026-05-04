@@ -676,7 +676,7 @@ class E0C6200():
         return self._PT >> 4 & 0xF
 
     def _get_io_rd30(self):
-        return self._PRD & 0xF
+        return self._RD & 0xF
 
     def _set_io_rd30(self, value):
         self._RD = (self._RD & 0xF0) | (value & 0x0F)
