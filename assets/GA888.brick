@@ -6,43 +6,60 @@
 	
 	"buttons": {
 		"btnPause": {
-			"port": "PS",
-			"pin": 0,
-			"level": 0,
 			"hot_keys": [49, 80]
 		},
 		"btnReset": {
-			"port": "RES",
-			"pin": 0,
-			"level": 0,
 			"hot_keys": [50, 82]
 		},
 		"btnLeft": {
-			"port": "PM",
-			"pin": 3,
-			"level": 0,
 			"hot_keys": [65, 16777234]
 		},
 		"btnRight": {
-			"port": "PM",
-			"pin": 2,
-			"level": 0,
 			"hot_keys": [68, 16777236]
 		},
 		"btnDown": {
-			"port": "PM",
-			"pin": 1,
-			"level": 0,
 			"hot_keys": [83, 16777237]
 		},
 		"btnRotate": {
-			"port": "PM",
-			"pin": 0,
-			"level": 0,
 			"hot_keys": [32, 16777220]
 		}
 	},
 	
+	"peripherals": {
+		"direct_input": {
+			"btnPause": {
+				"port": "PS",
+				"mask": 0,
+				"level": 0
+			},
+			"btnReset": {
+				"port": "RES",
+				"mask": 0,
+				"level": 0
+			},
+			"btnLeft": {
+				"port": "PM",
+				"mask": 3,
+				"level": 0
+			},
+			"btnRight": {
+				"port": "PM",
+				"mask": 2,
+				"level": 0
+			},
+			"btnDown": {
+				"port": "PM",
+				"mask": 1,
+				"level": 0
+			},
+			"btnRotate": {
+				"port": "PM",
+				"mask": 0,
+				"level": 0
+			}
+		}
+	},
+
 	"mask_options": {
 		"rom_path": "./assets/GA888.bin",
 		"sound_rom_path": "./assets/GA888.srom",

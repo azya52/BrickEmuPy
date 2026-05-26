@@ -1,19 +1,14 @@
-from .ToneGenerator import ToneGenerator
+CHANNEL = 0
 
 class PinTogglingSound:
+    def __init__(self, interconnect):
+        self._interconnect = interconnect
+        self._toggle_state = 1
 
-    def __init__(self, clock):
-        self._clock = clock
-        self._tone_generator = ToneGenerator()
-
-    def toggle(self, half_wave1, half_wave2, current_cycle):
-        if (half_wave1):
-            self._tone_generator.play(0, False, 1, current_cycle / self._clock)
-        elif (half_wave2):
-            self._tone_generator.play(0, False, -1, current_cycle / self._clock)
+    def toggle(self, half_wave1, half_wave2):
+        if (half_wave1 != half_wave2):
+            self._toggle_state *= -1
+            self._interconnect.emit_audio(CHANNEL, (0, False, self._toggle_state, 0))
+            return
         else:
-            self._tone_generator.stop(current_cycle / self._clock)
-
-    def stop(self):
-        self._tone_generator.close()
-        del self._tone_generator
+            self._interconnect.emit_audio(CHANNEL, None)

@@ -4,7 +4,6 @@ RAM_SIZE = 256
 VRAM_SIZE = 128
 
 EMPTY_VRAM = tuple([0] * VRAM_SIZE)
-FUULL_VRAM = tuple([255] * VRAM_SIZE)
 
 SUB_CLOCK = 32768
 
@@ -12,8 +11,11 @@ PC_RAM_BANK1 = 0x01
 PC_LCD_ON = 0x02
 
 class HTG12N0(HT4BIT):
-    def __init__(self, mask, clock):
-        super().__init__(mask, clock)
+    def __init__(self, mask, clock, interconnect):
+        super().__init__(mask, clock, interconnect)
+
+        self._interconnect = interconnect
+        self._interconnect.register_port_device(self)
 
         self._PS_pullup_mask = mask['port_pullup']['PS']
         self._PM_pullup_mask = mask['port_pullup']['PM']
@@ -118,9 +120,16 @@ class HTG12N0(HT4BIT):
             for i, value in state["VRAM"].items():
                 self._VRAM[i] = value & 0xF
         if ("MEMORY" in state):
-            self._ROM.writeWord(state["MEMORY"][0], state["MEMORY"][1])
+            self._rom.write_word(state["MEMORY"][0], state["MEMORY"][1])
     
-    def pin_set(self, port, pin, level):
+    def port_handler(self, port, mask, level):
+        #to-do
+        if (level >= 0):
+            self._pin_set(port, mask, level)
+        else:
+            self._pin_release(port, mask)
+
+    def _pin_set(self, port, pin, level):
         if (port == 'PM'):
             self._PM = ~(1 << pin) & self._PM | level << pin
             if ((self._PM_wakeup_mask & (1 << pin)) > 0):
@@ -133,7 +142,7 @@ class HTG12N0(HT4BIT):
             self._reset()
             self._RESET = 1
 
-    def pin_release(self, port, pin):
+    def _pin_release(self, port, pin):
         if (port == 'PM'):
             self._PM &= ~(1 << pin)
             self._PM |= self._PM_pullup_mask & (1 << pin)

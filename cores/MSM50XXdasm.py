@@ -1,6 +1,6 @@
 class MSM50XXdasm():
 
-    def __init__(self):
+    def __init__(self, roots=None):
         self._addrbase = '%0.3X'
         self._opbase = '%0.4X'
 
@@ -160,7 +160,7 @@ class MSM50XXdasm():
     def _disassemble(self, pc, rom):
         listing = []
         while ((pc * 2) < rom.size()):
-            opcode = rom.getWord(pc * 2)
+            opcode = rom.get_word(pc * 2)
             listing.append((self._opbase % opcode, self._instructions[opcode >> 4](self, pc, opcode)))
             pc += 1
         return listing

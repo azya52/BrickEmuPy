@@ -1,7 +1,8 @@
-from PyQt6 import uic, QtCore, QtGui, QtWidgets
-from PyQt6.QtCore import Qt, pyqtSignal, pyqtSlot, QByteArray
-from PyQt6.QtWidgets import QMessageBox, QTableWidgetItem
-import time
+from PyQt6 import uic, QtWidgets
+from PyQt6 import QtCore
+from PyQt6.QtCore import Qt, pyqtSignal, pyqtSlot
+from PyQt6.QtWidgets import QTableWidgetItem, QMessageBox
+from listing_model import ListingModel
 
 class DebugWidget(QtWidgets.QWidget):
     editStateSignal = pyqtSignal(dict)
@@ -24,16 +25,9 @@ class DebugWidget(QtWidgets.QWidget):
 
         self.prepareWidgetMap()
 
-    def __del__(self):
-        self.editStateSignal.disconnect()
-        self.debugRunSignal.disconnect()
-        self.debugStopSignal.disconnect()
-        self.debugPauseSignal.disconnect()
-        self.debugStepSignal.disconnect()
-    
     def showEvent(self, event):
-        for tableView in self.findChildren(QtWidgets.QTableWidget):
-            self.prepareTable(tableView)
+        for table in self.findChildren(QtWidgets.QTableWidget):
+            self.prepareTable(table)
         super().showEvent(event)
 
     def prepareTable(self, tableView):
@@ -85,16 +79,6 @@ class DebugWidget(QtWidgets.QWidget):
         except ValueError:
             self.editStateSignal.emit({})
 
-    @pyqtSlot(QtWidgets.QTableWidgetItem)
-    def listingTableChanged(self, item):
-        if (item.column() == 1):
-            try:
-                self.editStateSignal.emit({"MEMORY": [item.row() * 2, self.str2int(item.text())]})
-            except ValueError:
-                self.editStateSignal.emit({})
-        else:
-            self.editStateSignal.emit({"BRKPT": (item.row(), item.checkState() == Qt.CheckState.Checked)})
-
     @pyqtSlot()
     def refrashStateSignal(self):
         self.editStateSignal.emit({})
@@ -106,6 +90,13 @@ class DebugWidget(QtWidgets.QWidget):
     @pyqtSlot(int)
     def comboBoxItemChanged(self, index):
         self.editStateSignal.emit({self.sender().property("key"): index})
+
+    def _onListingEdit(self, index):
+        if index.isValid():
+            if index.column() == 0:
+                self.editStateSignal.emit({
+                    "BRKPT": (index.row(), index.model().isBreakpoint(index.row()))
+                })
 
     def examine(self, state):
         if not self.isHidden():
@@ -124,40 +115,29 @@ class DebugWidget(QtWidgets.QWidget):
                         for i, value in enumerate(value):
                             widget.item(i // cols, i % cols).setText(mask % value)
                         widget.blockSignals(False)
-                    elif (datatype == "listing" and widget.state() != QtWidgets.QAbstractItemView.State.EditingState):
-                        widget.blockSignals(True)
-                        widget.clear()
-                        widget.clearContents()
-                        widget.setRowCount(1)
-                        
-                        itemAdr = QtWidgets.QTableWidgetItem()
-                        itemAdr.setText(mask % 0)
-                        itemAdr.setForeground(QtGui.QBrush(QtGui.QColor(128, 128, 128)))
-                        itemAdr.setFlags(itemAdr.flags() & ~QtCore.Qt.ItemFlag.ItemIsEditable)
-                        itemAdr.setCheckState(Qt.CheckState.Unchecked)
+                    elif datatype == "listing":
+                        if not hasattr(widget, "_model"):
+                            widget._model = ListingModel(value, self._breakpoints, mask)
+                            widget.setModel(widget._model)
+                            header = widget.horizontalHeader()
+                            header.setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+                            header.setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeMode.Stretch)
+                            widget.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+                            widget._model.dataChanged.connect(
+                                lambda topLeft, bottomRight: self._onListingEdit(topLeft)
+                            )
+                        else:
+                            widget._model.updateData(value)
 
-                        widget.setItem(0, 0, itemAdr.clone())
-                        widget.setItem(0, 1, QtWidgets.QTableWidgetItem("000"))
-                        widget.resizeRowsToContents()
-                        widget.resizeColumnsToContents()
-                        widget.setItem(0, 1, None)
-                        widget.setRowCount(len(value))
-
-                        for i, instr in enumerate(value):
-                            item = itemAdr.clone()
-                            if (i in self._breakpoints):
-                                item.setCheckState(Qt.CheckState.Checked)
-                            item.setText(mask % i)
-                            widget.setItem(i, 0, item)
-                            if (instr):
-                                itemOpcode = QtWidgets.QTableWidgetItem(instr[0])
-                                itemOpcode.setFlags(itemOpcode.flags() & ~QtCore.Qt.ItemFlag.ItemIsEditable)
-                                widget.setItem(i, 1, itemOpcode)
-                                itemAsm = QtWidgets.QTableWidgetItem(instr[1])
-                                itemAsm.setFlags(itemAsm.flags() & ~QtCore.Qt.ItemFlag.ItemIsEditable)
-                                widget.setItem(i, 2, itemAsm)
-                        widget.blockSignals(False)
-
-            if ("PC" in state and "LISTING" in self._examineMap):
-                widget = self._examineMap["LISTING"][0]
-                widget.selectRow(state["PC"])
+            if "PC" in state and "LISTING" in self._examineMap:
+                view = self._examineMap["LISTING"][0]
+                if (view):
+                    model = view.model()
+                    if (model):
+                        if (model.getPC() != state["PC"]):
+                            model.setPC(state["PC"])
+                            index = model.index(state["PC"], 0)
+                            view.selectionModel().setCurrentIndex(index, 
+                                QtCore.QItemSelectionModel.SelectionFlag.ClearAndSelect | 
+                                QtCore.QItemSelectionModel.SelectionFlag.Rows
+                            )

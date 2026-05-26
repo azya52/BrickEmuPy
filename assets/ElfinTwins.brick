@@ -6,49 +6,68 @@
 	
 	"buttons": {
 		"btnEsc": {
-			"port": "PA",
-			"pin": 1,
-			"level": 0,
 			"hot_keys": [49, 16777216]
 		},
 		"btnEnter": {
-			"port": "PA",
-			"pin": 16,
-			"level": 0,
 			"hot_keys": [50, 16777221]
 		},
 		"btnClock": {
-			"port": "PA",
-			"pin": 8,
-			"level": 0,
 			"hot_keys": [51, 67]
 		},
 		"btnLeft": {
-			"port": "PA",
-			"pin": 2,
-			"level": 0,
 			"hot_keys": [65, 16777234]
 		},
 		"btnRight": {
-			"port": "PA",
-			"pin": 4,
-			"level": 0,
 			"hot_keys": [68, 16777236]
 		},
 		"btnUp": {
-			"port": "PA",
-			"pin": 6,
-			"level": 0,
 			"hot_keys": [87, 16777235]
 		},
 		"btnDown": {
-			"port": "PA",
-			"pin": 12,
-			"level": 0,
 			"hot_keys": [83, 16777237]
 		}
 	},
 	
+	"peripherals": {
+		"direct_input": {
+			"btnEsc": {
+				"port": "PA",
+				"mask": 1,
+				"level": 0
+			},
+			"btnEnter": {
+				"port": "PA",
+				"mask": 16,
+				"level": 0
+			},
+			"btnClock": {
+				"port": "PA",
+				"mask": 8,
+				"level": 0
+			},
+			"btnLeft": {
+				"port": "PA",
+				"mask": 2,
+				"level": 0
+			},
+			"btnRight": {
+				"port": "PA",
+				"mask": 4,
+				"level": 0
+			},
+			"btnUp": {
+				"port": "PA",
+				"mask": 6,
+				"level": 0
+			},
+			"btnDown": {
+				"port": "PA",
+				"mask": 12,
+				"level": 0
+			}
+		}
+	},
+
 	"mask_options": {
 		"rom_path": "./assets/ElfinTwins.bin",
 		"non_crystal_mode": 0,

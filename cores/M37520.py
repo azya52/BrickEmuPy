@@ -83,20 +83,21 @@ IO_CPUM_MAINDIV8 = 0x40
 IO_CPUM_CLKLOW = 0x80
 
 class M37520():
-    def __init__(self, mask, clock):
+    def __init__(self, mask, clock, interconnect):
         self._ROM = ROM(mask['rom_path'])
-        self._sound = PinTogglingSound(clock)
+        self._sound = PinTogglingSound(interconnect)
+
+        self._interconnect = interconnect
+        self._interconnect.register_port_device(self)
 
         self._rom_offset = ADDRESS_SPACE_SIZE - self._ROM.size()
-
-        self._cycle_counter = 0
 
         self._pullup_ext = {
             **{"P0": 0, "P1": 0, "P2": 0, "P3": 0, "P4": 0},
             **mask['port_pullup']
         }
 
-        self._port_input = {
+        self._port_handler = {
             "P0": [0, 0],
             "P1": [0, 0],
             "P2": [0, 0],
@@ -543,7 +544,7 @@ class M37520():
         
     def _go_vector(self, addr):
         vector_addr = (ADDRESS_SPACE_SIZE - addr) - self._rom_offset
-        self._PC = self._ROM.getWordLSB(vector_addr) % ADDRESS_SPACE_SIZE
+        self._PC = self._ROM.get_word_LSB(vector_addr) % ADDRESS_SPACE_SIZE
 
     def pc(self):
         return self._PC % ADDRESS_SPACE_SIZE
@@ -559,36 +560,30 @@ class M37520():
     def istr_counter(self):
         return self._instr_counter
 
-    def pin_set(self, port, pin, level):
-        self._process_port_input(port, pin, level)
-
-    def pin_release(self, port, pin):
-        self._process_port_input(port, pin, -1)
-
     def _port_read(self, port):
         return (
             (self._PDIR[port] & self._PLATCH[port]) | 
-            (~self._PDIR[port] & (~self._port_input[port][0] & 
-            (self._port_input[port][1] | self._PULLUP[port] | self._pullup_ext[port])))
+            (~self._PDIR[port] & (~self._port_handler[port][0] & 
+            (self._port_handler[port][1] | self._PULLUP[port] | self._pullup_ext[port])))
         )
 
-    def _process_port_input(self, port, pin, level):
+    def port_handler(self, port, mask, level):
         if (port == 'RES'):
             if (level == 0):
                 self.reset()
         else:
             prev_port = self._port_read(port)
-            self._port_input[port][0] &= ~(1 << pin)
-            self._port_input[port][1] &= ~(1 << pin)
+            self._port_handler[port][0] &= ~mask
+            self._port_handler[port][1] &= ~mask
             if (level >= 0):
-                self._port_input[port][level] |= (1 << pin)
+                self._port_handler[port][level] |= mask
             if (prev_port != self._port_read(port)):
                 if (port == "P2" and level == 0):
                     self._IREQ2 |= IO_IREQ2_KEYON
                 elif (port == "P4"):
-                    if (pin == 0 and bool(self._INTEDGE & IO_INTEDGE_INT0) == level):
+                    if (mask & 0x1 and bool(self._INTEDGE & IO_INTEDGE_INT0) == level):
                         self._IREQ1 |= IO_IREQ1_INT0
-                    elif (pin == 1 and bool(self._INTEDGE & IO_INTEDGE_INT1) == level):
+                    elif (mask & 0x2 and bool(self._INTEDGE & IO_INTEDGE_INT1) == level):
                         self._IREQ1 |= IO_IREQ1_INT1
 
     def _interrupt(self, addr):
@@ -675,9 +670,9 @@ class M37520():
 
         if (self._nSTOP):
             if (self._nWAIT):
-                byte = self._ROM.getByte(self._PC - self._rom_offset)
+                byte = self._ROM.get_byte(self._PC - self._rom_offset)
                 bytes_count = self._execute[byte][1]
-                opcode = self._ROM.getBytes(self._PC - self._rom_offset, bytes_count)
+                opcode = self._ROM.get_bytes(self._PC - self._rom_offset, bytes_count)
                 self._PC += bytes_count
                 exec_cycles *= self._execute[byte][0](self, opcode)
                 self._instr_counter += 1
@@ -687,7 +682,6 @@ class M37520():
         if (not self._IF):
             self._interrupt_process()
 
-        self._cycle_counter += exec_cycles
         return exec_cycles
 
 
@@ -737,7 +731,7 @@ class M37520():
         return self._port_read("P3")
     
     def _set_io_p3(self, value):
-        self._sound.toggle((value & 0x40 > 0), (value & 0x20 > 0), self._cycle_counter)
+        self._sound.toggle((value & 0x40 > 0), (value & 0x20 > 0))
         self._PLATCH["P3"] = value
 
     def _get_io_p3d(self):
@@ -946,7 +940,7 @@ class M37520():
             if (io != None):
                 return io[0](self)
         elif (addr >= self._rom_offset):
-            return self._ROM.getByte(addr - self._rom_offset)
+            return self._ROM.get_byte(addr - self._rom_offset)
         return 0
 
     def _ps(self):

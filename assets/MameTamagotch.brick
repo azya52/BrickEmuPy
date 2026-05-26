@@ -6,49 +6,68 @@
 	
 	"buttons": {
 		"btnPause": {
-			"port": "PS",
-			"pin": 1,
-			"level": 0,
 			"hot_keys": [49, 80]
 		},
 		"btnSound": {
-			"port": "PP",
-			"pin": 3,
-			"level": 0,
 			"hot_keys": [51]
 		},
 		"btnOnReset": {
-			"port": "RES",
-			"pin": 0,
-			"level": 0,
 			"hot_keys": [50, 82]
 		},
 		"btnLeft": {
-			"port": "PP",
-			"pin": 1,
-			"level": 0,
 			"hot_keys": [65, 16777234]
 		},
 		"btnRight": {
-			"port": "PP",
-			"pin": 0,
-			"level": 0,
 			"hot_keys": [68, 16777236]
 		},
 		"btnDown": {
-			"port": "PP",
-			"pin": 2,
-			"level": 0,
 			"hot_keys": [83, 16777237]
 		},
 		"btnStartRotate": {
-			"port": "PS",
-			"pin": 2,
-			"level": 0,
 			"hot_keys": [32, 16777235, 16777220]
 		}
 	},
 	
+	"peripherals": {
+		"direct_input": {
+			"btnPause": {
+				"port": "PS",
+				"mask": 1,
+				"level": 0
+			},
+			"btnSound": {
+				"port": "PP",
+				"mask": 3,
+				"level": 0
+			},
+			"btnOnReset": {
+				"port": "RES",
+				"mask": 0,
+				"level": 0
+			},
+			"btnLeft": {
+				"port": "PP",
+				"mask": 1,
+				"level": 0
+			},
+			"btnRight": {
+				"port": "PP",
+				"mask": 0,
+				"level": 0
+			},
+			"btnDown": {
+				"port": "PP",
+				"mask": 2,
+				"level": 0
+			},
+			"btnStartRotate": {
+				"port": "PS",
+				"mask": 2,
+				"level": 0
+			}
+		}
+	},
+
 	"mask_options": {
 		"rom_path": "./assets/MameTamagotch.bin",
 		"sound_rom_path": "./assets/MameTamagotch.srom",

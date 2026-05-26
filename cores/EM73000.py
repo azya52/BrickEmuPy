@@ -65,9 +65,12 @@ P30_BFREQL = 4
 P30_BFREQH = 8
 
 class EM73000():
-    def __init__(self, mask, clock):
+    def __init__(self, mask, clock, interconnect):
         self._ROM = ROM(mask['rom_path'])
-        self._sound = EM73000sound(clock)
+        self._sound = EM73000sound(clock, interconnect)
+
+        self._interconnect = interconnect
+        self._interconnect.register_port_device(self)
         
         self._P0_pullup_mask = mask['port_pullup']['P0']
         self._P7_pullup_mask = mask['port_pullup']['P7']
@@ -79,7 +82,6 @@ class EM73000():
         self._reset()
 
         self._instr_counter = 0
-        self._cycle_counter = 0
 
         self._io_tbl = {
             0: (EM73000._get_io_P0, EM73000._set_io_dummy),
@@ -307,7 +309,7 @@ class EM73000():
         self._P16 = value
 
     def _set_io_P23(self, value):
-        self._sound.set_freq_div(((self._P24 << 4) | value) + 1, self._cycle_counter)
+        self._sound.set_freq_div(((self._P24 << 4) | value) + 1)
         self._P23 = value
 
     def _set_io_P24(self, value):
@@ -329,7 +331,7 @@ class EM73000():
 
     def _set_io_P30(self, value):
         self._sound.set_basic_freq_div(4 << ((value & P30_BFREQ) >> 2))
-        self._sound.set_mode(value & P30_SMODE, self._cycle_counter)
+        self._sound.set_mode(value & P30_SMODE)
         self._P30 = value
 
     def examine(self):
@@ -406,9 +408,16 @@ class EM73000():
                 if i in self._io_tbl:
                     list(self._io_tbl.values())[i][1](self, value & 0xF)
         if ("MEMORY" in state):
-            self._ROM.writeWord(state["MEMORY"][0], state["MEMORY"][1])
+            self._rom.write_word(state["MEMORY"][0], state["MEMORY"][1])
     
-    def pin_set(self, port, pin, level):
+    def port_handler(self, port, mask, level):
+        #to-do
+        if (level >= 0):
+            self._pin_set(port, mask, level)
+        else:
+            self._pin_release(port, mask)
+
+    def _pin_set(self, port, pin, level):
         pin_mask = (1 << pin)
         if (port == 'P0'):
             prev_P0 = self._P0
@@ -425,7 +434,7 @@ class EM73000():
             if ((prev_P8 & pin_mask) and ~(self._P8 & pin_mask)):
                 self._IL |= ((pin == 0) << INT1_ID) | ((pin == 2) << INT0_ID)
 
-    def pin_release(self, port, pin):
+    def _pin_release(self, port, pin):
         pin_mask = (1 << pin)
         if (port == 'P0'):
             prev_P0 = self._P0
@@ -499,14 +508,12 @@ class EM73000():
             self._interrupt()
 
         if (not (self._P16 & P16_SE)):
-            opcode = self._ROM.getByte(self._PC)
+            opcode = self._ROM.get_byte(self._PC)
             exec_cycles = self._execute[opcode](self, opcode)
             self._instr_counter += 1
             self._process_timer(exec_cycles)
-            self._cycle_counter += exec_cycles
             return exec_cycles
 
-        self._cycle_counter += WARMUP_TIME[self._P16 & P16_SWWT]
         return WARMUP_TIME[self._P16 & P16_SWWT]
 
     def _sbr_a(self, opcode):
@@ -525,13 +532,13 @@ class EM73000():
         self._RAM[sp + 1] = (pc >> 8) & 0xF
         self._RAM[sp + 2] = (pc >> 4) & 0xF
         self._RAM[sp + 3] = (pc) & 0xF
-        self._PC = ((opcode & 0x07) << 8) | self._ROM.getByte((self._PC + 1) & 0x1FFF)
+        self._PC = ((opcode & 0x07) << 8) | self._ROM.get_byte((self._PC + 1) & 0x1FFF)
         self._SP = (self._SP - 1) & 0xF
         return 16
         
     def _std_k_y(self, opcode):
         #0100 1000 kkkk yyyy RAM[y]¬k 2 2 - - 1
-        ky = self._ROM.getByte((self._PC + 1) & 0x1FFF)
+        ky = self._ROM.get_byte((self._PC + 1) & 0x1FFF)
         k = (ky >> 4) & 0x0F
         y = ky & 0x0F
         self._RAM[y] = k
@@ -541,7 +548,7 @@ class EM73000():
         
     def _add_k_y(self, opcode):
         #0100 1001 kkkk yyyy RAM[y]¬RAM[y] +k 2 2 - Z C'
-        ky = self._ROM.getByte((self._PC + 1) & 0x1FFF)
+        ky = self._ROM.get_byte((self._PC + 1) & 0x1FFF)
         k = (ky >> 4) & 0x0F
         y = ky & 0x0F
         self._RAM[y] = (self._RAM[y] + k) & 0xF
@@ -552,7 +559,7 @@ class EM73000():
         
     def _out_k_p(self, opcode):
         #0100 1010 kkkk pppp PORT[p]¬k 2 2 - - 1
-        kp = self._ROM.getByte((self._PC + 1) & 0x1FFF)
+        kp = self._ROM.get_byte((self._PC + 1) & 0x1FFF)
         k = (kp >> 4) & 0x0F
         p = kp & 0x0F
         self._io_tbl[p][1](self, k)
@@ -562,7 +569,7 @@ class EM73000():
         
     def _cmp_k_y(self, opcode):
         #0100 1011 kkkk yyyy k-RAM[y] 2 2 C Z Z'
-        ky = self._ROM.getByte((self._PC + 1) & 0x1FFF)
+        ky = self._ROM.get_byte((self._PC + 1) & 0x1FFF)
         k = (ky >> 4) & 0x0F
         y = ky & 0x0F
         self._CF = k >= self._RAM[y]
@@ -573,7 +580,7 @@ class EM73000():
         
     def _exhl_x(self, opcode):
         #0100 1100 xxxx xx00 LR«RAM[x], HR«RAM[x+1] 2 2 - - 1
-        x = (self._ROM.getByte((self._PC + 1) & 0x1FFF)) & 0x00FF
+        x = (self._ROM.get_byte((self._PC + 1) & 0x1FFF)) & 0x00FF
         hl_tmp = self._HL
         self._HL = (self._RAM[self._ram_bank + x + 1] << 4) | self._RAM[self._ram_bank + x] 
         self._RAM[self._ram_bank + x] = hl_tmp & 0x0F
@@ -595,7 +602,7 @@ class EM73000():
         
     def _ldhl_x(self, opcode):
         #0100 1110 xxxx xx00 LR¬RAM[x],HR¬RAM[x+1] 2 2 - - 1
-        x = (self._ROM.getByte((self._PC + 1) & 0x1FFF)) & 0x00FF
+        x = (self._ROM.get_byte((self._PC + 1) & 0x1FFF)) & 0x00FF
         self._HL = (self._RAM[self._ram_bank + x + 1] << 4) | self._RAM[self._ram_bank + x] 
         self._SF = 1
         self._PC = (self._PC + 2) & 0x1FFF
@@ -646,7 +653,7 @@ class EM73000():
         #0101 0101 1100 aaaa aaaa aaaa (a:1000h~1FFFh) SF=1; PC ¬ a ( branch condition satisified)
         self._PC = (self._PC + 3) & 0x1FFF
         if (self._SF):
-            self._PC = 0x1000 | (self._ROM.getWord((self._PC - 2) & 0x1FFF) & 0x0FFF)
+            self._PC = 0x1000 | (self._ROM.get_word((self._PC - 2) & 0x1FFF) & 0x0FFF)
         self._SF = 1
         return 24
 
@@ -654,7 +661,7 @@ class EM73000():
         #0101 0111 1100 aaaa aaaa aaaa (a:0000h~0FFFh) SF=1; PC ¬ a ( branch condition satisified)
         self._PC = (self._PC + 3) & 0x1FFF
         if (self._SF):
-            self._PC = self._ROM.getWord((self._PC - 2) & 0x1FFF) & 0x0FFF
+            self._PC = self._ROM.get_word((self._PC - 2) & 0x1FFF) & 0x0FFF
         self._SF = 1
         return 24
             
@@ -756,12 +763,12 @@ class EM73000():
     
     def _cil(self, opcode):
         #0110 0011
-        id = (self._ROM.getByte((self._PC + 1) & 0x1FFF) >> 6) & 0x03
+        id = (self._ROM.get_byte((self._PC + 1) & 0x1FFF) >> 6) & 0x03
         return self._execute_cil[id](self, opcode)
         
     def _cil_r(self, opcode):
         #0110 0011 11rr rrrr IL¬IL & r 2 2 - - 1
-        r = self._ROM.getByte((self._PC + 1) & 0x1FFF) & 0x3F
+        r = self._ROM.get_byte((self._PC + 1) & 0x1FFF) & 0x3F
         self._IL &= r
         self._SF = 1
         self._PC = (self._PC + 2) & 0x1FFF
@@ -769,7 +776,7 @@ class EM73000():
     
     def _dicil_r(self, opcode):
         #0110 0011 10rr rrrr EIF¬0,IL¬IL&r 2 2 - - 1
-        r = self._ROM.getByte((self._PC + 1) & 0x1FFF) & 0x3F
+        r = self._ROM.get_byte((self._PC + 1) & 0x1FFF) & 0x3F
         self._IL &= r
         self._EI = 0
         self._SF = 1
@@ -778,7 +785,7 @@ class EM73000():
     
     def _eicil_r(self, opcode):
         #0110 0011 01rr rrrr EIF¬1,IL¬IL&r 2 2 - - 1
-        r = self._ROM.getByte((self._PC + 1) & 0x1FFF) & 0x3F
+        r = self._ROM.get_byte((self._PC + 1) & 0x1FFF) & 0x3F
         self._IL &= r
         self._EI = 1
         self._SF = 1
@@ -797,7 +804,7 @@ class EM73000():
         
     def _ldax(self, opcode):
         #0110 0101 Acc¬ROM[DP]L 1 2 - Z 1
-        self._ACC = self._ROM.getByte(0x1000 | self._DP) & 0x0F
+        self._ACC = self._ROM.get_byte(0x1000 | self._DP) & 0x0F
         self._ZF = self._ACC == 0
         self._SF = 1
         self._PC = (self._PC + 1) & 0x1FFF
@@ -815,7 +822,7 @@ class EM73000():
         
     def _ldaxi(self, opcode):
         #0110 0111 Acc¬ROM[DP]H,DP+1 1 2 - Z 1
-        self._ACC = (self._ROM.getByte(0x1000 | self._DP) >> 4) & 0x0F
+        self._ACC = (self._ROM.get_byte(0x1000 | self._DP) >> 4) & 0x0F
         self._DP = (self._DP + 1) & 0xFFF
         self._ZF = self._ACC == 0
         self._SF = 1
@@ -824,7 +831,7 @@ class EM73000():
         
     def _exa_x(self, opcode):
         #0110 1000 xxxx xxxx Acc«RAM[x] 2 2 - Z 1
-        x = self._ROM.getByte((self._PC + 1) & 0x1FFF)
+        x = self._ROM.get_byte((self._PC + 1) & 0x1FFF)
         acc_tmp = self._ACC
         self._ACC = self._RAM[self._ram_bank + x]
         self._RAM[self._ram_bank + x] = acc_tmp
@@ -835,7 +842,7 @@ class EM73000():
         
     def _sta_x(self, opcode):
         #0110 1001 xxxx xxxx RAM[x]¬Acc 2 2 - - 1
-        x = self._ROM.getByte((self._PC + 1) & 0x1FFF)
+        x = self._ROM.get_byte((self._PC + 1) & 0x1FFF)
         if (x < 0xF4):
             self._RAM[self._ram_bank + x] = self._ACC
         elif (x == 0xF4):
@@ -864,7 +871,7 @@ class EM73000():
         
     def _lda_x(self, opcode):
         #0110 1010 xxxx xxxx Acc¬RAM[x] 2 2 - Z 1
-        x = self._ROM.getByte((self._PC + 1) & 0x1FFF)
+        x = self._ROM.get_byte((self._PC + 1) & 0x1FFF)
         if (x < 0xF4):
             self._ACC = self._RAM[self._ram_bank + x]
         elif (x == 0xF4):
@@ -894,7 +901,7 @@ class EM73000():
         
     def _cmpa_x(self, opcode):
         #0110 1011 xxxx xxxx RAM[x]-Acc 2 2 C Z Z'
-        x = self._ROM.getByte((self._PC + 1) & 0x1FFF)
+        x = self._ROM.get_byte((self._PC + 1) & 0x1FFF)
         self._CF = self._RAM[self._ram_bank + x] >= self._ACC
         self._ZF = self._RAM[self._ram_bank + x] == self._ACC
         self._SF = 1 - self._ZF
@@ -903,12 +910,12 @@ class EM73000():
 
     def _bit_y_b(self, opcode):
         #0110 1100
-        id = (self._ROM.getByte((self._PC + 1) & 0x1FFF) >> 6) & 0x03
+        id = (self._ROM.get_byte((self._PC + 1) & 0x1FFF) >> 6) & 0x03
         return self._execute_bit_y_b[id](self, opcode)
     
     def _tf_y_b(self, opcode):
         #0110 1100 00bb yyyy SF¬RAM[y]b' 2 2 - - *
-        by = self._ROM.getByte((self._PC + 1) & 0x1FFF)
+        by = self._ROM.get_byte((self._PC + 1) & 0x1FFF)
         b = (by >> 4) & 0x03
         y = by & 0x0F
         self._SF = self._RAM[y] & (0x1 << b) == 0
@@ -917,7 +924,7 @@ class EM73000():
 
     def _set_y_b(self, opcode):
         #0110 1100 01bb yyyy RAM[y]b¬1 2 2 - - 1
-        by = self._ROM.getByte((self._PC + 1) & 0x1FFF)
+        by = self._ROM.get_byte((self._PC + 1) & 0x1FFF)
         b = (by >> 4) & 0x03
         y = by & 0x0F
         self._RAM[y] = self._RAM[y] | (0x1 << b)
@@ -927,7 +934,7 @@ class EM73000():
 
     def _tt_y_b(self, opcode):
         #0110 1100 10bb yyyy SF¬RAM[y]b 2 2 - - *
-        by = self._ROM.getByte((self._PC + 1) & 0x1FFF)
+        by = self._ROM.get_byte((self._PC + 1) & 0x1FFF)
         b = (by >> 4) & 0x03
         y = by & 0x0F
         self._SF = (self._RAM[y] & (0x1 << b)) > 0
@@ -936,7 +943,7 @@ class EM73000():
 
     def _clr_y_b(self, opcode):
         #0110 1100 11bb yyyy RAM[y]b¬0 2 2 - - 1
-        by = self._ROM.getByte((self._PC + 1) & 0x1FFF)
+        by = self._ROM.get_byte((self._PC + 1) & 0x1FFF)
         b = (by >> 4) & 0x03
         y = by & 0x0F
         self._RAM[y] = self._RAM[y] & ~(0x1 << b)
@@ -946,12 +953,12 @@ class EM73000():
 
     def _bit_p_b(self, opcode):
         #0110 1101
-        id = (self._ROM.getByte((self._PC + 1) & 0x1FFF) >> 6) & 0x03
+        id = (self._ROM.get_byte((self._PC + 1) & 0x1FFF) >> 6) & 0x03
         return self._execute_bit_p_b[id](self, opcode)
     
     def _tfp_p_b(self, opcode):
         #0110 1101 00bb pppp SF¬PORT[p]b' 2 2 - - *
-        bp = self._ROM.getByte((self._PC + 1) & 0x1FFF)
+        bp = self._ROM.get_byte((self._PC + 1) & 0x1FFF)
         b = (bp >> 4) & 0x03
         p = bp & 0x0F
         self._SF = (self._io_tbl[p][0](self) & (0x1 << b)) == 0
@@ -960,7 +967,7 @@ class EM73000():
 
     def _sep_p_b(self, opcode):
         #0110 1101 01bb pppp PORT[p]b¬1 2 2 - - 1
-        bp = self._ROM.getByte((self._PC + 1) & 0x1FFF)
+        bp = self._ROM.get_byte((self._PC + 1) & 0x1FFF)
         b = (bp >> 4) & 0x03
         p = bp & 0x0F
         self._io_tbl[p][1](self, self._io_tbl[p][0](self) | (0x1 << b))
@@ -970,7 +977,7 @@ class EM73000():
 
     def _ttp_p_b(self, opcode):
         #0110 1101 10bb pppp SF¬PORT[p]b 2 2 - - *
-        bp = self._ROM.getByte((self._PC + 1) & 0x1FFF)
+        bp = self._ROM.get_byte((self._PC + 1) & 0x1FFF)
         b = (bp >> 4) & 0x03
         p = bp & 0x0F
         self._SF = (self._io_tbl[p][0](self) & (0x1 << b)) > 0
@@ -979,7 +986,7 @@ class EM73000():
 
     def _clp_p_b(self, opcode):
         #0110 1101 11bb pppp PORT[p]b¬0 2 2 - - 1
-        bp = self._ROM.getByte((self._PC + 1) & 0x1FFF)
+        bp = self._ROM.get_byte((self._PC + 1) & 0x1FFF)
         b = (bp >> 4) & 0x03
         p = bp & 0x0F
         self._io_tbl[p][1](self, self._io_tbl[p][0](self) & ~(0x1 << b))
@@ -989,12 +996,12 @@ class EM73000():
 
     def _math_k(self, opcode):
         #0110 1110
-        id = (self._ROM.getByte((self._PC + 1) & 0x1FFF) >> 4) & 0x0F
+        id = (self._ROM.get_byte((self._PC + 1) & 0x1FFF) >> 4) & 0x0F
         return self._execute_math_k[id](self, opcode)
 
     def _addl_k(self, opcode):
         #0110 1110 0001 kkkk LR¬LR+k 2 2 - Z C'
-        k = self._ROM.getByte((self._PC + 1) & 0x1FFF) & 0x0F
+        k = self._ROM.get_byte((self._PC + 1) & 0x1FFF) & 0x0F
         self._HL = (self._HL & 0xF0) | ((self._HL + k) & 0x0F)
         self._ZF = (self._HL & 0x0F) == 0
         self._SF = (self._HL & 0x0F) >= k
@@ -1003,7 +1010,7 @@ class EM73000():
 
     def _cmpl_k(self, opcode):
         #0110 1110 0011 kkkk k-LR 2 2 - Z C
-        k = self._ROM.getByte((self._PC + 1) & 0x1FFF) & 0x0F
+        k = self._ROM.get_byte((self._PC + 1) & 0x1FFF) & 0x0F
         self._ZF = k == (self._HL & 0x0F)
         self._SF = k >= (self._HL & 0x0F)
         self._PC = (self._PC + 2) & 0x1FFF
@@ -1011,7 +1018,7 @@ class EM73000():
 
     def _ora_k(self, opcode):
         #0110 1110 0100 kkkk Acc¬Acc k 2 2 - Z Z'
-        k = self._ROM.getByte((self._PC + 1) & 0x1FFF) & 0x0F
+        k = self._ROM.get_byte((self._PC + 1) & 0x1FFF) & 0x0F
         self._ACC |= k
         self._ZF = self._ACC == 0
         self._SF = 1 - self._ZF
@@ -1020,7 +1027,7 @@ class EM73000():
 
     def _adda_k(self, opcode):
         #0110 1110 0101 kkkk Acc¬Acc+k 2 2 - Z C'
-        k = self._ROM.getByte((self._PC + 1) & 0x1FFF) & 0x0F
+        k = self._ROM.get_byte((self._PC + 1) & 0x1FFF) & 0x0F
         self._ACC = self._ACC + k & 0xF
         self._ZF = self._ACC == 0
         self._SF = self._ACC >= k
@@ -1029,7 +1036,7 @@ class EM73000():
 
     def _anda_k(self, opcode):
         #0110 1110 0110 kkkk Acc¬Acc&k 2 2 - Z Z'
-        k = self._ROM.getByte((self._PC + 1) & 0x1FFF) & 0x0F
+        k = self._ROM.get_byte((self._PC + 1) & 0x1FFF) & 0x0F
         self._ACC &= k
         self._ZF = self._ACC == 0
         self._SF = 1 - self._ZF
@@ -1038,7 +1045,7 @@ class EM73000():
 
     def _suba_k(self, opcode):
         #0110 1110 0111 kkkk Acc¬k-Acc 2 2 - Z C
-        k = self._ROM.getByte((self._PC + 1) & 0x1FFF) & 0x0F
+        k = self._ROM.get_byte((self._PC + 1) & 0x1FFF) & 0x0F
         self._ACC = k - self._ACC & 0xF
         self._ZF = self._ACC == 0
         self._SF = k >= self._ACC
@@ -1047,7 +1054,7 @@ class EM73000():
 
     def _addh_k(self, opcode):
         #0110 1110 1001 kkkk HR¬HR+k 2 2 - Z C'
-        k = self._ROM.getByte((self._PC + 1) & 0x1FFF) & 0x0F
+        k = self._ROM.get_byte((self._PC + 1) & 0x1FFF) & 0x0F
         self._HL = (self._HL + (k << 4)) & 0xFF
         self._ZF = (self._HL >> 4) == 0
         self._SF = (self._HL >> 4) >= k
@@ -1056,7 +1063,7 @@ class EM73000():
 
     def _cmph_k(self, opcode):
         #0110 1110 1011 kkkk k - HR 2 2 - Z C
-        k = self._ROM.getByte((self._PC + 1) & 0x1FFF) & 0x0F
+        k = self._ROM.get_byte((self._PC + 1) & 0x1FFF) & 0x0F
         self._ZF = (self._HL >> 4) == k
         self._SF = k >= (self._HL >> 4)
         self._PC = (self._PC + 2) & 0x1FFF
@@ -1064,7 +1071,7 @@ class EM73000():
 
     def _orm_k(self, opcode):
         #0110 1110 1100 kkkk RAM[HL]¬RAM[HL] k 2 2 - Z Z'
-        k = self._ROM.getByte((self._PC + 1) & 0x1FFF) & 0x0F
+        k = self._ROM.get_byte((self._PC + 1) & 0x1FFF) & 0x0F
         self._RAM[self._ram_bank + self._HL] |= k
         self._ZF = self._RAM[self._ram_bank + self._HL] == 0
         self._SF = 1 - self._ZF
@@ -1073,7 +1080,7 @@ class EM73000():
 
     def _addm_k(self, opcode):
         #0110 1110 1101 kkkk RAM[HL]¬RAM[HL] +k 2 2 - Z C'
-        k = self._ROM.getByte((self._PC + 1) & 0x1FFF) & 0x0F
+        k = self._ROM.get_byte((self._PC + 1) & 0x1FFF) & 0x0F
         self._RAM[self._ram_bank + self._HL] = (self._RAM[self._ram_bank + self._HL] + k) & 0xF
         self._ZF = self._RAM[self._ram_bank + self._HL] == 0
         self._SF = self._RAM[self._ram_bank + self._HL] >= k
@@ -1082,7 +1089,7 @@ class EM73000():
 
     def _andm_k(self, opcode):
         #0110 1110 1110 kkkk RAM[HL]¬RAM[HL]&k 2 2 - Z Z'
-        k = self._ROM.getByte((self._PC + 1) & 0x1FFF) & 0x0F
+        k = self._ROM.get_byte((self._PC + 1) & 0x1FFF) & 0x0F
         self._RAM[self._ram_bank + self._HL] &= k
         self._ZF = self._RAM[self._ram_bank + self._HL] == 0
         self._SF = 1 - self._ZF
@@ -1091,7 +1098,7 @@ class EM73000():
 
     def _subm_k(self, opcode):
         #0110 1110 1111 kkkk RAM[HL]¬k - RAM[HL] 2 2 - Z C
-        k = self._ROM.getByte((self._PC + 1) & 0x1FFF) & 0x0F
+        k = self._ROM.get_byte((self._PC + 1) & 0x1FFF) & 0x0F
         self._RAM[self._ram_bank + self._HL] = (k - self._RAM[self._ram_bank + self._HL]) & 0xF
         self._ZF = self._RAM[self._ram_bank + self._HL] == 0
         self._SF = k >= self._RAM[self._ram_bank + self._HL]
@@ -1100,12 +1107,12 @@ class EM73000():
 
     def _io_p(self, opcode):
         #0110 1111
-        id = (self._ROM.getByte((self._PC + 1) & 0x1FFF) >> 6) & 0x03
+        id = (self._ROM.get_byte((self._PC + 1) & 0x1FFF) >> 6) & 0x03
         return self._execute_io_p[id](self, opcode)
 
     def _ina_p(self, opcode):
         #0110 1111 0100 pppp Acc¬PORT[p] 2 2 - Z Z'
-        p = self._ROM.getByte((self._PC + 1) & 0x1FFF) & 0x0F
+        p = self._ROM.get_byte((self._PC + 1) & 0x1FFF) & 0x0F
         self._ACC = self._io_tbl[p][0](self)
         self._ZF = self._ACC == 0
         self._SF = 1 - self._ZF
@@ -1114,7 +1121,7 @@ class EM73000():
     
     def _inm_p(self, opcode):
         #0110 1111 1100 pppp RAM[HL]¬PORT[p] 2 2 - - Z'
-        p = self._ROM.getByte((self._PC + 1) & 0x1FFF) & 0x0F
+        p = self._ROM.get_byte((self._PC + 1) & 0x1FFF) & 0x0F
         self._RAM[self._ram_bank + self._HL] = self._io_tbl[p][0](self)
         self._SF = self._RAM[self._ram_bank + self._HL] != 0
         self._PC = (self._PC + 2) & 0x1FFF
@@ -1122,7 +1129,7 @@ class EM73000():
 
     def _outa_p(self, opcode):
         #0110 1111 000p pppp PORT[p]¬Acc 2 2 - - 1
-        p = self._ROM.getByte((self._PC + 1) & 0x1FFF) & 0x1F
+        p = self._ROM.get_byte((self._PC + 1) & 0x1FFF) & 0x1F
         self._io_tbl[p][1](self, self._ACC)
         self._SF = 1
         self._PC = (self._PC + 2) & 0x1FFF
@@ -1130,7 +1137,7 @@ class EM73000():
 
     def _outm_p(self, opcode):
         #0110 1111 100p pppp PORT[p]¬RAM[HL] 2 2 - - 1
-        p = self._ROM.getByte(self._PC + 1) & 0x1F
+        p = self._ROM.get_byte(self._PC + 1) & 0x1F
         self._io_tbl[p][1](self, self._RAM[self._ram_bank + self._HL])
         self._SF = 1
         self._PC = (self._PC + 2) & 0x1FFF
@@ -1292,7 +1299,7 @@ class EM73000():
         #1100 aaaa aaaa aaaa If SF= 1 then PC¬a else null 2 2 - - 1
         self._PC = (self._PC + 2) & 0x1FFF
         if (self._SF):
-            a = ((opcode << 8) | self._ROM.getByte((self._PC - 1) & 0x1FFF)) & 0x0FFF
+            a = ((opcode << 8) | self._ROM.get_byte((self._PC - 1) & 0x1FFF)) & 0x0FFF
             self._PC = (self._PC & 0x1000) | a
         self._SF = 1
         return 16

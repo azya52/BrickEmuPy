@@ -6,8 +6,8 @@ from PyQt6.QtCore import pyqtSlot, QByteArray
 from PyQt6.QtWidgets import QFileDialog, QMessageBox
 from PyQt6.QtGui import QShortcut
 
-from debugwidget import DebugWidget
-from brickwidget import BrickWidget
+from debug_widget import DebugWidget
+from brick_widget import BrickWidget
 
 class Window(QtWidgets.QMainWindow):    
     
@@ -51,10 +51,10 @@ class Window(QtWidgets.QMainWindow):
     def _setDeviceUI(self, config):
         if (self._brickWidget):
             self._brickWidget.deleteLater()
-            del self._brickWidget
+            self._brickWidget = None
         if (self._debugWidget):
             self._debugWidget.deleteLater()
-            del self._debugWidget
+            self._debugWidget = None
 
         self.actionDebug.setChecked(False)
 
@@ -105,6 +105,7 @@ class Window(QtWidgets.QMainWindow):
         else:
             geometry = self.screen().availableGeometry()
             self.setGeometry(QtCore.QRect(geometry.bottomRight() / 5, 3 * geometry.size() / 5))
+        
         state = self._settings.value("window/mainsplitter_state",  QByteArray())
         if (not state.isEmpty()):
             self.mainSplitter.restoreState(state.data())
@@ -138,20 +139,18 @@ class Window(QtWidgets.QMainWindow):
         self._saveSettings()
         if (self._brickWidget):
             self._brickWidget.deleteLater()
-            del self._brickWidget
+            self._brickWidget = None
         if (self._debugWidget):
             self._debugWidget.deleteLater()
-            del self._debugWidget
+            self._debugWidget = None
         
         super().closeEvent(event)
 
     def _examine(self, info):
         if (self._debugWidget):
             self._debugWidget.examine(info)
-        
         if ("DEBUG" in info):
             self.actionDebug.setChecked(info["DEBUG"])
-
         if ("ICTR" in info):
             self.iCounterLabel.setText("%d" % info["ICTR"])
 

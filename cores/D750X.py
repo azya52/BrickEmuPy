@@ -6,7 +6,6 @@ MCLOCK_DIV2 = 4
 
 RAM_SIZE = 256
 GRAM_SIZE = 24
-FULL_GRAM = tuple([255] * GRAM_SIZE)
 
 M_INT_T = 0x1
 M_INT_0S = 0x2
@@ -18,18 +17,20 @@ P_PORT6_MODE = 0xE
 P_SHIFT_MODE = 0xF
 
 class D750X():
-    def __init__(self, mask, clock):
+    def __init__(self, mask, clock, interconnect):
         self._ROM = ROM(mask['rom_path'])
-        self._sound = PinTogglingSound(clock)
+        self._sound = PinTogglingSound(interconnect)
+        
+        self._interconnect = interconnect
+        self._interconnect.register_port_device(self)
 
-        self._rom_mask = self._ROM.getMask()
+        self._rom_mask = self._ROM.get_mask()
 
         self._instr_counter = 0
-        self._cycle_counter = 0
         self._timer_counter = 0
 
         self._sound_port = mask['sound']['port']
-        self._sound_mask = 1 << mask['sound']['pin']
+        self._sound_mask = mask['sound']['mask']
 
         self._crystal_clock_div = clock / 32768
 
@@ -249,7 +250,7 @@ class D750X():
         if ("TMR" in state):
             self._TMR = state["TMR"]
         if ("PC" in state):
-            self._PC = state["PC"] & self._ROM.getMask()
+            self._PC = state["PC"] & self._ROM.get_mask()
         if ("SP" in state):
             self._SP = state["SP"] & 0xFF
         if ("RAM" in state):
@@ -259,15 +260,14 @@ class D750X():
             for i, value in state["PORT"].items():
                 self._P[i] = value & 0xF
         if ("MEMORY" in state):
-            self._ROM.writeWord(state["MEMORY"][0], state["MEMORY"][1])
+            self._rom.write_word(state["MEMORY"][0], state["MEMORY"][1])
     
-    def pin_set(self, port, pin, level):
-        port = int(port)
-        self._P[port] = ~(1 << pin) & self._P[port] | level << pin
 
-    def pin_release(self, port, pin):
+    def port_handler(self, port, mask, level):
         port = int(port)
-        self._P[port] &= ~(1 << pin)
+        self._P[port] &= ~mask
+        if (level > 0):
+            self._P[port] |= mask
 
     def pc(self):
         return self._PC & 0xFFF
@@ -293,10 +293,10 @@ class D750X():
     def clock(self):
         exec_cycles = 1
         if (not (self._HALT or self._STOP)):
-            data = opcode = self._ROM.getByte(self._PC)
+            data = opcode = self._ROM.get_byte(self._PC)
             self._PC = (self._PC + 1) & self._rom_mask
             if (self._execute[data][1] == 2):
-                opcode = (data << 8) | self._ROM.getByte(self._PC)
+                opcode = (data << 8) | self._ROM.get_byte(self._PC)
                 self._PC = (self._PC + 1) & self._rom_mask
 
             exec_cycles = self._execute[data][0](self, opcode)
@@ -317,9 +317,6 @@ class D750X():
                     self._RQF |= M_INT_T
                     self._STOP = self._HALT = 0
 
-        self._cycle_counter += exec_cycles
-        self._sound.toggle(self._P[self._sound_port] & self._sound_mask, 0, self._cycle_counter)
-
         return exec_cycles
 
 
@@ -335,7 +332,7 @@ class D750X():
         print("undefined instruction", "%0.3X" % self._PC)
 
     def _skip_next(self):
-        opcode = self._ROM.getByte(self._PC)
+        opcode = self._ROM.get_byte(self._PC)
         byte_count = self._execute[opcode][1]
         self._PC = (self._PC + byte_count) & self._rom_mask
         self._SK = 3
@@ -346,7 +343,7 @@ class D750X():
         res = self._A + opcode
         self._A = res & 0xF
         if (res > 15):
-            prev = self._ROM.getByte(self._PC - 2)
+            prev = self._ROM.get_byte(self._PC - 2)
             if (prev != 0b01111100 or self._CF):   #prev instruction is ACSC
                 return MCLOCK_DIV1 + self._skip_next()
         return MCLOCK_DIV1
@@ -355,7 +352,7 @@ class D750X():
         #0001iiii A <- i; 1; 1
         self._A = opcode & 0xF
         cycles = MCLOCK_DIV1
-        while ((self._ROM.getByte(self._PC) >> 4) == 0b0001):
+        while ((self._ROM.get_byte(self._PC) >> 4) == 0b0001):
             self._PC = (self._PC + 1) & self._rom_mask
             cycles += MCLOCK_DIV1
         return cycles
@@ -634,7 +631,12 @@ class D750X():
 
     def _op_addr(self, opcode):
         #00111111 1110iiii P(i) <- A; 2; 2
-        self._P[opcode & 0xF] = self._A
+        port = opcode & 0xF
+        self._P[port] = self._A
+
+        if (port == self._sound_port):
+            self._sound.toggle((self._P[self._sound_port] & self._sound_mask[0]) > 0, (self._P[self._sound_port] & self._sound_mask[1]) > 0)
+
         return MCLOCK_DIV2
 
     def _di_data(self, opcode):
@@ -718,22 +720,32 @@ class D750X():
         
     def _anp_data(self, opcode):
         #01001100 iiiiiiii P(i7-4) <- P(i7-4) & i3-0; 2; 2
-        self._P[(opcode >> 4) & 0xF] &= opcode
+        port = (opcode >> 4) & 0xF
+        self._P[port] &= opcode
+
+        if (port == self._sound_port):
+            self._sound.toggle((self._P[self._sound_port] & self._sound_mask[0]) > 0, (self._P[self._sound_port] & self._sound_mask[1]) > 0)
+
         return MCLOCK_DIV2
         
     def _orp_data(self, opcode):
         #01001101 iiiiiiii P(i7-4) <- P(i7-4) | i3-0; 2; 2
-        self._P[(opcode >> 4) & 0xF] |= opcode & 0xF
+        port = (opcode >> 4) & 0xF
+        self._P[port] |= opcode & 0xF
+
+        if (port == self._sound_port):
+            self._sound.toggle((self._P[self._sound_port] & self._sound_mask[0]) > 0, (self._P[self._sound_port] & self._sound_mask[1]) > 0)
+
         return MCLOCK_DIV2
 
     def _lhli_data(self, opcode):
         #01001110 iiiiiiii HL <- i; 2; 2
         self._HL = opcode & 0xFF
         cycles = MCLOCK_DIV2
-        opcode = self._ROM.getByte(self._PC)
+        opcode = self._ROM.get_byte(self._PC)
         while (opcode == 0b01001110 or (opcode >> 4) == 0b1100):
             cycles += self._skip_next()
-            opcode = self._ROM.getByte(self._PC)
+            opcode = self._ROM.get_byte(self._PC)
         return cycles
 
     def _ldei_data(self, opcode):
@@ -832,7 +844,7 @@ class D750X():
         
     def _lamt(self, opcode):
         #01011110 A <- [PC10-6.0.C.A]h, (HL) <- [PC10-6.0.C.A]l; 1; 2
-        data = self._ROM.getByte((self._PC & 0x7C0) | (self._CF << 4) | self._A)
+        data = self._ROM.get_byte((self._PC & 0x7C0) | (self._CF << 4) | self._A)
         self._A = data >> 4
         self._RAM[self._HL] = data & 0xF
         return MCLOCK_DIV2
@@ -877,7 +889,12 @@ class D750X():
 
     def _opl(self, opcode):
         #01110010 P(L) <- A; 1; 1
-        self._P[self._HL & 0xF] = self._A
+        port = self._HL & 0xF
+        self._P[port] = self._A
+
+        if (port == self._sound_port):
+            self._sound.toggle((self._P[self._sound_port] & self._sound_mask[0]) > 0, (self._P[self._sound_port] & self._sound_mask[1]) > 0)
+
         return MCLOCK_DIV1
 
     def _op3(self, opcode):
@@ -950,12 +967,12 @@ class D750X():
 
     def _lhlt_addr(self, opcode):
         #1100iiii HL <- [0xC0 + i]; 1; 2
-        self._HL = self._ROM.getByte(0xC0 | (opcode & 0xF))
+        self._HL = self._ROM.get_byte(0xC0 | (opcode & 0xF))
         cycles = MCLOCK_DIV2
-        opcode = self._ROM.getByte(self._PC)
+        opcode = self._ROM.get_byte(self._PC)
         while (opcode == 0b01001110 or (opcode >> 4) == 0b1100):
             cycles += self._skip_next()
-            opcode = self._ROM.getByte(self._PC)
+            opcode = self._ROM.get_byte(self._PC)
         return cycles
 
     def _calt_addr(self, opcode):
@@ -965,6 +982,6 @@ class D750X():
         self._RAM[(self._SP - 3) & 0xFF] = (self._SK << 2) | self._CF 
         self._SP = (self._SP - 4) & 0xFF
         self._RAM[self._SP] = (self._PC >> 8) & 0xF
-        tdata = self._ROM.getByte(opcode)
+        tdata = self._ROM.get_byte(opcode)
         self._PC = ((tdata << 2) & 0x380) | (tdata & 0x1F)
         return MCLOCK_DIV2

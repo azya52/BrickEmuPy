@@ -3,34 +3,47 @@
 	"core": "MSM50XX",
 	"face_path": "./assets/formel1.svg",
 	"clock": 32768,
-	
+
 	"buttons": {
 		"btnLeft": {
-			"port": "PK",
-			"pin": 0,
-			"level": 1,
 			"hot_keys": [65, 16777234, 49]
 		},
 		"btnGame": {
-			"port": "PS",
-			"pin": 1,
-			"level": 1,
 			"hot_keys": [32, 50]
 		},
 		"btnSet": {
-			"port": "PS",
-			"pin": 2,
-			"level": 1,
 			"hot_keys": [16777220, 51]
 		},
 		"btnRight": {
-			"port": "PS",
-			"pin": 3,
-			"level": 1,
 			"hot_keys": [68, 16777236, 52]
 		}
 	},
 	
+	"peripherals": {
+		"direct_input": {
+			"btnLeft": {
+				"port": "PK",
+				"mask": 1,
+				"level": 1
+			},
+			"btnGame": {
+				"port": "PS",
+				"mask": 2,
+				"level": 1
+			},
+			"btnSet": {
+				"port": "PS",
+				"mask": 4,
+				"level": 1
+			},
+			"btnRight": {
+				"port": "PS",
+				"mask": 8,
+				"level": 1
+			}
+		}
+	},
+
 	"mask_options": {
 		"rom_path": "./assets/formel1.bin",
 		"sound_freq_div_tbl": [0, 4, 8, 16]

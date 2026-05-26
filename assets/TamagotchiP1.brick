@@ -6,22 +6,33 @@
 	
 	"buttons": {
 		"btnLeft": {
-			"port": "K0",
-			"pin": 2,
-			"level": 0,
 			"hot_keys": [49]
 		},
 		"btnCenter": {
-			"port": "K0",
-			"pin": 1,
-			"level": 0,
 			"hot_keys": [50]
 		},
 		"btnRight": {
-			"port": "K0",
-			"pin": 0,
-			"level": 0,
 			"hot_keys": [51]
+		}
+	},
+	
+	"peripherals": {
+		"direct_input": {
+			"btnLeft": {
+				"port": "K0",
+				"mask": 2,
+				"level": 0
+			},
+			"btnCenter": {
+				"port": "K0",
+				"mask": 1,
+				"level": 0
+			},
+			"btnRight": {
+				"port": "K0",
+				"mask": 0,
+				"level": 0
+			}
 		}
 	},
 	

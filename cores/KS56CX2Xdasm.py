@@ -1,6 +1,6 @@
 class KS56CX2Xdasm():
 
-    def __init__(self):
+    def __init__(self, roots=None):
         self._base = '0x%X'
         self._nibbase = '0x%0.1X'
         self._bytebase = '0x%0.2X'
@@ -404,22 +404,22 @@ class KS56CX2Xdasm():
     def disassemble(self, rom):
         if (rom.size() > 0):
             listing = [None] * rom.size()
-            vector = rom.getWord(0) & 0x3FFF
+            vector = rom.get_word(0) & 0x3FFF
             listing = self._disassemble(vector, listing, rom)
-            vector = rom.getWord(2) & 0x3FFF
+            vector = rom.get_word(2) & 0x3FFF
             listing = self._disassemble(vector, listing, rom)
-            vector = rom.getWord(4) & 0x3FFF
+            vector = rom.get_word(4) & 0x3FFF
             listing = self._disassemble(vector, listing, rom)
-            vector = rom.getWord(6) & 0x3FFF
+            vector = rom.get_word(6) & 0x3FFF
             listing = self._disassemble(vector, listing, rom)
-            vector = rom.getWord(8) & 0x3FFF
+            vector = rom.get_word(8) & 0x3FFF
             listing = self._disassemble(vector, listing, rom)
-            vector = rom.getWord(10) & 0x3FFF
+            vector = rom.get_word(10) & 0x3FFF
             listing = self._disassemble(vector, listing, rom)
 
             for i in range(len(listing)):
                 if (listing[i] is None):
-                    byte = rom.getByte(i)
+                    byte = rom.get_byte(i)
                     listing[i] = (1, byte, 'db ' + self._bytebase % byte)
                 listing[i] = (self._opbase % listing[i][1], listing[i][2])
             
@@ -438,13 +438,13 @@ class KS56CX2Xdasm():
     
     def _disassemble(self, pc, listing, rom):
         while (pc < len(listing) and listing[pc] is None):
-            opcode = rom.getByte(pc)
+            opcode = rom.get_byte(pc)
             next_pcs, listing[pc] = self._instruction_tbl[opcode](self, pc, opcode, rom)
             instruction_size = listing[pc][0]
             while (instruction_size > 1  and (pc + 1) < len(listing)):
                 instruction_size -= 1
                 pc += 1
-                listing[pc] = (1, rom.getByte(pc), '')
+                listing[pc] = (1, rom.get_byte(pc), '')
             pc = next_pcs[0]
             if (len(next_pcs) > 1):
                 listing = self._disassemble(next_pcs[1], listing, rom)
@@ -452,72 +452,72 @@ class KS56CX2Xdasm():
 
     def _instruction_10101011(self, pc, opcode, rom):
         #10101011
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         return self._instruction_10101011_tbl[(op >> 6) & 0x1](self, pc, opcode, rom)
 
     def _instruction_10011001(self, pc, opcode, rom):
         #10011001
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         return self._instruction_10011001_tbl[op & 0x7F](self, pc, opcode, rom)
         
     def _instruction_10011010(self, pc, opcode, rom):
         #10011010
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         return self._instruction_10011010_tbl[(op >> 3) & 0x1](self, pc, opcode, rom)
 
     def _instruction_10011011(self, pc, opcode, rom):
         #10011011
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         return self._instruction_10011011_tbl[(op >> 6) & 0x3](self, pc, opcode, rom)
 
     def _instruction_10011100(self, pc, opcode, rom):
         #10011100
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         return self._instruction_10011100_tbl[(op >> 6) & 0x3](self, pc, opcode, rom)
 
     def _instruction_10011101(self, pc, opcode, rom):
         #10011101
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         return self._instruction_10011101_tbl[(op >> 6) & 0x3](self, pc, opcode, rom)
 
     def _instruction_10011111(self, pc, opcode, rom):
         #10011111
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         return self._instruction_10011111_tbl[(op >> 6) & 0x3](self, pc, opcode, rom)
 
     def _instruction_10101010(self, pc, opcode, rom):
         #10101010
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         return self._instruction_10101010_tbl[op](self, pc, opcode, rom)
 
     def _instruction_10101100(self, pc, opcode, rom):
         #10101100
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         return self._instruction_10101100_tbl[(op >> 6) & 0x3](self, pc, opcode, rom)
 
     def _instruction_10101110(self, pc, opcode, rom):
         #10101110
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         return self._instruction_10101110_tbl[(op >> 6) & 0x3](self, pc, opcode, rom)
     
     def _instruction_10111100(self, pc, opcode, rom):
         #10111100
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         return self._instruction_10111100_tbl[(op >> 6) & 0x3](self, pc, opcode, rom)
 
     def _instruction_10111101(self, pc, opcode, rom):
         #10111101
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         return self._instruction_10111101_tbl[(op >> 6) & 0x3](self, pc, opcode, rom)
 
     def _instruction_10111110(self, pc, opcode, rom):
         #10111110
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         return self._instruction_10111110_tbl[(op >> 6) & 0x3](self, pc, opcode, rom)
 
     def _instruction_10111111(self, pc, opcode, rom):
         #10111111
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         return self._instruction_10111111_tbl[(op >> 6) & 0x3](self, pc, opcode, rom)
 
     def _br_raddr(self, pc, opcode, rom):
@@ -537,7 +537,7 @@ class KS56CX2Xdasm():
 
     def _callf_faddr(self, pc, opcode, rom):
         #01000 A10 A9 A8 | A7 A6 A5 A4 A3 A2 A1 A0
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         a = ((opcode & 0x7) << 8) | op
         return (pc + 2, a), (2, (opcode << 8) | op, "callf " + self._addrbase % a)
 
@@ -575,7 +575,7 @@ class KS56CX2Xdasm():
 
     def _brcb_caddr(self, pc, opcode, rom):
         #0101 A11 A10 A9 A8 | A7 A6 A5 A4 A3 A2 A1 A0
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         a = (pc & 0xF000) | ((opcode & 0xF) << 8) | op
         return (pc + 2, a), (2, (opcode << 8) | op, "brcb " + self._addrbase % a)
 
@@ -595,32 +595,32 @@ class KS56CX2Xdasm():
 
     def _incs_mem(self, pc, opcode, rom):
         #10000010 | D7 D6 D5 D4 D3 D2 D1 D0
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         return (pc + 2,), (2, (opcode << 8) | op, "incs RAM[" + self._nibbase % op + "]")
 
     def _clr1_mem0(self, pc, opcode, rom):
         #10000100 | D7 D6 D5 D4 D3 D2 D1 D0
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         return (pc + 2,), (2, (opcode << 8) | op, "clr1 RAM[" + self._nibbase % op + "].0")
 
     def _set1_mem0(self, pc, opcode, rom):
         #10000101 | D7 D6 D5 D4 D3 D2 D1 D0
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         return (pc + 2,), (2, (opcode << 8) | op, "set1 RAM[" + self._nibbase % op + "].0")
 
     def _skf_mem0(self, pc, opcode, rom):
         #10000110 | D7 D6 D5 D4 D3 D2 D1 D0
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         return (pc + 2,), (2, (opcode << 8) | op, "skf RAM[" + self._nibbase % op + "].0")
 
     def _skt_mem0(self, pc, opcode, rom):
         #10000111 | D7 D6 D5 D4 D3 D2 D1 D0
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         return (pc + 2,), (2, (opcode << 8) | op, "skt RAM[" + self._nibbase % op + "].0")
 
     def _mov_xa_n8(self, pc, opcode, rom):
         #10001001 | I7 I6 I5 I4 I3 I2 I1 I0
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         return (pc + 2,), (2, (opcode << 8) | op, "mov XA, " + self._bytebase % op)
 
     def _incs_hl(self, pc, opcode, rom):
@@ -629,7 +629,7 @@ class KS56CX2Xdasm():
 
     def _mov_hl_n8(self, pc, opcode, rom):
         #10001011 | I7 I6 I5 I4 I3 I2 I1 I0
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         return (pc + 2,), (2, (opcode << 8) | op, "mov HL, " + self._bytebase % op)
         
     def _incs_de(self, pc, opcode, rom):
@@ -638,7 +638,7 @@ class KS56CX2Xdasm():
 
     def _mov_de_n8(self, pc, opcode, rom):
         #10001101 | I7 I6 I5 I4 I3 I2 I1 I0
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         return (pc + 2,), (2, (opcode << 8) | op, "mov DE, " + self._bytebase % op)
 
     def _incs_bc(self, pc, opcode, rom):
@@ -647,7 +647,7 @@ class KS56CX2Xdasm():
 
     def _mov_bc_n8(self, pc, opcode, rom):
         #10001111 | I7 I6 I5 I4 I3 I2 I1 I0
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         return (pc + 2,), (2, (opcode << 8) | op, "mov BC, " + self._bytebase % op)
 
     def _and_a_ahl(self, pc, opcode, rom):
@@ -656,32 +656,32 @@ class KS56CX2Xdasm():
 
     def _mov_mem_xa(self, pc, opcode, rom):
         #10010010 | D7 D6 D5 D4 D3 D2 D1 0
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         return (pc + 2,), (2, (opcode << 8) | op, "mov RAM[" + self._bytebase % op + "], XA")
 
     def _mov_mem_a(self, pc, opcode, rom):
         #10010011 | D7 D6 D5 D4 D3 D2 D1 D0
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         return (pc + 2,), (2, (opcode << 8) | op, "mov RAM[" + self._bytebase % op + "], A")
 
     def _clr1_mem1(self, pc, opcode, rom):
         #10010100 | D7 D6 D5 D4 D3 D2 D1 D0
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         return (pc + 2,), (2, (opcode << 8) | op, "clr1 RAM[" + self._bytebase % op + "].1")
 
     def _set1_mem1(self, pc, opcode, rom):
         #10010101 | D7 D6 D5 D4 D3 D2 D1 D0
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         return (pc + 2,), (2, (opcode << 8) | op, "set1 RAM[" + self._bytebase % op + "].1")
 
     def _skf_mem1(self, pc, opcode, rom):
         #10010110 | D7 D6 D5 D4 D3 D2 D1 D0
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         return (pc + 2,), (2, (opcode << 8) | op, "skf RAM[" + self._bytebase % op + "].1")
 
     def _skt_mem1(self, pc, opcode, rom):
         #10010111 | D7 D6 D5 D4 D3 D2 D1 D0
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         return (pc + 2,), (2, (opcode << 8) | op, "skt RAM[" + self._bytebase % op + "].1")
 
     def _rorc_a(self, pc, opcode, rom):
@@ -694,32 +694,32 @@ class KS56CX2Xdasm():
 
     def _mov_xa_mem(self, pc, opcode, rom):
         #10100010 | D7 D6 D5 D4 D3 D2 D1 0
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         return (pc + 2,), (2, (opcode << 8) | op, "mov XA, RAM[" + self._bytebase % op + "]")
 
     def _mov_a_mem(self, pc, opcode, rom):
         #10100011 | D7 D6 D5 D4 D3 D2 D1 D0
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         return (pc + 2,), (2, (opcode << 8) | op, "mov A, RAM[" + self._bytebase % op + "]")
 
     def _clr1_mem2(self, pc, opcode, rom):
         #10100100 | D7 D6 D5 D4 D3 D2 D1 D0
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         return (pc + 2,), (2, (opcode << 8) | op, "clr1 RAM[" + self._bytebase % op + "].2")
 
     def _set1_mem2(self, pc, opcode, rom):
         #10100101 | D7 D6 D5 D4 D3 D2 D1 D0
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         return (pc + 2,), (2, (opcode << 8) | op, "set1 RAM[" + self._bytebase % op + "].2")
 
     def _skf_mem2(self, pc, opcode, rom):
         #10100110 | D7 D6 D5 D4 D3 D2 D1 D0
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         return (pc + 2,), (2, (opcode << 8) | op, "skf RAM[" + self._bytebase % op + "].2")
 
     def _skt_mem2(self, pc, opcode, rom):
         #10100111 | D7 D6 D5 D4 D3 D2 D1 D0
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         return (pc + 2,), (2, (opcode << 8) | op, "skt RAM[" + self._bytebase % op + "].2")
 
     def _subs_a_ahl(self, pc, opcode, rom):
@@ -732,12 +732,12 @@ class KS56CX2Xdasm():
 
     def _br_addr(self, pc, opcode, rom):
         #10101011 | 00 A13 A12 A11 A10 A9 A8 | A7 A6 A5 A4 A3 A2 A1 A0
-        a = rom.getWord(pc + 1)
+        a = rom.get_word(pc + 1)
         return (pc + 3, a), (3, (opcode << 16) | a, "br " + self._addrbase % a)
 
     def _call_addr(self, pc, opcode, rom):
         #10101011 | 01 A13 A12 A11 A10 A9 A8 | A7 A6 A5 A4 A3 A2 A1 A0
-        a = rom.getWord(pc + 1) & 0x3FFF
+        a = rom.get_word(pc + 1) & 0x3FFF
         return (pc + 3, a), (3, (opcode << 16) | a, "call " + self._addrbase % a)
 
     def _xor_a_ahl(self, pc, opcode, rom):
@@ -746,32 +746,32 @@ class KS56CX2Xdasm():
 
     def _xch_xa_mem(self, pc, opcode, rom):
         #10110010 | D7 D6 D5 D4 D3 D2 D1 0
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         return (pc + 2,), (2, (opcode << 8) | op, "xch XA, RAM[" + self._bytebase % op + "]")
 
     def _xch_a_mem(self, pc, opcode, rom):
         #10110011 | D7 D6 D5 D4 D3 D2 D1 D0
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         return (pc + 2,), (2, (opcode << 8) | op, "xch A, RAM[" + self._bytebase % op + "]")
 
     def _clr1_mem3(self, pc, opcode, rom):
         #10110100 | D7 D6 D5 D4 D3 D2 D1 D0
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         return (pc + 2,), (2, (opcode << 8) | op, "clr1 RAM[" + self._bytebase % op + "].3")
 
     def _set1_mem3(self, pc, opcode, rom):
         #10110101 | D7 D6 D5 D4 D3 D2 D1 D0
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         return (pc + 2,), (2, (opcode << 8) | op, "set1 RAM[" + self._bytebase % op + "].3")
 
     def _skf_mem3(self, pc, opcode, rom):
         #10110110 | D7 D6 D5 D4 D3 D2 D1 D0
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         return (pc + 2,), (2, (opcode << 8) | op, "skf RAM[" + self._bytebase % op + "].3")
 
     def _skt_mem3(self, pc, opcode, rom):
         #10110111 | D7 D6 D5 D4 D3 D2 D1 D0
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         return (pc + 2,), (2, (opcode << 8) | op, "skt RAM[" + self._bytebase % op + "].3")
 
     def _subc_a_ahl(self, pc, opcode, rom):
@@ -780,7 +780,7 @@ class KS56CX2Xdasm():
 
     def _adds_xa_n8(self, pc, opcode, rom):
         #10111001 | I7 I6 I5 I4 I3 I2 I1 I0
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         return (pc + 2,), (2, (opcode << 8) | op, "adds XA, " + self._bytebase % op)
 
     def _incs_reg(self, pc, opcode, rom):
@@ -920,89 +920,89 @@ class KS56CX2Xdasm():
 
     def _ske_a_reg(self, pc, opcode, rom):
         #10011001 | 00001 R2 R1 R0
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         r = op & 0x7
         return (pc + 2,), (2, (opcode << 8) | op, "ske A, " + self._reg_tbl[r])
 
     def _sel_mbn(self, pc, opcode, rom):
         #10011001 | 0001 N3 N2 N1 N0
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         n = op & 0xF
         return (pc + 2,), (2, (opcode << 8) | op, "sel MB" + str(n))
 
     def _sel_rbn(self, pc, opcode, rom):
         #10011001 | 001000 N1 N0
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         n = op & 0x3
         return (pc + 2,), (2, (opcode << 8) | op, "sel RB" + str(n))
 
     def _and_a_n4(self, pc, opcode, rom):
         #10011001 | 0011 I3 I2 I1 I0
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         i = op & 0xF
         return (pc + 2,), (2, (opcode << 8) | op, "and A, " + self._nibbase % i)
 
     def _or_a_n4(self, pc, opcode, rom):
         #10011001 | 0100 I3 I2 I1 I0
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         i = op & 0xF
         return (pc + 2,), (2, (opcode << 8) | op, "or A, " + self._nibbase % i)
 
     def _xor_a_n4(self, pc, opcode, rom):
         #10011001 | 0101 I3 I2 I1 I0
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         i = op & 0xF
         return (pc + 2,), (2, (opcode << 8) | op, "xor A, " + self._nibbase % i)
 
     def _ske_ahl_n4(self, pc, opcode, rom):
         #10011001 | 0110 I3 I2 I1 I0
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         i = op & 0xF
         return (pc + 2,), (2, (opcode << 8) | op, "ske @HL, " + self._nibbase % i)
 
     def _mov_reg1_a(self, pc, opcode, rom):
         #10011001 | 01110 R2 R1 R0
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         r = op & 0x7
         return (pc + 2,), (2, (opcode << 8) | op, "mov " + self._reg_tbl[r] + ", A")
 
     def _mov_a_reg(self, pc, opcode, rom):
         #10011001 | 01111 R2 R1 R0
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         r = op & 0x7
         return (pc + 2,), (2, (opcode << 8) | op, "mov A, " + self._reg_tbl[r])
 
     def _ske_reg_n4(self, pc, opcode, rom):
         #10011010 | I3 I2 I1 I0 0 R2 R1 R0
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         r = op & 0x7
         i = (op >> 4) & 0xF
         return (pc + 2,), (2, (opcode << 8) | op, "ske " + self._reg_tbl[r] + ", " + self._nibbase % i)
 
     def _mov_reg1_n4(self, pc, opcode, rom):
         #10011010 | I3 I2 I1 I0 1 R2 R1 R0
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         r = op & 0x7
         i = (op >> 4) & 0xF
         return (pc + 2,), (2, (opcode << 8) | op, "mov " + self._reg_tbl[r] + ", " + self._nibbase % i)
 
     def _mov1_hmembit_cy(self, pc, opcode, rom):
         #10011011 | 00 B1 B0 D3 D2 D1 D0
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         d = op & 0xF
         b = (op >> 4) & 0x3
         return (pc + 2,), (2, (opcode << 8) | op, "mov1 RAM[@H + " + self._nibbase % d + "]." + str(b) + ", CY")
 
     def _mov1_pmeml_cy(self, pc, opcode, rom):
         #10011011 | 0100 G3 G2 G1 G0
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         g = op & 0xF
         pmem =  0xFC0 + (g << 2)
         return (pc + 2,), (2, (opcode << 8) | op, "mov1 RAM[" + self._rambase % pmem + " + @L3-2].@L1-0, CY")
 
     def _mov1_fmembit_cy(self, pc, opcode, rom):
         #10011011 | 1 X B1 B0 F3 F2 F1 F0
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         b = (op >> 4) & 0x3
         fmem = 0xFB0 | (op & 0b01001111)
         if (fmem in self._io_tbl):
@@ -1012,21 +1012,21 @@ class KS56CX2Xdasm():
 
     def _clr1_hmembit(self, pc, opcode, rom):
         #10011100 | 00 B1 B0 D3 D2 D1 D0
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         d = op & 0xF
         b = (op >> 4) & 0x3
         return (pc + 2,), (2, (opcode << 8) | op, "clr1 RAM[@H + " + self._nibbase % d + "]." + str(b))
 
     def _clr1_pmeml(self, pc, opcode, rom):
         #10011100 | 0100 G3 G2 G1 G0
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         g = op & 0xF
         pmem =  0xFC0 + (g << 2)
         return (pc + 2,), (2, (opcode << 8) | op, "clr1 RAM[" + self._rambase % pmem + " + @L3-2].@L1-0")
 
     def _clr1_fmembit(self, pc, opcode, rom):
         #10011100 | 1 X B1 B0 F3 F2 F1 F0
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         b = (op >> 4) & 0x3
         fmem = 0xFB0 | (op & 0b01001111)
         if (op in self._clr_fmem_tbl):
@@ -1038,21 +1038,21 @@ class KS56CX2Xdasm():
 
     def _set1_hmembit(self, pc, opcode, rom):
         #10011101 | 00 B1 B0 D3 D2 D1 D0
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         d = op & 0xF
         b = (op >> 4) & 0x3
         return (pc + 2,), (2, (opcode << 8) | op, "set1 RAM[@H + " + self._nibbase % d + "]." + str(b))
 
     def _set1_pmeml(self, pc, opcode, rom):
         #10011101 | 0100 G3 G2 G1 G0
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         g = op & 0xF
         pmem =  0xFC0 + (g << 2)
         return (pc + 2,), (2, (opcode << 8) | op, "set1 RAM[" + self._rambase % pmem + " + @L3-2].@L1-0")
 
     def _set1_fmembit(self, pc, opcode, rom):
         #10011101 | 1 X B1 B0 F3 F2 F1 F0
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         b = (op >> 4) & 0x3
         fmem = 0xFB0 | (op & 0b01001111)
         if (op in self._set_fmem_tbl):
@@ -1064,21 +1064,21 @@ class KS56CX2Xdasm():
 
     def _sktclr_hmembit(self, pc, opcode, rom):
         #10011111 | 00 B1 B0 D3 D2 D1 D0
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         d = op & 0xF
         b = (op >> 4) & 0x3
         return (pc + 2,), (2, (opcode << 8) | op, "sktclr RAM[@H + " + self._nibbase % d + "]." + str(b))
 
     def _sktclr_pmeml(self, pc, opcode, rom):
         #10011111 | 0100 G3 G2 G1 G0
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         g = op & 0xF
         pmem =  0xFC0 + (g << 2)
         return (pc + 2,), (2, (opcode << 8) | op, "sktclr RAM[" + self._rambase % pmem + " + @L3-2].@L1-0")
 
     def _sktclr_fmembit(self, pc, opcode, rom):
         #10011111 | 1 X B1 B0 F3 F2 F1 F0
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         b = (op >> 4) & 0x3
         fmem = 0xFB0 | (op & 0b01001111)
         if (fmem in self._io_tbl):
@@ -1104,135 +1104,135 @@ class KS56CX2Xdasm():
 
     def _xch_xa_rpe(self, pc, opcode, rom):
         #10101010 | 01000 P2 P1 P0
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         p = op & 0x7
         return (pc + 2,), (2, (opcode << 8) | op, "xch XA, " + self._rpe_tbl[p])
 
     def _ske_xa_rpe(self, pc, opcode, rom):
         #10101010 | 01001 P2 P1 P0
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         p = op & 0x7
         return (pc + 2,), (2, (opcode << 8) | op, "ske XA, " + self._rpe_tbl[p])
 
     def _mov_rpe1_xa(self, pc, opcode, rom):
         #10101010 | 01010 P2 P1 P0
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         p = op & 0x7
         return (pc + 2,), (2, (opcode << 8) | op, "mov " + self._rpe_tbl[p] + ", XA")
 
     def _mov_xa_rpe(self, pc, opcode, rom):
         #10101010 | 01011 P2 P1 P0
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         p = op & 0x7
         return (pc + 2,), (2, (opcode << 8) | op, "mov XA, " + self._rpe_tbl[p])
 
     def _decs_rpe(self, pc, opcode, rom):
         #10101010 | 01101 P2 P1 P0
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         p = op & 0x7
         return (pc + 2,), (2, (opcode << 8) | op, "decs " + self._rpe_tbl[p])
 
     def _and_rpe1_xa(self, pc, opcode, rom):
         #10101010 | 10010 P2 P1 P0
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         p = op & 0x7
         return (pc + 2,), (2, (opcode << 8) | op, "and " + self._rpe_tbl[p] + ", XA")
 
     def _and_xa_rpe(self, pc, opcode, rom):
         #10101010 | 10011 P2 P1 P0
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         p = op & 0x7
         return (pc + 2,), (2, (opcode << 8) | op, "and XA, " + self._rpe_tbl[p])
 
     def _or_rpe1_xa(self, pc, opcode, rom):
         #10101010 | 10100 P2 P1 P0
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         p = op & 0x7
         return (pc + 2,), (2, (opcode << 8) | op, "or " + self._rpe_tbl[p] + ", XA")
 
     def _or_xa_rpe(self, pc, opcode, rom):
         #10101010 | 10101 P2 P1 P0
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         p = op & 0x7
         return (pc + 2,), (2, (opcode << 8) | op, "or XA, " + self._rpe_tbl[p])
 
     def _xor_rpe1_xa(self, pc, opcode, rom):
         #10101010 | 10110 P2 P1 P0
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         p = op & 0x7
         return (pc + 2,), (2, (opcode << 8) | op, "xor " + self._rpe_tbl[p] + ", XA")
 
     def _xor_xa_rpe(self, pc, opcode, rom):
         #10101010 | 10111 P2 P1 P0
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         p = op & 0x7
         return (pc + 2,), (2, (opcode << 8) | op, "xor XA, " + self._rpe_tbl[p])
 
     def _adds_rpe1_xa(self, pc, opcode, rom):
         #10101010 | 11000 P2 P1 P0
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         p = op & 0x7
         return (pc + 2,), (2, (opcode << 8) | op, "adds " + self._rpe_tbl[p] + ", XA")
 
     def _adds_xa_rpe(self, pc, opcode, rom):
         #10101010 | 11001 P2 P1 P0
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         p = op & 0x7
         return (pc + 2,), (2, (opcode << 8) | op, "adds XA, " + self._rpe_tbl[p])
 
     def _addc_rpe1_xa(self, pc, opcode, rom):
         #10101010 | 11010 P2 P1 P0
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         p = op & 0x7
         return (pc + 2,), (2, (opcode << 8) | op, "addc " + self._rpe_tbl[p] + ", XA")
 
     def _addc_xa_rpe(self, pc, opcode, rom):
         #10101010 | 11011 P2 P1 P0
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         p = op & 0x7
         return (pc + 2,), (2, (opcode << 8) | op, "addc XA, " + self._rpe_tbl[p])
 
     def _subs_rpe1_xa(self, pc, opcode, rom):
         #10101010 | 11100 P2 P1 P0
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         p = op & 0x7
         return (pc + 2,), (2, (opcode << 8) | op, "subs " + self._rpe_tbl[p] + ", XA")
 
     def _subs_xa_rpe(self, pc, opcode, rom):
         #10101010 | 11101 P2 P1 P0
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         p = op & 0x7
         return (pc + 2,), (2, (opcode << 8) | op, "subs XA, " + self._rpe_tbl[p])
 
     def _subc_rpe1_xa(self, pc, opcode, rom):
         #10101010 | 11110 P2 P1 P0
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         p = op & 0x7
         return (pc + 2,), (2, (opcode << 8) | op, "subc " + self._rpe_tbl[p] + ", XA")
 
     def _subc_xa_rpe(self, pc, opcode, rom):
         #10101010 | 11111 P2 P1 P0
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         p = op & 0x7
         return (pc + 2,), (2, (opcode << 8) | op, "subc XA, " + self._rpe_tbl[p])
 
     def _and1_cy_hmembit(self, pc, opcode, rom):
         #10101100 | 00 B1 B0 D3 D2 D1 D0
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         d = op & 0xF
         b = (op >> 4) & 0x3
         return (pc + 2,), (2, (opcode << 8) | op, "and1 CY, RAM[@H + " + self._nibbase % d + "]." + str(b))
 
     def _and1_cy_pmeml(self, pc, opcode, rom):
         #10101100 | 0100 G3 G2 G1 G0
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         g = op & 0xF
         pmem =  0xFC0 + (g << 2)
         return (pc + 2,), (2, (opcode << 8) | op, "and1 CY, RAM[" + self._rambase % pmem + " + @L3-2].@L1-0")
 
     def _and1_cy_fmembit(self, pc, opcode, rom):
         #10101100 | 1 X B1 B0 F3 F2 F1 F0
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         b = (op >> 4) & 0x3
         fmem = 0xFB0 | (op & 0b01001111)
         if (fmem in self._io_tbl):
@@ -1242,21 +1242,21 @@ class KS56CX2Xdasm():
 
     def _or1_cy_hmembit(self, pc, opcode, rom):
         #10101110 | 00 B1 B0 D3 D2 D1 D0
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         d = op & 0xF
         b = (op >> 4) & 0x3
         return (pc + 2,), (2, (opcode << 8) | op, "or1 CY, RAM[@H + " + self._nibbase % d + "]." + str(b))
 
     def _or1_cy_pmeml(self, pc, opcode, rom):
         #10101110 | 0100 G3 G2 G1 G0
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         g = op & 0xF
         pmem =  0xFC0 + (g << 2)
         return (pc + 2,), (2, (opcode << 8) | op, "or1 CY, RAM[" + self._rambase % pmem + " + @L3-2].@L1-0")
 
     def _or1_cy_fmembit(self, pc, opcode, rom):
         #10101110 | 1 X B1 B0 F3 F2 F1 F0
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         b = (op >> 4) & 0x3
         fmem = 0xFB0 | (op & 0b01001111)
         if (fmem in self._io_tbl):
@@ -1266,21 +1266,21 @@ class KS56CX2Xdasm():
 
     def _xor1_cy_hmembit(self, pc, opcode, rom):
         #10111100 | 00 B1 B0 D3 D2 D1 D0
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         d = op & 0xF
         b = (op >> 4) & 0x3
         return (pc + 2,), (2, (opcode << 8) | op, "xor1 CY, RAM[@H + " + self._nibbase % d + "]." + str(b))
 
     def _xor1_cy_pmeml(self, pc, opcode, rom):
         #10111100 | 0100 G3 G2 G1 G0
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         g = op & 0xF
         pmem =  0xFC0 + (g << 2)
         return (pc + 2,), (2, (opcode << 8) | op, "xor1 CY, RAM[" + self._rambase % pmem + " + @L3-2].@L1-0")
 
     def _xor1_cy_fmembit(self, pc, opcode, rom):
         #10111100 | 1 X B1 B0 F3 F2 F1 F0
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         b = (op >> 4) & 0x3
         fmem = 0xFB0 | (op & 0b01001111)
         if (fmem in self._io_tbl):
@@ -1290,21 +1290,21 @@ class KS56CX2Xdasm():
 
     def _mov1_cy_hmembit(self, pc, opcode, rom):
         #10111101 | 00 B1 B0 D3 D2 D1 D0
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         d = op & 0xF
         b = (op >> 4) & 0x3
         return (pc + 2,), (2, (opcode << 8) | op, "mov1 CY, RAM[@H + " + self._nibbase % d + "]." + str(b))
 
     def _mov1_cy_pmeml(self, pc, opcode, rom):
         #10111101 | 0100 G3 G2 G1 G0
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         g = op & 0xF
         pmem =  0xFC0 + (g << 2)
         return (pc + 2,), (2, (opcode << 8) | op, "mov1 CY, RAM[" + self._rambase % pmem + " + @L3-2].@L1-0")
 
     def _mov1_cy_fmembit(self, pc, opcode, rom):
         #10111101 | 1 X B1 B0 F3 F2 F1 F0
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         b = (op >> 4) & 0x3
         fmem = 0xFB0 | (op & 0b01001111)
         if (fmem in self._io_tbl):
@@ -1314,21 +1314,21 @@ class KS56CX2Xdasm():
 
     def _skf_hmembit(self, pc, opcode, rom):
         #10111110 | 00 B1 B0 D3 D2 D1 D0
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         d = op & 0xF
         b = (op >> 4) & 0x3
         return (pc + 2,), (2, (opcode << 8) | op, "skf RAM[@H + " + self._nibbase % d + "]." + str(b))
 
     def _skf_pmeml(self, pc, opcode, rom):
         #10111110 | 0100 G3 G2 G1 G0
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         g = op & 0xF
         pmem =  0xFC0 + (g << 2)
         return (pc + 2,), (2, (opcode << 8) | op, "skf RAM[" + self._rambase % pmem + " + @L3-2].@L1-0")
 
     def _skf_fmembit(self, pc, opcode, rom):
         #10111110 | 1 X B1 B0 F3 F2 F1 F0
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         b = (op >> 4) & 0x3
         fmem = 0xFB0 | (op & 0b01001111)
         if (fmem in self._io_tbl):
@@ -1338,21 +1338,21 @@ class KS56CX2Xdasm():
 
     def _skt_hmembit(self, pc, opcode, rom):
         #10111111 | 00 B1 B0 D3 D2 D1 D0
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         d = op & 0xF
         b = (op >> 4) & 0x3
         return (pc + 2,), (2, (opcode << 8) | op, "skt RAM[@H + " + self._nibbase % d + "]." + str(b))
 
     def _skt_pmeml(self, pc, opcode, rom):
         #10111111 | 0100 G3 G2 G1 G0
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         g = op & 0xF
         pmem =  0xFC0 + (g << 2)
         return (pc + 2,), (2, (opcode << 8) | op, "skt RAM[" + self._rambase % pmem + " + @L3-2].@L1-0")
 
     def _skt_fmembit(self, pc, opcode, rom):
         #10111111 | 1 X B1 B0 F3 F2 F1 F0
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         b = (op >> 4) & 0x3
         fmem = 0xFB0 | (op & 0b01001111)
         if (fmem in self._io_tbl):

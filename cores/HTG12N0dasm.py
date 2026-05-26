@@ -2,8 +2,8 @@ from .HT4BITdasm import HT4BITdasm
 
 class HTG12N0dasm(HT4BITdasm):
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, roots=None):
+        super().__init__(roots)
 
         self._instructions = self._instructions_override({
             0b00110100: HTG12N0dasm._out_pc_a,

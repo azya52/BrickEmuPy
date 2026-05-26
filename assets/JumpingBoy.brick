@@ -7,49 +7,66 @@
 	
 	"buttons": {
 		"btnGameA": {
-			"port": "INP",
-			"pin": 0,
-			"level": {
-				"port": "OUTP",
-				"pin": 0
-			},
 			"hot_keys": [65, 16777234, 83, 16777237]
 		},
 		"btnGameB": {
-			"port": "INP",
-			"pin": 1,
-			"level": {
-				"port": "OUTP",
-				"pin": 0
-			},
 			"hot_keys": [68, 16777236, 87, 16777235]
 		},
 		"btnTime": {
-			"port": "INP",
-			"pin": 2,
-			"level": {
-				"port": "OUTP",
-				"pin": 0
-			},
 			"hot_keys": [84]
 		},
 		"btnAlarm": {
-			"port": "INP",
-			"pin": 3,
-			"level": {
-				"port": "OUTP",
-				"pin": 0
-			},
 			"hot_keys": [65]
 		},
 		"btnACL": {
-			"port": "RES",
-			"pin": 0,
-			"level": 1,
 			"hot_keys": [82]
 		}
 	},
 	
+	"peripherals": {
+		"matrix_input": {
+			"btnGameA": {
+				"port": "INP",
+				"mask": 1,
+				"level": {
+					"port": "OUTP",
+					"mask": 1
+				}
+			},
+			"btnGameB": {
+				"port": "INP",
+				"mask": 2,
+				"level": {
+					"port": "OUTP",
+					"mask": 1
+				}
+			},
+			"btnTime": {
+				"port": "INP",
+				"mask": 4,
+				"level": {
+					"port": "OUTP",
+					"mask": 1
+				}
+			},
+			"btnAlarm": {
+				"port": "INP",
+				"mask": 8,
+				"level": {
+					"port": "OUTP",
+					"mask": 1
+				}
+			}
+		},
+		"direct_input": {
+			"btnACL": {
+				"port": "RES",
+				"mask": 0,
+				"level": 1
+			}
+		}
+	},
+
 	"mask_options": {
 		"rom_path": "./assets/JumpingBoy.bin",
 		"prescaler_div": [2, 8, 32],

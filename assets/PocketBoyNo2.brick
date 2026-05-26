@@ -6,49 +6,68 @@
 	
 	"buttons": {
 		"btnLeft": {
-			"port": "PM",
-			"pin": 4,
-			"level": 1,
 			"hot_keys": [65, 16777234]
 		},
 		"btnRight": {
-			"port": "PM",
-			"pin": 2,
-			"level": 1,
 			"hot_keys": [68, 16777236]
 		},
 		"btnUp": {
-			"port": "PM",
-			"pin": 8,
-			"level": 1,
 			"hot_keys": [87, 16777235]
 		},
 		"btnDown": {
-			"port": "PM",
-			"pin": 1,
-			"level": 1,
 			"hot_keys": [83, 16777237]
 		},
 		"btnSound": {
-			"port": "PS",
-			"pin": 8,
-			"level": 1,
 			"hot_keys": [49, 77]
 		},
 		"btnMode": {
-			"port": "PS",
-			"pin": 4,
-			"level": 1,
 			"hot_keys": [50]
 		},
 		"btnStart": {
-			"port": "PS",
-			"pin": 3,
-			"level": 1,
 			"hot_keys": [51, 32]
 		}
 	},
 	
+	"peripherals": {
+		"direct_input": {
+			"btnLeft": {
+				"port": "PM",
+				"mask": 4,
+				"level": 1
+			},
+			"btnRight": {
+				"port": "PM",
+				"mask": 2,
+				"level": 1
+			},
+			"btnUp": {
+				"port": "PM",
+				"mask": 8,
+				"level": 1
+			},
+			"btnDown": {
+				"port": "PM",
+				"mask": 1,
+				"level": 1
+			},
+			"btnSound": {
+				"port": "PS",
+				"mask": 8,
+				"level": 1
+			},
+			"btnMode": {
+				"port": "PS",
+				"mask": 4,
+				"level": 1
+			},
+			"btnStart": {
+				"port": "PS",
+				"mask": 3,
+				"level": 1
+			}
+		}
+	},
+
 	"mask_options": {
 		"rom_path": "./assets/PocketBoyNo2.bin",
 		"sound_freq_tbl": [

@@ -6,28 +6,41 @@
 	
 	"buttons": {
 		"btnMode": {
-			"port": "K0",
-			"pin": 0,
-			"level": 0,
 			"hot_keys": [49]
 		},
 		"btnSelect": {
-			"port": "K0",
-			"pin": 1,
-			"level": 0,
 			"hot_keys": [50]
 		},
 		"btnSound": {
-			"port": "K0",
-			"pin": 2,
-			"level": 0,
 			"hot_keys": [51]
 		},
 		"btnHandle": {
-			"port": "K0",
-			"pin": 3,
-			"level": 0,
 			"hot_keys": [52, 32]
+		}
+	},
+
+	"peripherals": {
+		"direct_input": {
+			"btnMode": {
+				"port": "K0",
+				"mask": 0,
+				"level": 0
+			},
+			"btnSelect": {
+				"port": "K0",
+				"mask": 1,
+				"level": 0
+			},
+			"btnSound": {
+				"port": "K0",
+				"mask": 2,
+				"level": 0
+			},
+			"btnHandle": {
+				"port": "K0",
+				"mask": 3,
+				"level": 0
+			}
 		}
 	},
 	

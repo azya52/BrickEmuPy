@@ -7,9 +7,12 @@ EXTERNAL_INT_LOCATION = 8
 MCLOCK_DIV = 4
 
 class HT4BIT():
-    def __init__(self, mask, clock):
+    def __init__(self, mask, clock, interconnect):
         self._ROM = ROM(mask['rom_path'])
-        self._sound = HT4BITsound(mask, clock)
+        self._sound = HT4BITsound(mask, clock, interconnect)
+
+        self._interconnect = interconnect
+        self._interconnect.register_port_device(self)
 
         self._timer_div = mask['timer_clock_div']
 
@@ -167,7 +170,7 @@ class HT4BIT():
                     self._TF = 0
                     self._interrupt(TIMER_INT_LOCATION)
 
-            opcode = self._ROM.getByte(self._PC)
+            opcode = self._ROM.get_byte(self._PC)
             exec_cycles = self._execute[opcode](self, opcode)
 
             self._sound.clock(exec_cycles)
@@ -479,7 +482,7 @@ class HT4BIT():
         return 4
 
     def _add_a_x(self, opcode):
-        self._ACC += self._ROM.getByte(self._PC + 1) & 0xF
+        self._ACC += self._ROM.get_byte(self._PC + 1) & 0xF
         self._CF = self._ACC > 15
         self._ACC &= 0xF
         self._PC += 2
@@ -487,7 +490,7 @@ class HT4BIT():
         return 8
 
     def _sub_a_x(self, opcode):
-        self._ACC += (~self._ROM.getByte(self._PC + 1) & 0xF) + 1
+        self._ACC += (~self._ROM.get_byte(self._PC + 1) & 0xF) + 1
         self._CF = self._ACC > 15
         self._ACC &= 0xF
         self._PC += 2
@@ -495,37 +498,37 @@ class HT4BIT():
         return 8
 
     def _and_a_x(self, opcode):
-        self._ACC &= self._ROM.getByte(self._PC + 1) & 0xF
+        self._ACC &= self._ROM.get_byte(self._PC + 1) & 0xF
         self._PC += 2
 
         return 8
 
     def _xor_a_x(self, opcode):
-        self._ACC ^= self._ROM.getByte(self._PC + 1) & 0xF
+        self._ACC ^= self._ROM.get_byte(self._PC + 1) & 0xF
         self._PC += 2
 
         return 8
 
     def _or_a_x(self, opcode):
-        self._ACC |= self._ROM.getByte(self._PC + 1) & 0xF
+        self._ACC |= self._ROM.get_byte(self._PC + 1) & 0xF
         self._PC += 2
 
         return 8
 
     def _sound_n(self, opcode):
-        self._sound.set_sound_channel(self._ROM.getByte(self._PC + 1) & 0xF)
+        self._sound.set_sound_channel(self._ROM.get_byte(self._PC + 1) & 0xF)
         self._PC += 2
 
         return 8
 
     def _mov_r4_x(self, opcode):
-        self._WR[4] = self._ROM.getByte(self._PC + 1) & 0xF
+        self._WR[4] = self._ROM.get_byte(self._PC + 1) & 0xF
         self._PC += 2
 
         return 8
 
     def _timer_xx(self, opcode):
-        self._TC = self._ROM.getByte(self._PC + 1)
+        self._TC = self._ROM.get_byte(self._PC + 1)
         self._PC += 2
 
         return 8
@@ -556,7 +559,7 @@ class HT4BIT():
 
     def _read_r4a(self, opcode):
         self._PC += 1
-        byte = self._ROM.getByte((self._PC & 0xFF00) | (self._ACC << 4) | self._read_RAM(0))
+        byte = self._ROM.get_byte((self._PC & 0xFF00) | (self._ACC << 4) | self._read_RAM(0))
         self._ACC = byte & 0xF
         self._WR[4] = (byte >> 4) & 0xF
 
@@ -564,7 +567,7 @@ class HT4BIT():
     
     def _readf_r4a(self, opcode):
         self._PC += 1
-        byte = self._ROM.getByte((self._PC & 0xF000) | 0xF00 | (self._ACC << 4) | self._read_RAM(0))
+        byte = self._ROM.get_byte((self._PC & 0xF000) | 0xF00 | (self._ACC << 4) | self._read_RAM(0))
         self._ACC = byte & 0xF
         self._WR[4] = (byte >> 4) & 0xF
 
@@ -572,7 +575,7 @@ class HT4BIT():
 
     def _read_mr0a(self, opcode):
         self._PC += 1
-        byte = self._ROM.getByte((self._PC & 0xFF00) | (self._ACC << 4) | self._WR[4])
+        byte = self._ROM.get_byte((self._PC & 0xFF00) | (self._ACC << 4) | self._WR[4])
         self._ACC = byte & 0xF
         self._write_RAM(0, (byte >> 4) & 0xF)
 
@@ -580,7 +583,7 @@ class HT4BIT():
 
     def _readf_mr0a(self, opcode):
         self._PC += 1
-        byte = self._ROM.getByte((self._PC & 0xF000) | 0xF00 | (self._ACC << 4) | self._WR[4])
+        byte = self._ROM.get_byte((self._PC & 0xF000) | 0xF00 | (self._ACC << 4) | self._WR[4])
         self._ACC = byte & 0xF
         self._write_RAM(0, (byte >> 4) & 0xF)
 
@@ -588,14 +591,14 @@ class HT4BIT():
 
     def _mov_r1r0_xx(self, opcode):
         self._WR[0] = opcode & 0xF
-        self._WR[1] = self._ROM.getByte(self._PC + 1) & 0xF
+        self._WR[1] = self._ROM.get_byte(self._PC + 1) & 0xF
         self._PC += 2
 
         return 8
 
     def _mov_r3r2_xx(self, opcode):
         self._WR[2] = opcode & 0xF
-        self._WR[3] = self._ROM.getByte(self._PC + 1) & 0xF
+        self._WR[3] = self._ROM.get_byte(self._PC + 1) & 0xF
         self._PC += 2
 
         return 8
@@ -607,7 +610,7 @@ class HT4BIT():
         return 4
 
     def _jan_address(self, opcode):
-        al = self._ROM.getByte(self._PC + 1)
+        al = self._ROM.get_byte(self._PC + 1)
         self._PC += 2
         if (self._ACC & (0x1 << ((opcode >> 3) & 0x3))):
             self._PC = (self._PC & 0xF800) | ((opcode & 0x7) << 8) | al
@@ -615,7 +618,7 @@ class HT4BIT():
         return 8
 
     def _jnz_R0_address(self, opcode):
-        al = self._ROM.getByte(self._PC + 1)
+        al = self._ROM.get_byte(self._PC + 1)
         self._PC += 2
         if (self._WR[0]):
             self._PC = (self._PC & 0xF800) | ((opcode & 0x7) << 8) | al
@@ -623,7 +626,7 @@ class HT4BIT():
         return 8
 
     def _jnz_R1_address(self, opcode):
-        al = self._ROM.getByte(self._PC + 1)
+        al = self._ROM.get_byte(self._PC + 1)
         self._PC += 2
         if (self._WR[1]):
             self._PC = (self._PC & 0xF800) | ((opcode & 0x7) << 8) | al
@@ -631,7 +634,7 @@ class HT4BIT():
         return 8
 
     def _jz_a_address(self, opcode):
-        al = self._ROM.getByte(self._PC + 1)
+        al = self._ROM.get_byte(self._PC + 1)
         self._PC += 2
         if (self._ACC == 0):
             self._PC = (self._PC & 0xF800) | ((opcode & 0x7) << 8) | al
@@ -639,7 +642,7 @@ class HT4BIT():
         return 8
 
     def _jnz_a_address(self, opcode):
-        al = self._ROM.getByte(self._PC + 1)
+        al = self._ROM.get_byte(self._PC + 1)
         self._PC += 2
         if (self._ACC):
             self._PC = (self._PC & 0xF800) | ((opcode & 0x7) << 8) | al
@@ -647,7 +650,7 @@ class HT4BIT():
         return 8
 
     def _jc_address(self, opcode):
-        al = self._ROM.getByte(self._PC + 1)
+        al = self._ROM.get_byte(self._PC + 1)
         self._PC += 2
         if (self._CF):
             self._PC = (self._PC & 0xF800) | ((opcode & 0x7) << 8) | al
@@ -655,7 +658,7 @@ class HT4BIT():
         return 8
 
     def _jnc_address(self, opcode):
-        al = self._ROM.getByte(self._PC + 1)
+        al = self._ROM.get_byte(self._PC + 1)
         self._PC += 2
         if (not self._CF):
             self._PC = (self._PC & 0xF800) | ((opcode & 0x7) << 8) | al
@@ -663,7 +666,7 @@ class HT4BIT():
         return 8
 
     def _jtmr_address(self, opcode):
-        al = self._ROM.getByte(self._PC + 1)
+        al = self._ROM.get_byte(self._PC + 1)
         self._PC += 2
         if (self._TF):
             self._PC = (self._PC & 0xF800) | ((opcode & 0x7) << 8) | al
@@ -672,7 +675,7 @@ class HT4BIT():
         return 8
 
     def _jnz_R4_address(self, opcode):
-        al = self._ROM.getByte(self._PC + 1)
+        al = self._ROM.get_byte(self._PC + 1)
         self._PC += 2
         if (self._WR[4]):
             self._PC = (self._PC & 0xF800) | ((opcode & 0x7) << 8) | al
@@ -680,12 +683,12 @@ class HT4BIT():
         return 8
 
     def _jmp_address(self, opcode):
-        self._PC = (self._PC & 0xF000) | ((opcode & 0xF) << 8) | self._ROM.getByte(self._PC + 1)
+        self._PC = (self._PC & 0xF000) | ((opcode & 0xF) << 8) | self._ROM.get_byte(self._PC + 1)
 
         return 8
 
     def _call_address(self, opcode):
         self._STACK = (self._PC + 2) & 0xFFF
-        self._PC = (self._PC & 0xF000) | ((opcode & 0xF) << 8) | self._ROM.getByte(self._PC + 1)
+        self._PC = (self._PC & 0xF000) | ((opcode & 0xF) << 8) | self._ROM.get_byte(self._PC + 1)
 
         return 8

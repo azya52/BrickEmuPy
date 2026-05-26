@@ -6,52 +6,66 @@
 	
 	"buttons": {
 		"btnDown": {
-			"port": "INP",
-			"pin": 0,
-			"level": {
-				"port": "OUTP",
-				"pin": 0
-			},
 			"hot_keys": [83, 16777237]
 		},
 		"btnUp": {
-			"port": "INP",
-			"pin": 1,
-			"level": {
-				"port": "OUTP",
-				"pin": 0
-			},
 			"hot_keys": [87, 16777235]
 		},
 		"btnMode": {
-			"port": "INP",
-			"pin": 1,
-			"level": {
-				"port": "OUTP",
-				"pin": 1
-			},
 			"hot_keys": [49, 77]
 		},
 		"btnAction": {
-			"port": "INP",
-			"pin": 0,
-			"level": {
-				"port": "OUTP",
-				"pin": 1
-			},
 			"hot_keys": [50, 32]
 		},
 		"btnACL": {
-			"port": "RES",
-			"pin": 0,
-			"level": {
-				"port": "OUTP",
-				"pin": 0
-			},
 			"hot_keys": [82]
 		}
 	},
 	
+	"peripherals": {
+		"matrix_input": {
+			"btnDown": {
+				"port": "INP",
+				"mask": 1,
+				"level": {
+					"port": "OUTP",
+					"mask": 1
+				}
+			},
+			"btnUp": {
+				"port": "INP",
+				"mask": 2,
+				"level": {
+					"port": "OUTP",
+					"mask": 1
+				}
+			},
+			"btnMode": {
+				"port": "INP",
+				"mask": 2,
+				"level": {
+					"port": "OUTP",
+					"mask": 2
+				}
+			},
+			"btnAction": {
+				"port": "INP",
+				"mask": 1,
+				"level": {
+					"port": "OUTP",
+					"mask": 2
+				}
+			}
+		},
+		"direct_input": {
+			"btnACL": {
+				"port": "RES",
+				"mask": 0,
+				"level": 1
+			}
+		}
+	},
+
 	"mask_options": {
 		"rom_path": "./assets/IsogeDoraemon.bin",
 		"prescaler_div": [2, 8, 32],

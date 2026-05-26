@@ -6,49 +6,68 @@
 	
 	"buttons": {
 		"btnOnPause": {
-			"port": "PS",
-			"pin": 0,
-			"level": 0,
 			"hot_keys": [49, 80]
 		},
 		"btnSound": {
-			"port": "PM",
-			"pin": 2,
-			"level": 0,
 			"hot_keys": [51]
 		},
 		"btnReset": {
-			"port": "RES",
-			"pin": 0,
-			"level": 0,
 			"hot_keys": [51, 82]
 		},
 		"btnLeft": {
-			"port": "PM",
-			"pin": 3,
-			"level": 0,
 			"hot_keys": [65, 16777234]
 		},
 		"btnRight": {
-			"port": "PM",
-			"pin": 2,
-			"level": 0,
 			"hot_keys": [68, 16777236]
 		},
 		"btnDown": {
-			"port": "PM",
-			"pin": 1,
-			"level": 0,
 			"hot_keys": [83, 16777237]
 		},
 		"btnStartRotate": {
-			"port": "PM",
-			"pin": 0,
-			"level": 0,
 			"hot_keys": [32, 16777235, 16777220]
 		}
 	},
 	
+	"peripherals": {
+		"direct_input": {
+			"btnOnPause": {
+				"port": "PS",
+				"mask": 0,
+				"level": 0
+			},
+			"btnSound": {
+				"port": "PM",
+				"mask": 2,
+				"level": 0
+			},
+			"btnReset": {
+				"port": "RES",
+				"mask": 0,
+				"level": 0
+			},
+			"btnLeft": {
+				"port": "PM",
+				"mask": 3,
+				"level": 0
+			},
+			"btnRight": {
+				"port": "PM",
+				"mask": 2,
+				"level": 0
+			},
+			"btnDown": {
+				"port": "PM",
+				"mask": 1,
+				"level": 0
+			},
+			"btnStartRotate": {
+				"port": "PM",
+				"mask": 0,
+				"level": 0
+			}
+		}
+	},
+
 	"mask_options": {
 		"rom_path": "./assets/Keychain55in1.bin",
 		"sound_rom_path": "./assets/Keychain55in1.srom",

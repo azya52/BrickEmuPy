@@ -6,49 +6,68 @@
 	
 	"buttons": {
 		"btnPause": {
-			"port": "K1",
-			"pin": 1,
-			"level": 0,
 			"hot_keys": [49]
 		},
 		"btnSound": {
-			"port": "K1",
-			"pin": 2,
-			"level": 0,
 			"hot_keys": [50]
 		},
 		"btnOnOff": {
-			"port": "K1",
-			"pin": 0,
-			"level": 0,
 			"hot_keys": [51]
 		},
 		"btnLeft": {
-			"port": "K0",
-			"pin": 0,
-			"level": 0,
 			"hot_keys": [65, 16777234]
 		},
 		"btnDown": {
-			"port": "K0",
-			"pin": 1,
-			"level": 0,
 			"hot_keys": [83, 16777237]
 		},
 		"btnRight": {
-			"port": "K0",
-			"pin": 2,
-			"level": 0,
 			"hot_keys": [68, 16777236]
 		},
 		"btnRotate": {
-			"port": "K0",
-			"pin": 3,
-			"level": 0,
 			"hot_keys": [32, 16777235, 16777220]
 		}
 	},
-	
+
+	"peripherals": {
+		"direct_input": {
+			"btnPause": {
+				"port": "K1",
+				"mask": 1,
+				"level": 0
+			},
+			"btnSound": {
+				"port": "K1",
+				"mask": 2,
+				"level": 0
+			},
+			"btnOnOff": {
+				"port": "K1",
+				"mask": 0,
+				"level": 0
+			},
+			"btnLeft": {
+				"port": "K0",
+				"mask": 0,
+				"level": 0
+			},
+			"btnDown": {
+				"port": "K0",
+				"mask": 1,
+				"level": 0
+			},
+			"btnRight": {
+				"port": "K0",
+				"mask": 2,
+				"level": 0
+			},
+			"btnRotate": {
+				"port": "K0",
+				"mask": 3,
+				"level": 0
+			}
+		}
+	},
+
 	"mask_options": {
 		"rom_path": "./assets/RadioShackStackChallenge.bin",
 		"port_pullup": {

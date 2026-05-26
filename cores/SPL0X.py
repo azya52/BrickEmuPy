@@ -29,8 +29,11 @@ IO_SYS_CTRL_ROSC_STOP = 0x80
 IO_SPEECH_CTRL_ENBL = 0x01
 
 class SPL0X():
-    def __init__(self, mask, clock):
+    def __init__(self, mask, clock, interconnect):
         self._ROM = ROM(mask['rom_path'])
+
+        self._interconnect = interconnect
+        self._interconnect.register_port_device(self)
 
         self._cycle_counter = 0
 
@@ -39,7 +42,7 @@ class SPL0X():
             **mask['port_pullup']
         }
 
-        self._port_input = {
+        self._port_handler = {
             "PA": [0, 0],
             "PB": [0, 0]
         }
@@ -56,7 +59,7 @@ class SPL0X():
         if (self._sub_clock_div == 0):
             self._sub_clock_div = clock / SUB_CLOCK
 
-        self._sound = SPL0Xsound(clock, self._sub_clock_div)
+        self._sound = SPL0Xsound(clock, self._sub_clock_div, interconnect)
         
         self.reset()
 
@@ -320,7 +323,7 @@ class SPL0X():
         self._go_vector(VADDR_RESET)
         
     def _go_vector(self, addr):
-        self._PC = self._ROM.getWordLSB(addr + (self._ROM_BANK << 12))
+        self._PC = self._ROM.get_word_LSB(addr + (self._ROM_BANK << 12))
 
     def pc(self):
         return self._PC
@@ -334,29 +337,23 @@ class SPL0X():
     def istr_counter(self):
         return self._instr_counter
 
-    def pin_set(self, port, pin, level):
-        self._process_port_input(port, pin, level)
-
-    def pin_release(self, port, pin):
-        self._process_port_input(port, pin, -1)
-
     def _port_read(self, port):
         return (
             (~self._PDIR[port] & self._PLATCH[port]) | 
-            (self._PDIR[port] & (~self._port_input[port][0] & 
-            (self._port_input[port][1] | self._pullup_ext[port])))
+            (self._PDIR[port] & (~self._port_handler[port][0] & 
+            (self._port_handler[port][1] | self._pullup_ext[port])))
         )
 
-    def _process_port_input(self, port, pin, level):
+    def port_handler(self, port, mask, level):
         if (port == 'RES'):
             if (level == 0):
                 self.reset()
         else:
             prev_port = self._port_read(port)
-            self._port_input[port][0] &= ~pin
-            self._port_input[port][1] &= ~pin
+            self._port_handler[port][0] &= ~mask
+            self._port_handler[port][1] &= ~mask
             if (level >= 0):
-                self._port_input[port][level] |= pin
+                self._port_handler[port][level] |= mask
             if ((prev_port & self._port_pkey[port]) < (self._port_read(port) & self._port_pkey[port])):
                 if (self._INT_CFG & IO_INT_CFG_POWERKEY_INT):
                     self._IREQ |= IO_INT_CFG_POWERKEY_INT
@@ -406,9 +403,9 @@ class SPL0X():
         if (self._ROSC_ENBL):
             if (self._CPU_ENBL):
                 addr = self._get_pc()
-                byte = self._ROM.getByte(addr)
+                byte = self._ROM.get_byte(addr)
                 bytes_count = self._execute[byte][1]
-                opcode = self._ROM.getBytes(addr, bytes_count)
+                opcode = self._ROM.get_bytes(addr, bytes_count)
                 self._PC += bytes_count
                 exec_cycles = self._execute[byte][0](self, opcode)
                 self._instr_counter += 1
@@ -454,42 +451,42 @@ class SPL0X():
 
     def _set_io_ToneA_Ctrl1(self, value):
         self._TONEA_CTRL1 = value
-        self._sound.set_toneA(self._TONEA_CTRL1, self._TONEA_CTRL2, self._cycle_counter)        
+        self._sound.set_toneA(self._TONEA_CTRL1, self._TONEA_CTRL2)        
 
     def _get_io_ToneA_Ctrl2(self):
         return 0
     
     def _set_io_ToneA_Ctrl2(self, value):
         self._TONEA_CTRL2 = value
-        self._sound.set_toneA(self._TONEA_CTRL1, self._TONEA_CTRL2, self._cycle_counter)  
+        self._sound.set_toneA(self._TONEA_CTRL1, self._TONEA_CTRL2)  
 
     def _get_io_ToneB_Ctrl1(self):
         return 0
     
     def _set_io_ToneB_Ctrl1(self, value):
         self._TONEB_CTRL1 = value
-        self._sound.set_toneB(self._TONEB_CTRL1, self._TONEB_CTRL2, self._cycle_counter)  
+        self._sound.set_toneB(self._TONEB_CTRL1, self._TONEB_CTRL2)  
 
     def _get_io_ToneB_Ctrl2(self):
         return 0
     
     def _set_io_ToneB_Ctrl2(self, value):
         self._TONEB_CTRL2 = value
-        self._sound.set_toneB(self._TONEB_CTRL1, self._TONEB_CTRL2, self._cycle_counter) 
+        self._sound.set_toneB(self._TONEB_CTRL1, self._TONEB_CTRL2) 
 
     def _get_io_Noise_Ctrl1(self):
         return 0
     
     def _set_io_Noise_Ctrl1(self, value):
         self._NOISE_CTRL1 = value
-        self._sound.set_noise(self._NOISE_CTRL1, self._NOISE_CTRL2, self._cycle_counter)
+        self._sound.set_noise(self._NOISE_CTRL1, self._NOISE_CTRL2)
 
     def _get_io_Noise_Ctrl2(self):
         return 0
     
     def _set_io_Noise_Ctrl2(self, value):
         self._NOISE_CTRL2 = value
-        self._sound.set_noise(self._NOISE_CTRL1, self._NOISE_CTRL2, self._cycle_counter)
+        self._sound.set_noise(self._NOISE_CTRL1, self._NOISE_CTRL2)
 
     def _get_io_System_Ctrl(self):
         return self._SYS_CTRL
@@ -512,14 +509,14 @@ class SPL0X():
 
     def _set_io_Speech_Ctrl(self, value):
         self._SPEECH_CTRL = value
-        self._sound.set_speech(self._SPEECH_CTRL, self._SPEECH_DATA, self._cycle_counter)
+        self._sound.set_speech(self._SPEECH_CTRL, self._SPEECH_DATA)
 
     def _get_io_Speech_Data_Port(self):
         return (self._cycle_counter >> 3) & 0x1
 
     def _set_io_Speech_Data_Port(self, value):
         self._SPEECH_DATA = value
-        self._sound.set_speech(self._SPEECH_CTRL, self._SPEECH_DATA, self._cycle_counter)
+        self._sound.set_speech(self._SPEECH_CTRL, self._SPEECH_DATA)
         
     def _get_io_Bank_Select(self):
         return self._ROM_BANK
@@ -549,7 +546,7 @@ class SPL0X():
             return 0
         if (addr >= 0x1000):
             addr = (addr % ADDRESS_SPACE_SIZE) + (self._ROM_BANK << 12)
-        return self._ROM.getByte(addr)
+        return self._ROM.get_byte(addr)
 
     def _ps(self):
         return (

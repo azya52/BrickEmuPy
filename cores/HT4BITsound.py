@@ -1,5 +1,3 @@
-from .ToneGenerator import ToneGenerator
-
 SINGLE_SIZE_CHANNEL_SIZE = 32
 SINGLE_SIZE_CHANNEL_COUNT = 12
 SROM_SIZE = SINGLE_SIZE_CHANNEL_SIZE * 20
@@ -13,10 +11,12 @@ LFSR2DIV = (
 )
 
 SQUARENESS_FACTOR = 5
+CHANNEL = 0
     
 class HT4BITsound():
-    def __init__(self, mask, clock):
+    def __init__(self, mask, clock, interconnect):
         self._system_clock = clock
+        self._interconnect = interconnect
         self._clock_counter = 0
         self._note_counter = 0
         self._channel = 0
@@ -37,8 +37,6 @@ class HT4BITsound():
         self._sROM += bytearray([0] * (SROM_SIZE - len(self._sROM)))
         self._sROM = self._sROM[:SROM_SIZE]
 
-        self._toneGenerator = ToneGenerator()
-
     def clock(self, exec_cycles):
         self._cycle_counter += exec_cycles
         if (self._sound_on):
@@ -48,13 +46,13 @@ class HT4BITsound():
                 chanel_size = SINGLE_SIZE_CHANNEL_SIZE * ((self._channel >= SINGLE_SIZE_CHANNEL_COUNT) + 1)
                 freq = self._get_freq()
                 if (freq > 0):
-                    self._toneGenerator.play(freq, self._channel_effect[self._channel] & 0x1, SQUARENESS_FACTOR, self._cycle_counter / self._system_clock)
+                    self._interconnect.emit_audio(CHANNEL, (freq, self._channel_effect[self._channel] & 0x1, SQUARENESS_FACTOR, 0))
                 else:
-                    self._toneGenerator.stop(self._cycle_counter / self._system_clock)
+                    self._interconnect.emit_audio(CHANNEL, None)
                 self._note_counter = (self._note_counter + 1) % chanel_size
                 if ((self._note_counter == 0) and (not self._repeat_cycle)):
                     self._sound_on = False
-                    self._toneGenerator.stop(self._cycle_counter / self._system_clock)
+                    self._interconnect.emit_audio(CHANNEL, None)
 
     def _get_freq(self):
         chanel_offset = self._channel * SINGLE_SIZE_CHANNEL_SIZE
@@ -67,13 +65,9 @@ class HT4BITsound():
         
         return self._system_clock / self._freq_div / LFSR2DIV[note] * 2
 
-    def stop(self):
-        self._toneGenerator.close()
-        del self._toneGenerator
-
     def set_sound_off(self):
         self._sound_on = False
-        self._toneGenerator.stop(self._cycle_counter / self._system_clock)
+        self._interconnect.emit_audio(CHANNEL, None)
 
     def set_sound_channel(self, channel):
         self._sound_on = True

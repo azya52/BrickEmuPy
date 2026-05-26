@@ -1,6 +1,6 @@
 class T7741dasm():
 
-    def __init__(self):
+    def __init__(self, roots=None):
         self._addrbase = '%0.3X'
         self._opbase = '%0.3X'
         
@@ -143,7 +143,7 @@ class T7741dasm():
         listing = []
         self._prev_opcode = 0
         while ((pc * 2) < rom.size()):
-            opcode = rom.getWord(pc * 2)
+            opcode = rom.get_word(pc * 2)
             instr = self._instructions[opcode](self, pc, opcode)
             self._prev_opcode = opcode
             if ((type(instr) is tuple) and (not comments)):

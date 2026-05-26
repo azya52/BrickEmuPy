@@ -23,12 +23,15 @@ PDF_PS = 0x1
 PDF_PM = 0x2
 
 class LC5732():
-    def __init__(self, mask, clock):
+    def __init__(self, mask, clock, interconnect):
         self._ROM = ROM(mask['rom_path'])
-        self._sound = LC5732sound(mask, clock)
-
-        self._instr_counter = 0
+        self._sound = LC5732sound(mask, interconnect)
+    
+        self._interconnect = interconnect
+        self._interconnect.register_port_device(self)
+    
         self._cycle_counter = 0
+        self._instr_counter = 0
         
         self._500ms_div = clock / 2
         self._100ms_div = clock / 10
@@ -161,7 +164,7 @@ class LC5732():
         self._RAM = [0] * RAM_SIZE
         self._LCDRAM = [0xFF] * LCDRAM_SIZE
 
-        self._sound.set_alm(self._ALM, self._cycle_counter)
+        self._sound.set_alm(self._ALM)
 
     def reset(self):
         self._reset()
@@ -234,30 +237,29 @@ class LC5732():
             for i, value in state["LCDRAM"].items():
                 self._LCDRAM[i] = value
         if ("MEMORY" in state):
-            self._ROM.writeWord(state["MEMORY"][0], state["MEMORY"][1])
+            self._rom.write_word(state["MEMORY"][0], state["MEMORY"][1])
     
-    def pin_set(self, port, pin, level):
+    def port_handler(self, port, mask, level):
         if (port == 'PS'):
-            self._PS = ~pin & self._PS | pin
-            self._STS |= STS_SCF2_PS
-            if (self._HEF & HEF_2_PS):
-                self._HALT = 0
+            self._PS &= ~mask
+            if (level > 0):     
+                self._PS |= mask
+                self._STS |= STS_SCF2_PS
+                if (self._HEF & HEF_2_PS):
+                    self._HALT = 0
         elif (port == 'PM'):
-            self._PM = ~pin & self._PM | pin
-            self._STS |= STS_SCF3_PM
-            if (self._HEF & HEF_3_PM):
+            self._PM &= ~mask
+            if (level > 0):     
+                self._PM |= mask
+                self._STS |= STS_SCF3_PM
+                if (self._HEF & HEF_3_PM):
+                    self._HALT = 0
+        elif (port == 'RES'):
+            if (level == 1):
+                self._reset()
+                self._HALT = 1
+            else:
                 self._HALT = 0
-        elif (port == 'RES'):
-            self._reset()
-            self._HALT = 1
-
-    def pin_release(self, port, pin):
-        if (port == 'PS'):
-            self._PS &= ~pin
-        elif (port == 'PM'):
-            self._PM &= ~pin
-        elif (port == 'RES'):
-            self._HALT = 0
 
     def pc(self):
         return self._PC & 0xFFF
@@ -296,7 +298,7 @@ class LC5732():
             self._PS = 0xF
 
         if (not self._HALT):
-            opcode = self._ROM.getByte(self._PC)
+            opcode = self._ROM.get_byte(self._PC)
             self._PC += 1
             exec_cycles = self._execute[opcode](self, opcode)
             self._instr_counter += 1
@@ -322,7 +324,7 @@ class LC5732():
     def _taat(self, opcode):
         #00000001   (AC, TREG) <- ROM(PGX, AC, M(DP))
         addr = 0x700 | (self._AC << 4) | self._get_ram()
-        data = self._ROM.getByte(addr)
+        data = self._ROM.get_byte(addr)
         self._AC = data >> 4
         self._TREG = data & 0xF
         return MCLOCKx2_DIV
@@ -330,15 +332,15 @@ class LC5732():
     def _twrt(self, opcode):
         #00000010   PORT <- ROM(PGX, AC, M(DP))
         addr = 0x700 | (self._AC << 4) | self._get_ram()
-        self._LCDRAM[self._SP] = self._ROM.getByte(addr)
+        self._LCDRAM[self._SP] = self._ROM.get_byte(addr)
         return MCLOCKx2_DIV
 
     def _tmel(self, opcode):
         #00000011   ALM <- ROM(PGX, AC, M(DP))
         addr = 0x700 | (self._AC << 4) | self._get_ram()
-        data = self._ROM.getByte(addr)
+        data = self._ROM.get_byte(addr)
         self._ALM = data
-        self._sound.set_alm(data, self._cycle_counter)
+        self._sound.set_alm(data)
         return MCLOCKx2_DIV
 
     def _csp(self, opcode):
@@ -363,7 +365,7 @@ class LC5732():
 
     def _jmp_x(self, opcode):
         #00001XXX XXXXXXXX   PC <- X
-        self._PC = ((opcode & 0x7) << 8) | self._ROM.getByte(self._PC)
+        self._PC = ((opcode & 0x7) << 8) | self._ROM.get_byte(self._PC)
         return MCLOCKx2_DIV
 
     def _jmp_p(self, opcode):
@@ -464,7 +466,7 @@ class LC5732():
     def _baz_x(self, opcode):
         #01000XXX XXXXXXXX   PC <- X if AC == 0
         if (self._AC == 0):
-            self._PC = ((opcode & 0x7) << 8) | self._ROM.getByte(self._PC)
+            self._PC = ((opcode & 0x7) << 8) | self._ROM.get_byte(self._PC)
         else:
             self._PC += 1
             return MCLOCK_DIV
@@ -473,7 +475,7 @@ class LC5732():
     def _bab0_x(self, opcode):
         #01001XXX XXXXXXXX   PC <- X if AC0
         if (self._AC & 0x1):
-            self._PC = ((opcode & 0x7) << 8) | self._ROM.getByte(self._PC)
+            self._PC = ((opcode & 0x7) << 8) | self._ROM.get_byte(self._PC)
         else:
             self._PC += 1
             return MCLOCK_DIV
@@ -482,7 +484,7 @@ class LC5732():
     def _banz_x(self, opcode):
         #01010XXX XXXXXXXX   PC <- X if AC != 0
         if (self._AC):
-            self._PC = ((opcode & 0x7) << 8) | self._ROM.getByte(self._PC)
+            self._PC = ((opcode & 0x7) << 8) | self._ROM.get_byte(self._PC)
         else:
             self._PC += 1
             return MCLOCK_DIV
@@ -491,7 +493,7 @@ class LC5732():
     def _bab1_x(self, opcode):
         #01011XXX XXXXXXXX   PC <- X if AC1
         if (self._AC & 0x2):
-            self._PC = ((opcode & 0x7) << 8) | self._ROM.getByte(self._PC)
+            self._PC = ((opcode & 0x7) << 8) | self._ROM.get_byte(self._PC)
         else:
             self._PC += 1
             return MCLOCK_DIV
@@ -500,7 +502,7 @@ class LC5732():
     def _bcnh_x(self, opcode):
         #01100XXX XXXXXXXX   PC <- X if CF == 0
         if (self._CF == 0):
-            self._PC = ((opcode & 0x7) << 8) | self._ROM.getByte(self._PC)
+            self._PC = ((opcode & 0x7) << 8) | self._ROM.get_byte(self._PC)
         else:
             self._PC += 1
             return MCLOCK_DIV
@@ -509,7 +511,7 @@ class LC5732():
     def _bab2_x(self, opcode):
         #01101XXX XXXXXXXX   PC <- X if AC2
         if (self._AC & 0x4):
-            self._PC = ((opcode & 0x7) << 8) | self._ROM.getByte(self._PC)
+            self._PC = ((opcode & 0x7) << 8) | self._ROM.get_byte(self._PC)
         else:
             self._PC += 1
             return MCLOCK_DIV
@@ -518,7 +520,7 @@ class LC5732():
     def _bch_x(self, opcode):
         #01110XXX XXXXXXXX   PC <- X if CF != 0
         if (self._CF):
-            self._PC = ((opcode & 0x7) << 8) | self._ROM.getByte(self._PC)
+            self._PC = ((opcode & 0x7) << 8) | self._ROM.get_byte(self._PC)
         else:
             self._PC += 1
             return MCLOCK_DIV
@@ -527,7 +529,7 @@ class LC5732():
     def _bab3_x(self, opcode):
         #01111XXX XXXXXXXX   PC <- X if AC3
         if (self._AC & 0x8):
-            self._PC = ((opcode & 0x7) << 8) | self._ROM.getByte(self._PC)
+            self._PC = ((opcode & 0x7) << 8) | self._ROM.get_byte(self._PC)
         else:
             self._PC += 1
             return MCLOCK_DIV
@@ -639,7 +641,7 @@ class LC5732():
 
     def _adci(self, opcode):
         #10010000 ----XXXX   AC <- (AC) + X + (CF); CF
-        x = self._ROM.getByte(self._PC) & 0xF
+        x = self._ROM.get_byte(self._PC) & 0xF
         result = self._AC + x + self._CF
         self._AC = result & 0xF
         self._CF = result > 0xF
@@ -648,7 +650,7 @@ class LC5732():
 
     def _sbci(self, opcode):
         #10010001 ----XXXX   AC <- (AC) + ~X + (CF); CF
-        x = self._ROM.getByte(self._PC) & 0xF
+        x = self._ROM.get_byte(self._PC) & 0xF
         result = self._AC + (x ^ 0xF) + self._CF
         self._AC = result & 0xF
         self._CF = result > 0xF
@@ -657,7 +659,7 @@ class LC5732():
 
     def _addi(self, opcode):
         #10010010 ----XXXX   AC <- (AC) + X; CF
-        x = self._ROM.getByte(self._PC) & 0xF
+        x = self._ROM.get_byte(self._PC) & 0xF
         result = self._AC + x
         self._AC = result & 0xF
         self._CF = result > 0xF
@@ -666,7 +668,7 @@ class LC5732():
 
     def _subi(self, opcode):
         #10010011 ----XXXX   AC <- (AC) + ~X + 1; CF
-        x = self._ROM.getByte(self._PC) & 0xF
+        x = self._ROM.get_byte(self._PC) & 0xF
         result = self._AC + (x ^ 0xF) + 1
         self._AC = result & 0xF
         self._CF = result > 0xF
@@ -675,28 +677,28 @@ class LC5732():
 
     def _adni(self, opcode):
         #10010100 ----XXXX   AC <- (AC) + X
-        x = self._ROM.getByte(self._PC) & 0xF
+        x = self._ROM.get_byte(self._PC) & 0xF
         self._AC = (self._AC + x) & 0xF
         self._PC += 1
         return MCLOCKx2_DIV
 
     def _andi(self, opcode):
         #10010101 ----XXXX   AC <- (AC) and X
-        x = self._ROM.getByte(self._PC) & 0xF
+        x = self._ROM.get_byte(self._PC) & 0xF
         self._AC = self._AC & x
         self._PC += 1
         return MCLOCKx2_DIV
 
     def _eori(self, opcode):
         #10010110 ----XXXX   AC <- (AC) xor X
-        x = self._ROM.getByte(self._PC) & 0xF
+        x = self._ROM.get_byte(self._PC) & 0xF
         self._AC = self._AC ^ x
         self._PC += 1
         return MCLOCKx2_DIV
 
     def _ori(self, opcode):
         #10010111 ----XXXX   AC <- (AC) or X
-        x = self._ROM.getByte(self._PC) & 0xF
+        x = self._ROM.get_byte(self._PC) & 0xF
         self._AC = self._AC | x
         self._PC += 1
         return MCLOCKx2_DIV
@@ -746,7 +748,7 @@ class LC5732():
     def _jsr_x(self, opcode):
         #10100XXX XXXXXXXX   STACK <- PC + 2; PC <- X
         self._STACK = self._PC + 1
-        self._PC = ((opcode & 0x7) << 8) | self._ROM.getByte(self._PC)
+        self._PC = ((opcode & 0x7) << 8) | self._ROM.get_byte(self._PC)
         return MCLOCKx2_DIV
 
     def _ipm(self, opcode):
@@ -848,8 +850,8 @@ class LC5732():
 
     def _sas_x(self, opcode):
         #11111010 XXXXXXXX   ALM <- X
-        self._ALM = self._ROM.getByte(self._PC)
-        self._sound.set_alm(self._ALM, self._cycle_counter)
+        self._ALM = self._ROM.get_byte(self._PC)
+        self._sound.set_alm(self._ALM)
         self._PC += 1
         return MCLOCKx2_DIV
 

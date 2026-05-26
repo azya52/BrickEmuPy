@@ -29,36 +29,13 @@ class BrickWidget(QtWidgets.QGraphicsView):
         self._brick.uiDisplayUpdateSignal.connect(self.render)
         self._brick.examineSignal.connect(examine)
         self._brick.errorSignal.connect(self.error)
-        
         self._draw(config["face_path"])
-
-        self._brickThread = QtCore.QThread()
-        self._brick.moveToThread(self._brickThread)
-        self._brickThread.started.connect(self._brick.run)
-        self._brickThread.finished.connect(self._brick.deleteLater)
-        self._brickThread.finished.connect(self._brickThread.deleteLater)
-        self._brickThread.start(QtCore.QThread.Priority.LowestPriority)
+        self._brick.start()
 
     def __del__(self):
-        self._brick.uiDisplayUpdateSignal.disconnect()
-        self._brick.examineSignal.disconnect()
-        self._brick.errorSignal.disconnect()
-        try:
-            self._brickThread.requestInterruption()
-            self._brickThread.quit()
-            self._brickThread.wait(1000)
-            self._brickThread.terminate()
-            self._brickThread.wait()
-            self._brick.close()
-            del self._brick
-        except:
-            pass
-
+        self._brick.close()
         self._saveSettings()
-
-    @pyqtSlot(dict)
-    def editState(self, state):
-        self._brick.editState(state)
+        super().close()
 
     def showEvent(self, event):
         self._fitBrickInView()
@@ -70,12 +47,9 @@ class BrickWidget(QtWidgets.QGraphicsView):
     def _saveSettings(self):
         self._settings.setValue("brick/" + self._config["id"] + "/scene_rect", self.mapToScene(self.viewport().rect()).boundingRect())
 
-    def setConfig(self, config):
-        self._config = config
-        self._brick.setConfig(self._config)
-        self._draw(self._config["face_path"])
-        self._scene_rect = None
-        self._fitBrickInView()
+    @pyqtSlot(dict)
+    def editState(self, state):
+        self._brick.editState(state)
 
     @pyqtSlot()
     def step(self):
@@ -112,15 +86,15 @@ class BrickWidget(QtWidgets.QGraphicsView):
 
     def keyPressEvent(self, event):
         if not event.isAutoRepeat():
-            for button in self._config["buttons"].values():
-                if (event.key() in button["hot_keys"]):
-                    self._brick.btnPressed(button["port"], button["pin"], button["level"])
+            for name, value in self._config["buttons"].items():
+                if (event.key() in value["hot_keys"]):
+                    self._brick.btnPressed(name)
 
     def keyReleaseEvent(self, event):            
         if not event.isAutoRepeat():
-            for button in self._config["buttons"].values():
-                if (event.key() in button["hot_keys"]):
-                    self._brick.btnReleased(button["port"], button["pin"])
+            for name, value in self._config["buttons"].items():
+                if (event.key() in value["hot_keys"]):
+                    self._brick.btnReleased(name)
 
     def wheelEvent(self, event):
         zoomFactor = 1.1
@@ -148,8 +122,12 @@ class BrickWidget(QtWidgets.QGraphicsView):
         body.setSharedRenderer(faceRenderer)
         body.setElementId("body")
         self.scene().addItem(body)
-    
-        shadow_shift = self.scene().itemsBoundingRect().width() * 0.001
+
+        self._motionGhosting = 0.4
+        self._ghostSegments = 0
+        self._shadow = 0
+
+        shadow_shift = self.scene().itemsBoundingRect().width() * self._shadow
         
         overlay = QtSvgWidgets.QGraphicsSvgItem()
         overlay.setSharedRenderer(faceRenderer)
@@ -157,27 +135,27 @@ class BrickWidget(QtWidgets.QGraphicsView):
 
         self._segments = []
         for ramBit in range(8):
-            for ramNibble in range(256):
-                nextId = str(ramNibble) + "_" + str(ramBit)
+            for ramByte in range(256):
+                nextId = str(ramByte) + "_" + str(ramBit)
                 if (faceRenderer.elementExists(nextId)):
+                    group = QtWidgets.QGraphicsItemGroup()
                     segment = QtSvgWidgets.QGraphicsSvgItem()
                     segment.setSharedRenderer(faceRenderer)
                     segment.setElementId(nextId)
                     segment.setPos(faceRenderer.boundsOnElement(nextId).topLeft())
-
-                    segment_shadow = QtSvgWidgets.QGraphicsSvgItem()
-                    segment_shadow.setSharedRenderer(faceRenderer)
-                    segment_shadow.setElementId(nextId)
-                    segment_shadow.setPos(faceRenderer.boundsOnElement(nextId).topLeft().x() + shadow_shift,
-                                            faceRenderer.boundsOnElement(nextId).topLeft().y() + shadow_shift * 2)
-                    segment_shadow.setOpacity(0.1)
-                    
-                    group = QtWidgets.QGraphicsItemGroup()
-                    #group.addToGroup(segment_shadow)
                     group.addToGroup(segment)
-                    self.scene().addItem(group)
 
-                    self._segments.append([ramNibble, ramBit, group, -1])
+                    if (shadow_shift):
+                        segment_shadow = QtSvgWidgets.QGraphicsSvgItem()
+                        segment_shadow.setSharedRenderer(faceRenderer)
+                        segment_shadow.setElementId(nextId)
+                        segment_shadow.setPos(faceRenderer.boundsOnElement(nextId).topLeft().x() + shadow_shift,
+                                                faceRenderer.boundsOnElement(nextId).topLeft().y() + shadow_shift * 2)
+                        segment_shadow.setOpacity(0.1)                   
+                        group.addToGroup(segment_shadow)
+
+                    self.scene().addItem(group)
+                    self._segments.append([ramByte, ramBit, group, -1])
         
         overlay.setPos(faceRenderer.boundsOnElement("overlay").topLeft())
         self.scene().addItem(overlay)
@@ -190,26 +168,28 @@ class BrickWidget(QtWidgets.QGraphicsView):
                 for shortcut in value["hot_keys"]:
                     shortcuts += Qt.Key(shortcut).name + ", "
                 btn.setToolTip(shortcuts[:-2])
-                btn.pressed.connect(partial(self._brick.btnPressed, value["port"], value["pin"], value["level"]))
-                btn.released.connect(partial(self._brick.btnReleased, value["port"], value["pin"]))
+                btn.pressed.connect(partial(self._brick.btnPressed, name))
+                btn.released.connect(partial(self._brick.btnReleased, name))
                 self.scene().addWidget(btn)
 
     @pyqtSlot(tuple)
     def render(self, RAM):
+        motion_ghosting = self._motionGhosting
+        ghost_segments = self._ghostSegments
         ramSize = len(RAM)
         for seg in self._segments:
             nibble, bit, segment, opacity = seg
             if nibble < ramSize:
                 target = (RAM[nibble] >> bit) & 0x1
                 if (opacity != target):
-                    opacity += 0.4 * (target - opacity)
-                    if abs(opacity - target) < 1e-2:
+                    opacity += motion_ghosting * (target - opacity)
+                    if abs(opacity - target) < 1e-3:
                         opacity = target
-                    segment.setOpacity(opacity)
+                    segment.setOpacity(opacity + ghost_segments)
                     seg[-1] = opacity
             else:
                 seg[-1] = 0
-                segment.setOpacity(0)
+                segment.setOpacity(ghost_segments)
 
     @pyqtSlot(str)
     def error(self, error):

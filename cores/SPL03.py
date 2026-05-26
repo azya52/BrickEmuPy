@@ -10,8 +10,8 @@ class SPL03(SPL0X):
     LCDRAM_OFFSET = 0x00
     LCDRAM_SIZE = 0x30
 
-    def __init__(self, mask, clock):
-        super().__init__(mask, clock)
+    def __init__(self, mask, clock, interconnect):
+        super().__init__(mask, clock, interconnect)
 
         self._io_tbl = {
             0xC0: (SPL0X._get_io_IO_Ctrl, SPL0X._set_io_IO_Ctrl),

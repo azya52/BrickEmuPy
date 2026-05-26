@@ -2,7 +2,7 @@ from .KS57dasm import KS57dasm
 
 class KS57C21308dasm(KS57dasm):
 
-    def __init__(self):
+    def __init__(self, roots=None):
         super().__init__()
 
         self._clr_fmem_tbl = {
@@ -38,24 +38,24 @@ class KS57C21308dasm(KS57dasm):
     def disassemble(self, rom):
         if (rom.size() > 0):
             listing = [None] * rom.size()
-            vector = rom.getWord(0) & 0x3FFF
+            vector = rom.get_word(0) & 0x3FFF
             listing = self._disassemble(vector, listing, rom)
-            vector = rom.getWord(2) & 0x3FFF
+            vector = rom.get_word(2) & 0x3FFF
             listing = self._disassemble(vector, listing, rom)
-            vector = rom.getWord(4) & 0x3FFF
+            vector = rom.get_word(4) & 0x3FFF
             listing = self._disassemble(vector, listing, rom)
-            vector = rom.getWord(6) & 0x3FFF
+            vector = rom.get_word(6) & 0x3FFF
             listing = self._disassemble(vector, listing, rom)
-            vector = rom.getWord(8) & 0x3FFF
+            vector = rom.get_word(8) & 0x3FFF
             listing = self._disassemble(vector, listing, rom)
-            vector = rom.getWord(10) & 0x3FFF
+            vector = rom.get_word(10) & 0x3FFF
             listing = self._disassemble(vector, listing, rom)
 
             listing = self._disassemble_pcea(listing, rom)
 
             for i in range(len(listing)):
                 if (listing[i] is None):
-                    byte = rom.getByte(i)
+                    byte = rom.get_byte(i)
                     listing[i] = (1, byte, 'db ' + self._bytebase % byte)
                 listing[i] = (self._opbase % listing[i][1], listing[i][2])
             

@@ -6,49 +6,68 @@
 	
 	"buttons": {
 		"btnPause": {
-			"port": "PP",
-			"pin": 0,
-			"level": 0,
 			"hot_keys": [49]
 		},
 		"btnOnOff": {
-			"port": "PP",
-			"pin": 1,
-			"level": 0,
 			"hot_keys": [50]
 		},
 		"btnSound": {
-			"port": "PP",
-			"pin": 2,
-			"level": 0,
 			"hot_keys": [51]
 		},
 		"btnLeft": {
-			"port": "PS",
-			"pin": 0,
-			"level": 0,
 			"hot_keys": [65, 16777234]
 		},
 		"btnDown": {
-			"port": "PS",
-			"pin": 2,
-			"level": 0,
 			"hot_keys": [83, 16777237]
 		},
 		"btnRight": {
-			"port": "PS",
-			"pin": 1,
-			"level": 0,
 			"hot_keys": [68, 16777236]
 		},
 		"btnFire": {
-			"port": "PP",
-			"pin": 3,
-			"level": 0,
 			"hot_keys": [32, 16777235, 16777220]
 		}
 	},
 	
+	"peripherals": {
+		"direct_input": {
+			"btnPause": {
+				"port": "PP",
+				"mask": 0,
+				"level": 0
+			},
+			"btnOnOff": {
+				"port": "PP",
+				"mask": 1,
+				"level": 0
+			},
+			"btnSound": {
+				"port": "PP",
+				"mask": 2,
+				"level": 0
+			},
+			"btnLeft": {
+				"port": "PS",
+				"mask": 0,
+				"level": 0
+			},
+			"btnDown": {
+				"port": "PS",
+				"mask": 2,
+				"level": 0
+			},
+			"btnRight": {
+				"port": "PS",
+				"mask": 1,
+				"level": 0
+			},
+			"btnFire": {
+				"port": "PP",
+				"mask": 3,
+				"level": 0
+			}
+		}
+	},
+
 	"mask_options": {
 		"rom_path": "./assets/SpaceIntruderTK150I.bin",
 		"sound_rom_path": "./assets/SpaceIntruderTK150I.srom",

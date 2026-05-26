@@ -46,10 +46,12 @@ class SPL81408():
     LCDRAM_OFFSET = 0x20
     LCDRAM_SIZE = 0x1D
 
-    def __init__(self, mask, clock):
+    def __init__(self, mask, clock, interconnect):
         self._ROM = ROM(mask['rom_path'])
 
-        self._cycle_counter = 0
+        self._interconnect = interconnect
+        self._interconnect.register_port_device(self)
+
         self._instr_counter = 0
 
         self._pullup_ext = {
@@ -57,7 +59,7 @@ class SPL81408():
             **mask['port_pullup']
         }
 
-        self._port_input = {
+        self._port_handler = {
             "CD": [0, 0],
             "EF": [0, 0],
             "AB": [0, 0]
@@ -66,7 +68,7 @@ class SPL81408():
         self._clock = clock
         self._sub_clock_div = clock / SUB_CLOCK
 
-        self._sound = SPL81408sound(clock)
+        self._sound = SPL81408sound(interconnect)
         
         self.reset()
 
@@ -354,7 +356,7 @@ class SPL81408():
         self._go_vector(VADDR_RESET)
         
     def _go_vector(self, addr):
-        self._PC = self._ROM.getWordLSB(addr)
+        self._PC = self._ROM.get_word_LSB(addr)
 
     def pc(self):
         return self._PC
@@ -373,31 +375,25 @@ class SPL81408():
     def istr_counter(self):
         return self._instr_counter
 
-    def pin_set(self, port, pin, level):
-        self._process_port_input(port, pin, level)
-
-    def pin_release(self, port, pin):
-        self._process_port_input(port, pin, -1)
-
     def _port_read(self, port):
         return (
             (self._PDIR[port] & self._PLATCH[port]) | 
-            (~self._PDIR[port] & (~self._port_input[port][0] & 
-            (self._port_input[port][1] | self._pullup_ext[port])))
+            (~self._PDIR[port] & (~self._port_handler[port][0] & 
+            (self._port_handler[port][1] | self._pullup_ext[port])))
         )
 
-    def _process_port_input(self, port, pin, level):
+    def port_handler(self, port, mask, level):
         if (port == 'RES'):
             if (level == 0):
                 self.reset()
         else:
             prev_port = self._port_read(port)
-            self._port_input[port][0] &= ~pin
-            self._port_input[port][1] &= ~pin
+            self._port_handler[port][0] &= ~mask
+            self._port_handler[port][1] &= ~mask
             if (level >= 0):
-                self._port_input[port][level] |= pin
+                self._port_handler[port][level] |= mask
             
-            if ((port == "CD") and (pin & 0x2)):
+            if ((port == "CD") and (mask & 0x2)):
                 if ((prev_port & 0x2) > (self._port_read(port) & 0x2)):
                     self._IREQ |= IO_INT_CTRL_EXT
             if (port == "EF"):
@@ -439,7 +435,7 @@ class SPL81408():
                         self._WAKEUPREQ |= IO_WAKEUP_CTRL_TIMER0
                         self._CPU_ENBL |= self._WAKEUP_CTRL & IO_WAKEUP_CTRL_TIMER0
                     if (self._AUDIO_CH0_CTRL == 0xC0):
-                        self._sound.toggle(self._cycle_counter)
+                        self._sound.toggle()
 
         self._T2KHZ_counter -= exec_cycles
         while (self._T2KHZ_counter <= 0):
@@ -470,7 +466,7 @@ class SPL81408():
                 
     def clock(self):
         if (self._CPU_ENBL):
-            opcode = self._ROM.getByte(self._PC)
+            opcode = self._ROM.get_byte(self._PC)
             self._PC = (self._PC + 1) & 0xFFFF
             exec_cycles = self._execute[opcode](self) * self._CPU_DIV
             self._instr_counter += 1
@@ -483,7 +479,6 @@ class SPL81408():
         else:
             exec_cycles = self._sub_clock_div
 
-        self._cycle_counter += exec_cycles
         return exec_cycles
 
     def _get_io_portCD_dir(self):
@@ -528,7 +523,7 @@ class SPL81408():
 
     def _set_io_audio_ch0_data(self, value):
         self._AUDIO_CH0_DATA = value
-        self._sound.set_data(self._AUDIO_CH0_CTRL, value, self._cycle_counter)
+        self._sound.set_data(self._AUDIO_CH0_CTRL, value)
         
     def _get_io_Bank_Select(self):
         return self._ROM_BANK
@@ -629,9 +624,9 @@ class SPL81408():
         else:
             #to-do
             if (self._ROM_BANK):
-                return self._ROM.getByte(addr)
+                return self._ROM.get_byte(addr)
             addr = (addr & 0x7FFF)
-            return self._ROM.getByte(addr)
+            return self._ROM.get_byte(addr)
     
     def _ps(self):
         return (
@@ -695,7 +690,7 @@ class SPL81408():
         return 7
 
     def _ora_zp(self):
-        self._A |= self._read_mem(self._ROM.getByte(self._PC))
+        self._A |= self._read_mem(self._ROM.get_byte(self._PC))
         self._PC = (self._PC + 1) & 0xFFFF
         self._NF = self._A >> 7
         self._ZF = not self._A
@@ -707,7 +702,7 @@ class SPL81408():
         return 3
 
     def _ora_imm(self):
-        self._A |= self._ROM.getByte(self._PC)
+        self._A |= self._ROM.get_byte(self._PC)
         self._PC = (self._PC + 1) & 0xFFFF
         self._NF = self._A >> 7
         self._ZF = not self._A
@@ -715,7 +710,7 @@ class SPL81408():
 
     def _bpl(self):
         if (not self._NF):
-            opcode = self._ROM.getByte(self._PC)
+            opcode = self._ROM.get_byte(self._PC)
             self._PC = (self._PC + 1) & 0xFFFF
             prev_PC = self._PC
             self._PC = (self._PC + opcode - ((opcode & 0x80) << 1)) & 0xFFFF
@@ -733,11 +728,11 @@ class SPL81408():
         self._SP = (self._SP - 1) & 0xFF
         self._write_mem(self._SP, pc & 0xFF)
         self._SP = (self._SP - 1) & 0xFF
-        self._PC = self._ROM.getWordLSB(self._PC)
+        self._PC = self._ROM.get_word_LSB(self._PC)
         return 6
 
     def _bit_zp(self):
-        m = self._read_mem(self._ROM.getByte(self._PC))
+        m = self._read_mem(self._ROM.get_byte(self._PC))
         self._PC = (self._PC + 1) & 0xFFFF
         self._NF = m >> 7
         self._VF = m & 0x40 > 0
@@ -745,14 +740,14 @@ class SPL81408():
         return 3
 
     def _and_zp(self):
-        self._A &= self._read_mem(self._ROM.getByte(self._PC))
+        self._A &= self._read_mem(self._ROM.get_byte(self._PC))
         self._PC = (self._PC + 1) & 0xFFFF
         self._NF = self._A >> 7
         self._ZF = not self._A
         return 3
 
     def _rol_zp(self):
-        opcode = self._ROM.getByte(self._PC)
+        opcode = self._ROM.get_byte(self._PC)
         self._PC = (self._PC + 1) & 0xFFFF
         new_value = (self._read_mem(opcode) << 1) | self._CF
         self._write_mem(opcode, new_value & 0xFF)
@@ -767,7 +762,7 @@ class SPL81408():
         return 4
 
     def _and_imm(self):
-        self._A &= self._ROM.getByte(self._PC)
+        self._A &= self._ROM.get_byte(self._PC)
         self._PC = (self._PC + 1) & 0xFFFF
         self._NF = self._A >> 7
         self._ZF = not self._A
@@ -782,7 +777,7 @@ class SPL81408():
         return 2
 
     def _bit_abs(self):
-        m = self._read_mem(self._ROM.getWordLSB(self._PC))
+        m = self._read_mem(self._ROM.get_word_LSB(self._PC))
         self._PC = (self._PC + 2) & 0xFFFF
         self._NF = m >> 7
         self._VF = m & 0x40 > 0
@@ -791,7 +786,7 @@ class SPL81408():
 
     def _bmi(self):
         if (self._NF):
-            opcode = self._ROM.getByte(self._PC)
+            opcode = self._ROM.get_byte(self._PC)
             self._PC = (self._PC + 1) & 0xFFFF
             prev_PC = self._PC
             self._PC = (self._PC + opcode - ((opcode & 0x80) << 1)) & 0xFFFF
@@ -813,7 +808,7 @@ class SPL81408():
         return 6
 
     def _eor_zp(self):
-        self._A ^= self._read_mem(self._ROM.getByte(self._PC))
+        self._A ^= self._read_mem(self._ROM.get_byte(self._PC))
         self._PC = (self._PC + 1) & 0xFFFF
         self._NF = self._A >> 7
         self._ZF = not self._A
@@ -825,19 +820,19 @@ class SPL81408():
         return 3
 
     def _eor_imm(self):
-        self._A ^= self._ROM.getByte(self._PC) & 0xFF
+        self._A ^= self._ROM.get_byte(self._PC) & 0xFF
         self._PC = (self._PC + 1) & 0xFFFF
         self._NF = self._A >> 7
         self._ZF = not self._A
         return 2
 
     def _jmp_abs(self):
-        self._PC = self._ROM.getWordLSB(self._PC)
+        self._PC = self._ROM.get_word_LSB(self._PC)
         return 3
 
     def _bvc(self):
         if (not self._VF):
-            opcode = self._ROM.getByte(self._PC)
+            opcode = self._ROM.get_byte(self._PC)
             self._PC = (self._PC + 1) & 0xFFFF
             prev_PC = self._PC
             self._PC = (self._PC + opcode - ((opcode & 0x80) << 1)) & 0xFFFF
@@ -846,7 +841,7 @@ class SPL81408():
         return 2
 
     def _eor_zp_x(self):
-        self._A ^= self._read_mem((self._ROM.getByte(self._PC) + self._X) & 0xFF)
+        self._A ^= self._read_mem((self._ROM.get_byte(self._PC) + self._X) & 0xFF)
         self._PC = (self._PC + 1) & 0xFFFF
         self._NF = self._A >> 7
         self._ZF = not self._A
@@ -865,12 +860,12 @@ class SPL81408():
         return 6
 
     def _adc_zp(self):
-        self._adc(self._read_mem(self._ROM.getByte(self._PC)))
+        self._adc(self._read_mem(self._ROM.get_byte(self._PC)))
         self._PC = (self._PC + 1) & 0xFFFF
         return 3
 
     def _ror_zp(self):
-        opcode = self._ROM.getByte(self._PC)
+        opcode = self._ROM.get_byte(self._PC)
         self._PC = (self._PC + 1) & 0xFFFF
         prev_value = self._read_mem(opcode)
         self._write_mem(opcode, (prev_value >> 1) | (self._CF << 7))
@@ -887,7 +882,7 @@ class SPL81408():
         return 4
 
     def _adc_imm(self):
-        self._adc(self._ROM.getByte(self._PC))
+        self._adc(self._ROM.get_byte(self._PC))
         self._PC = (self._PC + 1) & 0xFFFF
         return 2
 
@@ -900,14 +895,14 @@ class SPL81408():
         return 2
 
     def _jmp_ind(self):
-        addr = self._ROM.getWordLSB(self._PC)
+        addr = self._ROM.get_word_LSB(self._PC)
         self._PC = self._read_mem(addr)
         self._PC |= self._read_mem((addr + 1) & 0xFFFF) << 8
         return 6
 
     def _bvs(self):
         if (self._VF):
-            opcode = self._ROM.getByte(self._PC)
+            opcode = self._ROM.get_byte(self._PC)
             self._PC = (self._PC + 1) & 0xFFFF
             prev_PC = self._PC
             self._PC = (self._PC + opcode - ((opcode & 0x80) << 1)) & 0xFFFF
@@ -920,7 +915,7 @@ class SPL81408():
         return 2
 
     def _sta_ind_x(self):
-        opcode = self._ROM.getByte(self._PC)
+        opcode = self._ROM.get_byte(self._PC)
         self._PC = (self._PC + 1) & 0xFFFF
     
         addr = self._read_mem((opcode + self._X) & 0xFF) | (self._read_mem((opcode + self._X + 1) & 0xFF) << 8)
@@ -928,12 +923,12 @@ class SPL81408():
         return 6
 
     def _sta_zp(self):
-        self._write_mem(self._ROM.getByte(self._PC), self._A)
+        self._write_mem(self._ROM.get_byte(self._PC), self._A)
         self._PC = (self._PC + 1) & 0xFFFF
         return 3
 
     def _stx_zp(self):
-        self._write_mem(self._ROM.getByte(self._PC), self._X)
+        self._write_mem(self._ROM.get_byte(self._PC), self._X)
         self._PC = (self._PC + 1) & 0xFFFF
         return 3
 
@@ -944,13 +939,13 @@ class SPL81408():
         return 2
 
     def _stx_abs(self):
-        self._write_mem(self._ROM.getWordLSB(self._PC), self._X)
+        self._write_mem(self._ROM.get_word_LSB(self._PC), self._X)
         self._PC = (self._PC + 2) & 0xFFFF
         return 4
 
     def _bcc(self):
         if (not self._CF):
-            opcode = self._ROM.getByte(self._PC)
+            opcode = self._ROM.get_byte(self._PC)
             self._PC = (self._PC + 1) & 0xFFFF
             prev_PC = self._PC
             self._PC = (self._PC + opcode - ((opcode & 0x80) << 1)) & 0xFFFF
@@ -959,7 +954,7 @@ class SPL81408():
         return 2
 
     def _sta_zp_x(self):
-        self._write_mem((self._ROM.getByte(self._PC) + self._X) & 0xFF, self._A)
+        self._write_mem((self._ROM.get_byte(self._PC) + self._X) & 0xFF, self._A)
         self._PC = (self._PC + 1) & 0xFFFF
         return 4
 
@@ -968,7 +963,7 @@ class SPL81408():
         return 2
 
     def _lda_ind_x(self):
-        value = self._ROM.getByte(self._PC) + self._X
+        value = self._ROM.get_byte(self._PC) + self._X
         self._PC = (self._PC + 1) & 0xFFFF
         self._A = self._read_mem(self._read_mem(value & 0xFF) | (self._read_mem((value + 1) & 0xFF) << 8))
         self._NF = self._A >> 7
@@ -976,28 +971,28 @@ class SPL81408():
         return 6
 
     def _ldx_imm(self):
-        self._X = self._ROM.getByte(self._PC)
+        self._X = self._ROM.get_byte(self._PC)
         self._PC = (self._PC + 1) & 0xFFFF
         self._NF = self._X >> 7
         self._ZF = not self._X
         return 2
 
     def _lda_zp(self):
-        self._A = self._read_mem(self._ROM.getByte(self._PC))
+        self._A = self._read_mem(self._ROM.get_byte(self._PC))
         self._PC = (self._PC + 1) & 0xFFFF
         self._NF = self._A >> 7
         self._ZF = not self._A
         return 3
 
     def _ldx_zp(self):
-        self._X = self._read_mem(self._ROM.getByte(self._PC))
+        self._X = self._read_mem(self._ROM.get_byte(self._PC))
         self._PC = (self._PC + 1) & 0xFFFF
         self._NF = self._X >> 7
         self._ZF = not self._X
         return 3
 
     def _lda_imm(self):
-        self._A = self._ROM.getByte(self._PC)
+        self._A = self._ROM.get_byte(self._PC)
         self._PC = (self._PC + 1) & 0xFFFF
         self._NF = self._A >> 7
         self._ZF = not self._A
@@ -1010,14 +1005,14 @@ class SPL81408():
         return 2
 
     def _lda_abs(self):
-        self._A = self._read_mem(self._ROM.getWordLSB(self._PC))
+        self._A = self._read_mem(self._ROM.get_word_LSB(self._PC))
         self._PC = (self._PC + 2) & 0xFFFF
         self._NF = self._A >> 7
         self._ZF = not self._A
         return 4
 
     def _ldx_abs(self):
-        self._X = self._read_mem(self._ROM.getWordLSB(self._PC))
+        self._X = self._read_mem(self._ROM.get_word_LSB(self._PC))
         self._PC = (self._PC + 2) & 0xFFFF
         self._NF = self._X >> 7
         self._ZF = not self._X
@@ -1025,7 +1020,7 @@ class SPL81408():
 
     def _bcs(self):
         if (self._CF):
-            opcode = self._ROM.getByte(self._PC)
+            opcode = self._ROM.get_byte(self._PC)
             self._PC = (self._PC + 1) & 0xFFFF
             prev_PC = self._PC
             self._PC = (self._PC + opcode - ((opcode & 0x80) << 1)) & 0xFFFF
@@ -1034,7 +1029,7 @@ class SPL81408():
         return 2
 
     def _lda_zp_x(self):
-        self._A = self._read_mem((self._ROM.getByte(self._PC) + self._X) & 0xFF)
+        self._A = self._read_mem((self._ROM.get_byte(self._PC) + self._X) & 0xFF)
         self._PC = (self._PC + 1) & 0xFFFF
         self._NF = self._A >> 7
         self._ZF = not self._A
@@ -1051,7 +1046,7 @@ class SPL81408():
         return 2
 
     def _lda_abs_x(self):   
-        base = self._ROM.getWordLSB(self._PC)
+        base = self._ROM.get_word_LSB(self._PC)
         self._PC = (self._PC + 2) & 0xFFFF
         addr = (base + self._X) & 0xFFFF
         self._A = self._read_mem(addr)
@@ -1061,7 +1056,7 @@ class SPL81408():
     
 
     def _cmp_zp(self):
-        test_value = self._A - self._read_mem(self._ROM.getByte(self._PC))
+        test_value = self._A - self._read_mem(self._ROM.get_byte(self._PC))
         self._PC = (self._PC + 1) & 0xFFFF
         self._NF = (test_value >> 7) & 0x1
         self._ZF = not test_value
@@ -1069,7 +1064,7 @@ class SPL81408():
         return 3
 
     def _dec_zp(self):
-        opcode = self._ROM.getByte(self._PC)
+        opcode = self._ROM.get_byte(self._PC)
         self._PC = (self._PC + 1) & 0xFFFF
         new_value = (self._read_mem(opcode) - 1) & 0xFF
         self._write_mem(opcode, new_value)
@@ -1078,7 +1073,7 @@ class SPL81408():
         return 5
 
     def _cmp_imm(self):
-        test_value = self._A - (self._ROM.getByte(self._PC))
+        test_value = self._A - (self._ROM.get_byte(self._PC))
         self._PC = (self._PC + 1) & 0xFFFF
         self._NF = (test_value >> 7) & 0x1
         self._ZF = not test_value
@@ -1093,7 +1088,7 @@ class SPL81408():
 
     def _bne(self):
         if (not self._ZF):
-            opcode = self._ROM.getByte(self._PC)
+            opcode = self._ROM.get_byte(self._PC)
             self._PC = (self._PC + 1) & 0xFFFF
             prev_PC = self._PC
             self._PC = (self._PC + opcode - ((opcode & 0x80) << 1)) & 0xFFFF
@@ -1102,7 +1097,7 @@ class SPL81408():
         return 2
 
     def _cmp_zp_x(self):
-        test_value = self._A - self._read_mem((self._ROM.getByte(self._PC) + self._X) & 0xFF)
+        test_value = self._A - self._read_mem((self._ROM.get_byte(self._PC) + self._X) & 0xFF)
         self._PC = (self._PC + 1) & 0xFFFF
         self._NF = (test_value >> 7) & 0x1
         self._ZF = not test_value
@@ -1110,7 +1105,7 @@ class SPL81408():
         return 4
 
     def _dec_zp_x(self):
-        addr = (self._ROM.getByte(self._PC) + self._X) & 0xFF
+        addr = (self._ROM.get_byte(self._PC) + self._X) & 0xFF
         self._PC = (self._PC + 1) & 0xFFFF
         new_value = (self._read_mem(addr) - 1) & 0xFF
         self._write_mem(addr, new_value)
@@ -1119,7 +1114,7 @@ class SPL81408():
         return 6
 
     def _cpx_imm(self):
-        test_value = self._X - self._ROM.getByte(self._PC)
+        test_value = self._X - self._ROM.get_byte(self._PC)
         self._PC = (self._PC + 1) & 0xFFFF
         self._NF = (test_value >> 7) & 0x1
         self._ZF = not test_value
@@ -1127,7 +1122,7 @@ class SPL81408():
         return 2
 
     def _cpx_zp(self):
-        test_value = self._X - self._read_mem(self._ROM.getByte(self._PC))
+        test_value = self._X - self._read_mem(self._ROM.get_byte(self._PC))
         self._PC = (self._PC + 1) & 0xFFFF
         self._NF = (test_value >> 7) & 0x1
         self._ZF = not test_value
@@ -1135,12 +1130,12 @@ class SPL81408():
         return 3
 
     def _sbc_zp(self):
-        self._sbc(self._read_mem(self._ROM.getByte(self._PC)))
+        self._sbc(self._read_mem(self._ROM.get_byte(self._PC)))
         self._PC = (self._PC + 1) & 0xFFFF
         return 3
 
     def _inc_zp(self):
-        opcode = self._ROM.getByte(self._PC)
+        opcode = self._ROM.get_byte(self._PC)
         self._PC = (self._PC + 1) & 0xFFFF
         new_value = (self._read_mem(opcode) + 1) & 0xFF
         self._write_mem(opcode, new_value)
@@ -1155,7 +1150,7 @@ class SPL81408():
         return 2
 
     def _sbc_imm(self):
-        self._sbc(self._ROM.getByte(self._PC))
+        self._sbc(self._ROM.get_byte(self._PC))
         self._PC = (self._PC + 1) & 0xFFFF
         return 2
 
@@ -1164,7 +1159,7 @@ class SPL81408():
 
     def _beq(self):
         if (self._ZF):
-            opcode = self._ROM.getByte(self._PC)
+            opcode = self._ROM.get_byte(self._PC)
             self._PC = (self._PC + 1) & 0xFFFF
             prev_PC = self._PC
             self._PC = (self._PC + opcode - ((opcode & 0x80) << 1)) & 0xFFFF

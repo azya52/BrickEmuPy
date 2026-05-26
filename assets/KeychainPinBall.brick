@@ -6,49 +6,68 @@
 	
 	"buttons": {
 		"btnLeft": {
-			"port": "PP",
-			"pin": 1,
-			"level": 0,
 			"hot_keys": [65, 16777234]
 		},
 		"btnRight": {
-			"port": "PP",
-			"pin": 0,
-			"level": 0,
 			"hot_keys": [68, 16777236]
 		},
 		"btnStartOn": {
-			"port": "PS",
-			"pin": 0,
-			"level": 0,
 			"hot_keys": [32, 16777235, 16777220]
 		},
 		"btnPause": {
-			"port": "PS",
-			"pin": 2,
-			"level": 0,
 			"hot_keys": [83, 16777237]
 		},
 		"btnReset": {
-			"port": "RES",
-			"pin": 0,
-			"level": 0,
 			"hot_keys": [51, 82]
 		},
 		"btnMute": {
-			"port": "PS",
-			"pin": 1,
-			"level": 0,
 			"hot_keys": [50]
 		},
 		"btnOff": {
-			"port": "PS",
-			"pin": 3,
-			"level": 0,
 			"hot_keys": [49]
 		}
 	},
 	
+	"peripherals": {
+		"direct_input": {
+			"btnLeft": {
+				"port": "PP",
+				"mask": 1,
+				"level": 0
+			},
+			"btnRight": {
+				"port": "PP",
+				"mask": 0,
+				"level": 0
+			},
+			"btnStartOn": {
+				"port": "PS",
+				"mask": 0,
+				"level": 0
+			},
+			"btnPause": {
+				"port": "PS",
+				"mask": 2,
+				"level": 0
+			},
+			"btnReset": {
+				"port": "RES",
+				"mask": 0,
+				"level": 0
+			},
+			"btnMute": {
+				"port": "PS",
+				"mask": 1,
+				"level": 0
+			},
+			"btnOff": {
+				"port": "PS",
+				"mask": 3,
+				"level": 0
+			}
+		}
+	},
+
 	"mask_options": {
 		"rom_path": "./assets/KeychainPinBall.bin",
 		"sound_rom_path": "./assets/KeychainPinBall.srom",

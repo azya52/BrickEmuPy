@@ -6,49 +6,66 @@
 	
 	"buttons": {
 		"btnAdjust": {
-			"port": "5",
-			"pin": 0,
-			"level": 1,
 			"hot_keys": [50]
 		},
 		"btnMode": {
-			"port": "5",
-			"pin": 1,
-			"level": 1,
 			"hot_keys": [51, 82]
 		},
 		"btnLeft": {
-			"port": "4",
-			"pin": 1,
-			"level": 1,
 			"hot_keys": [65, 16777234]
 		},
 		"btnRight": {
-			"port": "4",
-			"pin": 0,
-			"level": 1,
 			"hot_keys": [68, 16777236]
 		},
 		"btnAttack": {
-			"port": "4",
-			"pin": 2,
-			"level": 1,
 			"hot_keys": [83, 16777237]
 		},
 		"btnJump": {
-			"port": "4",
-			"pin": 3,
-			"level": 1,
 			"hot_keys": [32, 16777235, 16777220]
 		}
 	},
-	
+
+	"peripherals": {
+		"direct_input": {
+			"btnAdjust": {
+				"port": "5",
+				"mask": 1,
+				"level": 1
+			},
+			"btnMode": {
+				"port": "5",
+				"mask": 2,
+				"level": 1
+			},
+			"btnLeft": {
+				"port": "4",
+				"mask": 2,
+				"level": 1
+			},
+			"btnRight": {
+				"port": "4",
+				"mask": 1,
+				"level": 1
+			},
+			"btnAttack": {
+				"port": "4",
+				"mask": 4,
+				"level": 1
+			},
+			"btnJump": {
+				"port": "4",
+				"mask": 8,
+				"level": 1
+			}
+		}
+	},
+
 	"mask_options": {
-		"rom_path": "./assets/result.bin",
-		
+		"rom_path": "./assets/EpochMonsterPanic.bin",
+
 		"sound": {
 			"port": 6,
-			"pin": 3
+			"mask": [8, 4]
 		}
 	}
 }

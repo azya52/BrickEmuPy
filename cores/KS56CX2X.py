@@ -10,7 +10,6 @@ IORAM_OFFSET = 0xF80
 IORAM_SIZE = 128
 
 EMPTY_VRAM = tuple([0] * VRAM_SIZE)
-FULL_VRAM = tuple([1] * VRAM_SIZE)
 
 BASIC_TIMER_DIV = [1 << 12, 1 << 12, 1 << 9, 1 << 9, 1 << 7, 1 << 7, 1 << 5]
 WATCH_TIMER_DIV = [1 << 14, 1 << 7]
@@ -89,9 +88,12 @@ M_IM2_KR2KR3 = 2
 M_IM2_KR0TOKR3 = 3
 
 class KS56CX2X():
-    def __init__(self, mask, clock):
+    def __init__(self, mask, clock, interconnect):
         self._ROM = ROM(mask['rom_path'])
-        self._sound = PinTogglingSound(clock)
+        self._sound = PinTogglingSound(interconnect)
+
+        self._interconnect = interconnect
+        self._interconnect.register_port_device(self)
 
         self._instr_counter = 0
         self._basic_timer_counter = 0
@@ -101,9 +103,7 @@ class KS56CX2X():
         self._timerWatch_counter = 0
         self._sub_clock_div = clock / SUB_CLOCK
         self._cpu_clock_div = MAIN_CLOCK_DIV[0]
-
-        self._cycle_counter = 0
-        
+       
         self._reset()
 
         self._io_tbl = {
@@ -509,7 +509,7 @@ class KS56CX2X():
         if ("SBS" in state):
             self._SBS = state["SBS"] & 0xF
         if ("PC" in state):
-            self._PC = state["PC"] & self._ROM.getMask()
+            self._PC = state["PC"] & self._ROM.get_mask()
         if ("SP" in state):
             self._SP = state["SP"] & 0xFF
         if ("RAM0" in state):
@@ -523,7 +523,7 @@ class KS56CX2X():
                 if i < len(self._io_tbl):
                         list(self._io_tbl.values())[i][1](self, value & 0xF)
         if ("MEMORY" in state):
-            self._ROM.writeWord(state["MEMORY"][0], state["MEMORY"][1])
+            self._rom.write_word(state["MEMORY"][0], state["MEMORY"][1])
 
     def _init_registers(self):
         self._PC = 0
@@ -844,7 +844,7 @@ class KS56CX2X():
 
     def _set_io_port3(self, value):
         self._PORT3_OUT_LATCH = value
-        self._sound.toggle(value & 0x8, 0, self._cycle_counter)
+        self._sound.toggle(value & 0x8, 0)
 
     def _get_io_port5(self):
         return ~self._PORT5[0] & self._PORT5[1]
@@ -871,34 +871,28 @@ class KS56CX2X():
     def _set_io_port9(self, value):
         self._PORT9_OUT_LATCH = value
 
-    def pin_set(self, port, pin, level):
-        self._process_port_int(port, pin, level)
-
-    def pin_release(self, port, pin):
-        self._process_port_int(port, pin, -1)
-
-    def _process_port_int(self, port, pin, level):
+    def port_handler(self, port, mask, level):
         if (port == 'PORT1'):
             prev_port = self._get_io_port1()
-            self._PORT1[0] &= ~(1 << pin)
-            self._PORT1[1] &= ~(1 << pin)
+            self._PORT1[0] &= ~mask
+            self._PORT1[1] &= ~mask
             if (level >= 0):
-                self._PORT1[level] |= (1 << pin)
+                self._PORT1[level] |= mask
             if (prev_port != self._get_io_port1()):
-                if ((pin == 1) and (self._IM1 != ((self._get_io_port1() >> 1) & 0x1))):
+                if ((mask & 0x2) and (self._IM1 != ((self._get_io_port1() >> 1) & 0x1))):
                     self._INTG |= IOM_INTG_IRQ1
-                if ((pin == 0) and (self._IM0 != M_IM0_IGNORED) and
+                if ((mask & 0x1) and (self._IM0 != M_IM0_IGNORED) and
                     (((self._IM0 & M_IM0_FALLING_EDGE) != level) or (self._IM0 & M_IM0_ANY_EDGE))):
                     self._INTG |= IOM_INTG_IRQ0
         elif (port == 'PORT6'):
             prev_port = self._get_io_port6()
-            self._PORT6[0] &= ~(1 << pin)
-            self._PORT6[1] &= ~(1 << pin)
+            self._PORT6[0] &= ~mask
+            self._PORT6[1] &= ~mask
             if (level >= 0):
-                self._PORT6[level] |= (1 << pin)
+                self._PORT6[level] |= mask
             if ((level == 0 and prev_port != self._get_io_port6()) and
-                ((self._PM6 & (1 << pin)) == PORT_MODE_INPUT) and
-                (self._IM2 == M_IM2_KR0TOKR3 or (self._IM2 == M_IM2_KR2KR3 and (pin == 2 or pin == 3)))):
+                ((self._PM6 & mask) == PORT_MODE_INPUT) and
+                (self._IM2 == M_IM2_KR0TOKR3 or (self._IM2 == M_IM2_KR2KR3 and (mask & 0xC)))):
                 self._INTH |= IOM_INTH_IRQ2
 
     def update_cpu_clock_div(self):
@@ -938,10 +932,10 @@ class KS56CX2X():
             self._watch_timer_counter = 0
 
     def _go_vector(self, addr):
-        vector = self._ROM.getWord(addr)
+        vector = self._ROM.get_word(addr)
         self._MBE = (vector >> 15) & 0x1
         self._RBE = (vector >> 14) & 0x1
-        self._PC = vector & self._ROM.getMask()
+        self._PC = vector & self._ROM.get_mask()
 
     def _interrupt(self, IRQn):
         vector_addr = IRQn << 1
@@ -998,9 +992,9 @@ class KS56CX2X():
         exec_cycles = self._cpu_clock_div
             
         if (self._PCC_MODE == PCC_MODE_NORMAL):
-            byte = self._ROM.getByte(self._PC)
+            byte = self._ROM.get_byte(self._PC)
             bytes_count = self._execute[byte][1]
-            opcode = self._ROM.getBytes(self._PC, bytes_count)
+            opcode = self._ROM.get_bytes(self._PC, bytes_count)
             self._PC += bytes_count
             exec_cycles *= self._execute[byte][0](self, opcode)
             self._instr_counter += 1
@@ -1024,7 +1018,6 @@ class KS56CX2X():
             if (IRQn > 0):
                 self._interrupt(IRQn)
         
-        self._cycle_counter += exec_cycles
         return exec_cycles
 
     def _get_mem(self, addr):
@@ -1185,7 +1178,7 @@ class KS56CX2X():
         return (self._RAM[sph] << 4) | self._RAM[spl]
 
     def _skip_next(self):
-        opcode = self._ROM.getByte(self._PC)
+        opcode = self._ROM.get_byte(self._PC)
         byte_count = self._execute[opcode][1]
         self._PC += byte_count
         return 1 if (byte_count < 3) else 2
@@ -1259,19 +1252,19 @@ class KS56CX2X():
     def _geti_taddr(self, opcode):
         #00 T5 T4 T3 T2 T1 T0
         taddr = opcode << 1
-        byte = self._ROM.getByte(taddr)
+        byte = self._ROM.get_byte(taddr)
         bytes_count = self._execute[byte][1]
         execute_time = 1
         if (bytes_count == 1):
             if ((byte & 0xC0) == 0):
-                self._PC = self._ROM.getWord(taddr) & self._ROM.getMask()
+                self._PC = self._ROM.get_word(taddr) & self._ROM.get_mask()
                 return 3
             opcode = byte
             execute_time += self._execute[byte][0](self, opcode)
-            byte = self._ROM.getByte(taddr + 1)
+            byte = self._ROM.get_byte(taddr + 1)
             execute_time += self._execute[byte][0](self, opcode)
         else:
-            opcode = self._ROM.getBytes(taddr, bytes_count)
+            opcode = self._ROM.get_bytes(taddr, bytes_count)
             execute_time += self._execute[byte][0](self, opcode)
         return execute_time
 
@@ -1281,7 +1274,7 @@ class KS56CX2X():
         self._stack_push(self._PC & 0x000F)
         self._stack_push((self._MBE << 3) | (self._RBE << 2) | (self._PC >> 12) & 0x0003)
         self._stack_push((self._PC >> 8) & 0x000F)
-        self._PC = opcode & self._ROM.getMask()
+        self._PC = opcode & self._ROM.get_mask()
         return 2
 
     def _pop_rp(self, opcode):
@@ -1296,7 +1289,7 @@ class KS56CX2X():
 
     def _brcb_caddr(self, opcode):
         #0101 A11 A10 A9 A8 | A7 A6 A5 A4 A3 A2 A1 A0
-        self._PC = ((self._PC & 0xF000) | (opcode & 0xFFF)) & self._ROM.getMask()
+        self._PC = ((self._PC & 0xF000) | (opcode & 0xFFF)) & self._ROM.get_mask()
         return 2
 
     def _adds_a_n4(self, opcode):
@@ -1311,11 +1304,11 @@ class KS56CX2X():
         #0111 I3 I2 I1 I0
         self._set_reg(REG_A, opcode & 0xF)
         cycle_count = 1
-        opcode = self._ROM.getByte(self._PC)
+        opcode = self._ROM.get_byte(self._PC)
         while (((opcode >> 4) == 0b0111) or (opcode == 0b10001001)):
             cycle_count += 1
             self._PC += self._execute[opcode][1]
-            opcode = self._ROM.getByte(self._PC)
+            opcode = self._ROM.get_byte(self._PC)
         return cycle_count
 
     def _ske_a_ahl(self, opcode):
@@ -1363,11 +1356,11 @@ class KS56CX2X():
         #10001001 | I7 I6 I5 I4 I3 I2 I1 I0
         self._set_rp(RPE_XA, opcode & 0xFF)
         cycle_count = 2
-        opcode = self._ROM.getByte(self._PC)
+        opcode = self._ROM.get_byte(self._PC)
         while (((opcode >> 4) == 0b0111) or (opcode == 0b10001001)):
             cycle_count += 1
             self._PC += self._execute[opcode][1]
-            opcode = self._ROM.getByte(self._PC)
+            opcode = self._ROM.get_byte(self._PC)
         return cycle_count
 
     def _incs_rp1(self, opcode):
@@ -1382,11 +1375,11 @@ class KS56CX2X():
         #10001011 | I7 I6 I5 I4 I3 I2 I1 I0
         self._set_rp(RPE_HL, opcode & 0xFF)
         cycle_count = 2
-        opcode = self._ROM.getByte(self._PC)
+        opcode = self._ROM.get_byte(self._PC)
         while (opcode == 0b10001011):
             cycle_count += 1
             self._PC += self._execute[opcode][1]
-            opcode = self._ROM.getByte(self._PC)
+            opcode = self._ROM.get_byte(self._PC)
         return cycle_count
 
     def _mov_de_n8(self, opcode):
@@ -1455,7 +1448,7 @@ class KS56CX2X():
         new_A = self._get_reg(REG_A) + self._get_ahl() + self._CY
         self._set_reg(REG_A, new_A & 0xF)
         self._CY = new_A > 15
-        opcode = self._ROM.getByte(self._PC)
+        opcode = self._ROM.get_byte(self._PC)
         if ((opcode >> 4) == 0b0110):
             if (self._CY):
                 return 1 + self._skip_next()
@@ -1466,7 +1459,7 @@ class KS56CX2X():
 
     def _br_addr(self, opcode):
         #10101011 | 00 A13 A12 A11 A10 A9 A8 | A7 A6 A5 A4 A3 A2 A1 A0
-        self._PC = opcode & self._ROM.getMask()
+        self._PC = opcode & self._ROM.get_mask()
         return 1
 
     def _call_addr(self, opcode):
@@ -1475,7 +1468,7 @@ class KS56CX2X():
         self._stack_push(self._PC & 0x000F)
         self._stack_push((self._MBE << 3) | (self._RBE << 2) | (self._PC >> 12) & 0x0003)
         self._stack_push((self._PC >> 8) & 0x000F)
-        self._PC = opcode & self._ROM.getMask()
+        self._PC = opcode & self._ROM.get_mask()
         return 3
 
     def _xor_a_ahl(self, opcode):
@@ -1508,7 +1501,7 @@ class KS56CX2X():
         new_A = self._get_reg(REG_A) - self._get_ahl() - self._CY
         self._set_reg(REG_A, new_A & 0xF)
         self._CY = new_A < 0
-        opcode = self._ROM.getByte(self._PC)
+        opcode = self._ROM.get_byte(self._PC)
         if ((opcode >> 4) == 0b0110):
             if (self._CY):
                 self._PC += 1
@@ -1546,13 +1539,13 @@ class KS56CX2X():
     def _movt_xa_pcxa(self, opcode):
         #11010000
         addr = (self._PC & 0xFF00) | self._get_rp(RPE_XA)
-        self._set_rp(RPE_XA, self._ROM.getByte(addr))
+        self._set_rp(RPE_XA, self._ROM.get_byte(addr))
         return 3
 
     def _movt_xa_bcxa(self, opcode):
         #11010001
         addr = (self._get_rp(RPE_BC) << 8) | self._get_rp(RPE_XA)
-        self._set_rp(RPE_XA, self._ROM.getByte(addr))
+        self._set_rp(RPE_XA, self._ROM.get_byte(addr))
         return 3
 
     def _adds_a_ahl(self, opcode):
@@ -1566,13 +1559,13 @@ class KS56CX2X():
     def _movt_xa_pcde(self, opcode):
         #11010100
         addr = (self._PC & 0xFF00) | self._get_rp(RPE_DE)
-        self._set_rp(RPE_XA, self._ROM.getByte(addr))
+        self._set_rp(RPE_XA, self._ROM.get_byte(addr))
         return 3
 
     def _movt_xa_bcde(self, opcode):
         #11010101
         addr = (self._get_rp(RPE_BC) << 8) | self._get_rp(RPE_DE)
-        self._set_rp(RPE_XA, self._ROM.getByte(addr))
+        self._set_rp(RPE_XA, self._ROM.get_byte(addr))
         return 3
 
     def _not1_cy(self, opcode):
@@ -1603,7 +1596,7 @@ class KS56CX2X():
         self._RBE = (stack_value >> 2) & 0x1
         self._PC |= self._stack_pop()
         self._PC |= self._stack_pop() << 4
-        self._PC &= self._ROM.getMask()
+        self._PC &= self._ROM.get_mask()
         return 3 + self._skip_next()
 
     def _mov_a_ahl(self, opcode):
@@ -1708,7 +1701,7 @@ class KS56CX2X():
         self._RBE = (stack_value >> 2) & 0x1
         self._PC |= self._stack_pop()
         self._PC |= self._stack_pop() << 4
-        self._PC &= self._ROM.getMask()
+        self._PC &= self._ROM.get_mask()
         return 3
 
     def _reti(self, opcode):
@@ -1727,17 +1720,17 @@ class KS56CX2X():
         stack_value = self._stack_pop()
         self._CY = (stack_value >> 3) & 0x1
         self._SK = stack_value & 0x7
-        self._PC &= self._ROM.getMask()
+        self._PC &= self._ROM.get_mask()
         return 3
 
     def _br_pcxa(self, opcode):
         #10011001 | 00000000
-        self._PC = ((self._PC & 0xFF00) | (self._get_reg(REG_X) << 4) | self._get_reg(REG_A)) & self._ROM.getMask()
+        self._PC = ((self._PC & 0xFF00) | (self._get_reg(REG_X) << 4) | self._get_reg(REG_A)) & self._ROM.get_mask()
         return 3
 
     def _br_bcxa(self, opcode):
         #10011001 | 00000001
-        self._PC = ((self._get_reg(REG_B) << 12) | (self._get_reg(REG_C) << 8) | (self._get_reg(REG_X) << 4) | self._get_reg(REG_A)) & self._ROM.getMask()
+        self._PC = ((self._get_reg(REG_B) << 12) | (self._get_reg(REG_C) << 8) | (self._get_reg(REG_X) << 4) | self._get_reg(REG_A)) & self._ROM.get_mask()
         return 3
 
     def _incs_ahl(self, opcode):
@@ -1750,12 +1743,12 @@ class KS56CX2X():
 
     def _br_pcde(self, opcode):
         #10011001 | 00000100
-        self._PC = ((self._PC & 0xFF00) | (self._get_reg(REG_D) << 4) | self._get_reg(REG_E)) & self._ROM.getMask()
+        self._PC = ((self._PC & 0xFF00) | (self._get_reg(REG_D) << 4) | self._get_reg(REG_E)) & self._ROM.get_mask()
         return 3
 
     def _br_bcde(self, opcode):
         #10011001 | 00000101
-        self._PC = ((self._get_reg(REG_B) << 12) | (self._get_reg(REG_C) << 8) | (self._get_reg(REG_D) << 4) | self._get_reg(REG_E)) & self._ROM.getMask()
+        self._PC = ((self._get_reg(REG_B) << 12) | (self._get_reg(REG_C) << 8) | (self._get_reg(REG_D) << 4) | self._get_reg(REG_E)) & self._ROM.get_mask()
         return 3
 
     def _pop_bs(self, opcode):

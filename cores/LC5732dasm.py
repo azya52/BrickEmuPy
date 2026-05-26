@@ -1,6 +1,6 @@
 class LC5732dasm():
 
-    def __init__(self):
+    def __init__(self, roots=None):
         self._bytebase = '0x%0.2X'
         self._nibblebase = '0x%0.1X'
         self._addrbase = '%0.3X'
@@ -110,7 +110,7 @@ class LC5732dasm():
 
             for i in range(len(listing)):
                 if (listing[i] is None):
-                    byte = rom.getByte(i)
+                    byte = rom.get_byte(i)
                     listing[i] = (1, byte, 'db ' + self._bytebase % byte, '')
                 listing[i] = (self._opbase % listing[i][1], (listing[i][2] + "\t;" + listing[i][3]).expandtabs(10))
             
@@ -129,13 +129,13 @@ class LC5732dasm():
     
     def _disassemble(self, pc, listing, rom):
         while (pc < len(listing) and listing[pc] is None):
-            opcode = rom.getByte(pc)
+            opcode = rom.get_byte(pc)
             next_pcs, listing[pc] = self._instructions[opcode](self, pc, opcode, rom)
             instruction_size = listing[pc][0]
             while (instruction_size > 1  and (pc + 1) < len(listing)):
                 instruction_size -= 1
                 pc += 1
-                listing[pc] = (1, rom.getByte(pc), '', '')
+                listing[pc] = (1, rom.get_byte(pc), '', '')
             pc = next_pcs[0]
             if (len(next_pcs) > 1):
                 listing = self._disassemble(next_pcs[1], listing, rom)
@@ -177,7 +177,7 @@ class LC5732dasm():
 
     def _jmp_x(self, pc, opcode, rom):
         #00001XXX XXXXXXXX  2 2   PC <- X
-        x = ((opcode & 0x7) << 8) | rom.getByte(pc + 1)
+        x = ((opcode & 0x7) << 8) | rom.get_byte(pc + 1)
         return (x,), (2, opcode, "jmp " + self._addrbase % x, "PC <- %0.3X" % x)
 
     def _jmp_p(self, pc, opcode, rom):
@@ -256,42 +256,42 @@ class LC5732dasm():
 
     def _baz_x(self, pc, opcode, rom):
         #01000XXX XXXXXXXX  2 2   PC <- X if AC == 0
-        x = ((opcode & 0x7) << 8) | rom.getByte(pc + 1)
+        x = ((opcode & 0x7) << 8) | rom.get_byte(pc + 1)
         return (x, pc + 2,), (2, opcode, "baz " + self._addrbase % x, "PC <- X if AC == 0")
 
     def _bab0_x(self, pc, opcode, rom):
         #01001XXX XXXXXXXX  2 2   PC <- X if AC0
-        x = ((opcode & 0x7) << 8) | rom.getByte(pc + 1)
+        x = ((opcode & 0x7) << 8) | rom.get_byte(pc + 1)
         return (x, pc + 2,), (2, opcode, "bab0 " + self._addrbase % x, "PC <- X if AC0")
 
     def _banz_x(self, pc, opcode, rom):
         #01010XXX XXXXXXXX  2 2   PC <- X if AC != 0
-        x = ((opcode & 0x7) << 8) | rom.getByte(pc + 1)
+        x = ((opcode & 0x7) << 8) | rom.get_byte(pc + 1)
         return (x, pc + 2,), (2, opcode, "banz " + self._addrbase % x, "PC <- X if AC != 0")
 
     def _bab1_x(self, pc, opcode, rom):
         #01011XXX XXXXXXXX  2 2   PC <- X if AC1
-        x = ((opcode & 0x7) << 8) | rom.getByte(pc + 1)
+        x = ((opcode & 0x7) << 8) | rom.get_byte(pc + 1)
         return (x, pc + 2,), (2, opcode, "bab1 " + self._addrbase % x, "PC <- X if AC1")
 
     def _bcnh_x(self, pc, opcode, rom):
         #01100XXX XXXXXXXX  2 2   PC <- X if CF == 0
-        x = ((opcode & 0x7) << 8) | rom.getByte(pc + 1)
+        x = ((opcode & 0x7) << 8) | rom.get_byte(pc + 1)
         return (x, pc + 2,), (2, opcode, "bcnh " + self._addrbase % x, "PC <- X if CF == 0")
 
     def _bab2_x(self, pc, opcode, rom):
         #01101XXX XXXXXXXX  2 2   PC <- X if AC2
-        x = ((opcode & 0x7) << 8) | rom.getByte(pc + 1)
+        x = ((opcode & 0x7) << 8) | rom.get_byte(pc + 1)
         return (x, pc + 2,), (2, opcode, "bab2 " + self._addrbase % x, "PC <- X if AC2")
 
     def _bch_x(self, pc, opcode, rom):
         #01110XXX XXXXXXXX  2 2   PC <- X if CF != 0
-        x = ((opcode & 0x7) << 8) | rom.getByte(pc + 1)
+        x = ((opcode & 0x7) << 8) | rom.get_byte(pc + 1)
         return (x, pc + 2,), (2, opcode, "bch " + self._addrbase % x, "PC <- X if CF != 0")
 
     def _bab3_x(self, pc, opcode, rom):
         #01111XXX XXXXXXXX  2 2   PC <- X if AC3
-        x = ((opcode & 0x7) << 8) | rom.getByte(pc + 1)
+        x = ((opcode & 0x7) << 8) | rom.get_byte(pc + 1)
         return (x, pc + 2,), (2, opcode, "bab3 " + self._addrbase % x, "PC <- X if AC3")
 
     def _adc(self, pc, opcode, rom):
@@ -360,42 +360,42 @@ class LC5732dasm():
 
     def _adci(self, pc, opcode, rom):
         #10010000 ----XXXX  2 2   AC <- (AC) + X + (CF); CF
-        x = rom.getByte(pc + 1) & 0xF
+        x = rom.get_byte(pc + 1) & 0xF
         return (pc + 2,), (2, opcode, "adci " + self._nibblebase % x, "AC <- (AC) + X + (CF); CF")
 
     def _sbci(self, pc, opcode, rom):
         #10010001 ----XXXX  2 2   AC <- (AC) + ~X + (CF); CF
-        x = rom.getByte(pc + 1) & 0xF
+        x = rom.get_byte(pc + 1) & 0xF
         return (pc + 2,), (2, opcode, "sbci " + self._nibblebase % x, "AC <- (AC) + ~X + (CF); CF")
 
     def _addi(self, pc, opcode, rom):
         #10010010 ----XXXX  2 2   AC <- (AC) + X; CF
-        x = rom.getByte(pc + 1) & 0xF
+        x = rom.get_byte(pc + 1) & 0xF
         return (pc + 2,), (2, opcode, "addi " + self._nibblebase % x, "AC <- (AC) + X; CF")
 
     def _subi(self, pc, opcode, rom):
         #10010011 ----XXXX  2 2   AC <- (AC) + ~X + 1; CF
-        x = rom.getByte(pc + 1) & 0xF
+        x = rom.get_byte(pc + 1) & 0xF
         return (pc + 2,), (2, opcode, "subi " + self._nibblebase % x, "AC <- (AC) + ~X + 1; CF")
 
     def _adni(self, pc, opcode, rom):
         #10010100 ----XXXX  2 2   AC <- (AC) + X
-        x = rom.getByte(pc + 1) & 0xF
+        x = rom.get_byte(pc + 1) & 0xF
         return (pc + 2,), (2, opcode, "adni " + self._nibblebase % x, "AC <- (AC) + X")
 
     def _andi(self, pc, opcode, rom):
         #10010101 ----XXXX  2 2   AC <- (AC) and X
-        x = rom.getByte(pc + 1) & 0xF
+        x = rom.get_byte(pc + 1) & 0xF
         return (pc + 2,), (2, opcode, "andi " + self._nibblebase % x, "AC <- (AC) and X")
 
     def _eori(self, pc, opcode, rom):
         #10010110 ----XXXX  2 2   AC <- (AC) xor X
-        x = rom.getByte(pc + 1) & 0xF
+        x = rom.get_byte(pc + 1) & 0xF
         return (pc + 2,), (2, opcode, "eori " + self._nibblebase % x, "AC <- (AC) xor X")
 
     def _ori(self, pc, opcode, rom):
         #10010111 ----XXXX  2 2   AC <- (AC) or X
-        x = rom.getByte(pc + 1) & 0xF
+        x = rom.get_byte(pc + 1) & 0xF
         return (pc + 2,), (2, opcode, "ori " + self._nibblebase % x, "AC <- (AC) or X")
 
     def _inc(self, pc, opcode, rom):
@@ -432,7 +432,7 @@ class LC5732dasm():
 
     def _jsr_x(self, pc, opcode, rom):
         #10100XXX XXXXXXXX  2 2   STACK <- PC + 2; PC <- X
-        x = ((opcode & 0x7) << 8) | rom.getByte(pc + 1)
+        x = ((opcode & 0x7) << 8) | rom.get_byte(pc + 1)
         return (x, pc + 2,), (2, opcode, "jsr " + self._addrbase % x, "STACK <- PC + 2; PC <- X")
 
     def _ipm(self, pc, opcode, rom):
@@ -518,7 +518,7 @@ class LC5732dasm():
 
     def _sas_x(self, pc, opcode, rom):
         #11111010 XXXXXXXX  2 2   ALM <- X
-        x = rom.getByte(pc + 1)
+        x = rom.get_byte(pc + 1)
         return (pc + 2,), (2, opcode, "sas " + self._bytebase % x, "ALM <- 0x%0.1X" % x)
 
     def _csec(self, pc, opcode, rom):

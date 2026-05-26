@@ -12,7 +12,7 @@ ADDR = "%0.4X"
 ADDRESS_SPACE_SIZE = 0x10000
 
 class SPLB20dasm():
-    def __init__(self):
+    def __init__(self, roots=None):
         self._instructions = (
             (SPLB20dasm._brk, 1),
             *([(SPLB20dasm._dummy, 1)] * 4),
@@ -142,13 +142,13 @@ class SPLB20dasm():
             for i in range(7):
                 vector = rom.size() - 2 - i * 2
                 if (vector > 0):
-                    addr = (rom.getByte(vector) | (rom.getByte(vector + 1) << 8)) - self._rom_offset
+                    addr = (rom.get_byte(vector) | (rom.get_byte(vector + 1) << 8)) - self._rom_offset
                     if (addr != 0xFFFF):
                         listing = self._disassemble(addr, listing, rom)
-            result = [()] * ADDRESS_SPACE_SIZE
+            result = [(0, 0)] * ADDRESS_SPACE_SIZE
             for i in range(len(listing)):
                 if (listing[i] is None):
-                    byte = rom.getByte(i)
+                    byte = rom.get_byte(i)
                     listing[i] = (1, byte, 'db 0x%0.2X' % byte)
                 result[i + self._rom_offset] = ("%0.2X" % listing[i][1], listing[i][2])
             return {"LISTING": tuple(result)}
@@ -164,17 +164,17 @@ class SPLB20dasm():
     
     def _disassemble(self, pc, listing, rom):
         while (pc >= 0 and pc < len(listing) and listing[pc] is None):
-            opcode = rom.getByte(pc)
+            opcode = rom.get_byte(pc)
             instruction = self._instructions[opcode]
             instruction_size = instruction[1]
             if (instruction_size > 1):
-                opcode = rom.getBytes(pc, instruction_size)
+                opcode = rom.get_bytes(pc, instruction_size)
             next_pc, symbol = instruction[0](self, pc, opcode)
             listing[pc] = (instruction_size, opcode, symbol)
             while ((instruction_size > 1)  and ((pc + 1) < len(listing))):
                 instruction_size -= 1
                 pc += 1
-                listing[pc] = (1, rom.getByte(pc), '')
+                listing[pc] = (1, rom.get_byte(pc), '')
             pc = next_pc[0]
             if (len(next_pc) > 1):
                 listing = self._disassemble(next_pc[1], listing, rom)

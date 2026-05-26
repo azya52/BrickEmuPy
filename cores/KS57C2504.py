@@ -110,29 +110,31 @@ IO_IMOD0_FXX64_SAMPLING = 0x8
 IO_IMOD1_FALLING_EDGE = 0x1
 IO_IMOD2_FALLING_EDGE = 0x1
 
-IO_MASK_IMODK_PINS = 0x3
+IO_MASK_IMODK_MASK = [0x0, 0x3, 0x7, 0xF]
+IO_MASK_IMODK = 0x3
 IO_IMODK_RISING_EDGE = 0x4
 
 PORT4_TC0_OUT_PIN = 0x2
-PORT1_INT0_PIN = 0
-PORT1_INT1_PIN = 1
-PORT1_INT2_PIN = 2
-PORT1_INT4_PIN = 3
+PORT1_INT0_MASK = 0
+PORT1_INT1_MASK = 1
+PORT1_INT2_MASK = 2
+PORT1_INT4_MASK = 3
 
 class KS57C2504():
-    def __init__(self, mask, clock):
+    def __init__(self, mask, clock, interconnect):
         self._ROM = ROM(mask['rom_path'])
-        self._sound = PinTogglingSound(clock)
+        self._sound = PinTogglingSound(interconnect)
+
+        self._interconnect = interconnect
+        self._interconnect.register_port_device(self)
 
         self._instr_counter = 0
-        self._cycle_counter = 0
         self._basic_timer_counter = 0
         self._T0_timer_counter = 0
         self._watch_timer_counter = 0
 
         self._sub_clock_div = clock / SUB_CLOCK
         self._cpu_clock_div = MAIN_CLOCK_DIV[0]
-        
         self._reset()
 
         self._io_tbl = {
@@ -504,7 +506,7 @@ class KS57C2504():
         if ("MBS" in state):
             self._SMB = state["MBS"] & 0xF
         if ("PC" in state):
-            self._PC = state["PC"] & self._ROM.getMask()
+            self._PC = state["PC"] & self._ROM.get_mask()
         if ("SP" in state):
             self._SP = state["SP"] & 0xFF
         if ("RAM0" in state):
@@ -518,7 +520,7 @@ class KS57C2504():
                 if i < len(self._io_tbl):
                         list(self._io_tbl.values())[i][1](self, value & 0xF)
         if ("MEMORY" in state):
-            self._ROM.writeWord(state["MEMORY"][0], state["MEMORY"][1])
+            self._rom.write_word(state["MEMORY"][0], state["MEMORY"][1])
 
     def _init_registers(self):
         self._PC = 0
@@ -593,7 +595,7 @@ class KS57C2504():
         self._RAM = [0] * RAM_SIZE
 
     def _reset(self):
-        self._sound.toggle(0, 0, 0)
+        self._sound.toggle(0, 0)
         self._init_registers()
         self._go_vector(0)
 
@@ -884,7 +886,7 @@ class KS57C2504():
 
     def _set_io_port2(self, value):
         if (self._PORT2_OUT_LATCH != value):
-            self._sound.toggle(value & 0x8, value & 0x4, self._cycle_counter)
+            self._sound.toggle((value & 0x8) > 0, (value & 0x4) > 0)
         self._PORT2_OUT_LATCH = value
 
     def _get_io_port3(self):
@@ -901,50 +903,44 @@ class KS57C2504():
     def _set_io_port4(self, value):
         self._PORT4_OUT_LATCH = value
 
-    def pin_set(self, port, pin, level):
-        self._process_port_int(port, pin, level)
-
-    def pin_release(self, port, pin):
-        self._process_port_int(port, pin, -1)
-
-    def _process_port_int(self, port, pin, level):
+    def port_handler(self, port, mask, level):
         if (port == 'PORT0'):
             prev_port = self._get_io_port0()
-            self._PORT0[0] &= ~(1 << pin)
-            self._PORT0[1] &= ~(1 << pin)
+            self._PORT0[0] &= ~mask
+            self._PORT0[1] &= ~mask
             if (level >= 0):
-                self._PORT0[level] |= (1 << pin)
-            if ((self._IMODK & IO_MASK_IMODK_PINS) and (prev_port != self._get_io_port0())):
-                if ((pin <= (self._IMODK & IO_MASK_IMODK_PINS)) and ((self._IMODK & IO_IMODK_RISING_EDGE) == level)):
+                self._PORT0[level] |= mask
+            if ((self._IMODK & IO_MASK_IMODK) and (prev_port != self._get_io_port0())):
+                if ((mask & IO_MASK_IMODK_MASK[self._IMODK & IO_MASK_IMODK]) and ((self._IMODK & IO_IMODK_RISING_EDGE) == level)):
                     self._INTK |= IO_INTK_IRQK
         elif (port == 'PORT1'):
             prev_port = self._get_io_port1()
-            self._PORT1[0] &= ~(1 << pin)
-            self._PORT1[1] &= ~(1 << pin)
+            self._PORT1[0] &= ~mask
+            self._PORT1[1] &= ~mask
             if (level >= 0):
-                self._PORT1[level] |= (1 << pin)
+                self._PORT1[level] |= mask
             if (prev_port != self._get_io_port1()):
-                if ((pin == PORT1_INT0_PIN) and (self._IMOD0 != IO_IMOD0_IGNORED) and
+                if ((mask & PORT1_INT0_MASK) and (self._IMOD0 != IO_IMOD0_IGNORED) and
                     (((self._IMOD0 & IO_IMOD0_FALLING_EDGE) != level) or (self._IMOD0 & IO_IMOD0_ANY_EDGE))):
                     self._INT01 |= IO_INT01_IRQ0
-                if ((pin == PORT1_INT1_PIN) and ((self._IMOD1 & IO_IMOD1_FALLING_EDGE) != level)):
+                if ((mask & PORT1_INT1_MASK) and ((self._IMOD1 & IO_IMOD1_FALLING_EDGE) != level)):
                     self._INT01 |= IO_INT01_IRQ1
-                if ((pin == PORT1_INT2_PIN) and ((self._IMOD2 & IO_IMOD2_FALLING_EDGE) != level)):
+                if ((mask & PORT1_INT2_MASK) and ((self._IMOD2 & IO_IMOD2_FALLING_EDGE) != level)):
                     self._INT2 |= IO_INT2_IRQ2
-                if (pin == PORT1_INT4_PIN):
+                if (mask & PORT1_INT4_MASK):
                     self._INT4B |= IO_INT4B_IRQ4
         elif (port == 'PORT2'):
             prev_port = self._get_io_port2()
-            self._PORT2[0] &= ~(1 << pin)
-            self._PORT2[1] &= ~(1 << pin)
+            self._PORT2[0] &= ~mask 
+            self._PORT2[1] &= ~mask
         elif (port == 'PORT3'):
             prev_port = self._get_io_port3()
-            self._PORT3[0] &= ~(1 << pin)
-            self._PORT3[1] &= ~(1 << pin)
+            self._PORT3[0] &= ~mask
+            self._PORT3[1] &= ~mask
         elif (port == 'PORT4'):
             prev_port = self._get_io_port4()
-            self._PORT4[0] &= ~(1 << pin)
-            self._PORT4[1] &= ~(1 << pin)
+            self._PORT4[0] &= ~mask
+            self._PORT4[1] &= ~mask
 
     def update_cpu_clock_div(self):
         if (self._SCMOD & IO_SCMOD_SELECT_FXT):
@@ -981,10 +977,10 @@ class KS57C2504():
                 self._INTW |= IO_INTW_IRQW
 
     def _go_vector(self, addr):
-        vector = self._ROM.getWord(addr)
+        vector = self._ROM.get_word(addr)
         self._EMB = (vector >> 15) & 0x1
         self._ERB = (vector >> 14) & 0x1
-        self._PC = vector & self._ROM.getMask()
+        self._PC = vector & self._ROM.get_mask()
 
     def _interrupt(self, IRQn):
         vector_addr = IRQn << 1
@@ -1055,10 +1051,10 @@ class KS57C2504():
         exec_cycles = self._cpu_clock_div
  
         if (self._PCON_MODE == PCC_MODE_NORMAL):
-            opcode = self._ROM.getByte(self._PC)
+            opcode = self._ROM.get_byte(self._PC)
             instr = self._execute[opcode]
             if (instr[INSTR_SIZE] > 1):
-                opcode = self._ROM.getBytes(self._PC, instr[INSTR_SIZE])
+                opcode = self._ROM.get_bytes(self._PC, instr[INSTR_SIZE])
             self._PC += instr[INSTR_SIZE]
             exec_cycles *= instr[INSTR_EXE](self, opcode)
             self._instr_counter += 1
@@ -1080,7 +1076,6 @@ class KS57C2504():
 
         self._process_timers(exec_cycles)
 
-        self._cycle_counter += exec_cycles
         return exec_cycles
 
     def _get_mem(self, addr):
@@ -1266,7 +1261,7 @@ class KS57C2504():
         return (self._RAM[(sp + 1) & 0xFF] << 4) | self._RAM[sp]
 
     def _skip_next(self):
-        opcode = self._ROM.getByte(self._PC)
+        opcode = self._ROM.get_byte(self._PC)
         byte_count = self._execute[opcode][INSTR_SIZE]
         self._PC += byte_count
         return 1 + (byte_count > 2)
@@ -1326,9 +1321,9 @@ class KS57C2504():
     def _ref(self, opcode):
         #TTTTTTTT
         taddr = (opcode & 0xF0) | ((opcode << 1) & 0x0E)
-        byte = self._ROM.getByte(taddr)
+        byte = self._ROM.get_byte(taddr)
         if ((byte & 0xC0) == 0x00):
-            self._PC = self._ROM.getWord(taddr) & self._ROM.getMask()
+            self._PC = self._ROM.get_word(taddr) & self._ROM.get_mask()
             return 3
         if ((byte & 0xC0) == 0x40):
             self._stack_push(0)
@@ -1337,15 +1332,15 @@ class KS57C2504():
             self._stack_push(self._PC & 0x000F)
             self._stack_push((self._PC >> 12) & 0x0003)
             self._stack_push((self._PC >> 8) & 0x000F)
-            self._PC = self._ROM.getWord(taddr) & self._ROM.getMask()
+            self._PC = self._ROM.get_word(taddr) & self._ROM.get_mask()
             return 4
         bytes_count = self._execute[byte][INSTR_SIZE]
         if (bytes_count == 1):
             execute_time = self._execute[byte][INSTR_EXE](self, byte)
-            byte = self._ROM.getByte(taddr + 1)
+            byte = self._ROM.get_byte(taddr + 1)
             return 1 + execute_time + self._execute[byte][INSTR_EXE](self, byte)
         else:
-            opcode = self._ROM.getBytes(taddr, bytes_count)
+            opcode = self._ROM.get_bytes(taddr, bytes_count)
             return 1 + self._execute[byte][INSTR_EXE](self, opcode)
 
     def _calls_addr11(self, opcode):
@@ -1371,7 +1366,7 @@ class KS57C2504():
 
     def _jps_addr12(self, opcode):
         #1001AAAA AAAAAAAA
-        self._PC = ((self._PC & 0xF000) | (opcode & 0xFFF)) & self._ROM.getMask()
+        self._PC = ((self._PC & 0xF000) | (opcode & 0xFFF)) & self._ROM.get_mask()
         return 2
 
     def _ads_a_im(self, opcode):
@@ -1386,11 +1381,11 @@ class KS57C2504():
         #1011DDDD
         self._set_reg(REG_A, opcode & 0xF)
         cycle_count = 1
-        opcode = self._ROM.getByte(self._PC)
+        opcode = self._ROM.get_byte(self._PC)
         while (((opcode >> 4) == 0b1011) or (opcode == 0b10000001)):
             cycle_count += 1
             self._PC += self._execute[opcode][INSTR_SIZE]
-            opcode = self._ROM.getByte(self._PC)
+            opcode = self._ROM.get_byte(self._PC)
         return cycle_count
 
     def _cpse_a_ahl(self, opcode):
@@ -1438,11 +1433,11 @@ class KS57C2504():
         #10000001 DDDDDDDD
         self._set_rp(RP_EA, opcode & 0xFF)
         cycle_count = 2
-        opcode = self._ROM.getByte(self._PC)
+        opcode = self._ROM.get_byte(self._PC)
         while (((opcode >> 4) == 0b1011) or (opcode == 0b10000001)):
             cycle_count += 1
             self._PC += self._execute[opcode][INSTR_SIZE]
-            opcode = self._ROM.getByte(self._PC)
+            opcode = self._ROM.get_byte(self._PC)
         return cycle_count
 
     def _incs_rrb(self, opcode):
@@ -1457,11 +1452,11 @@ class KS57C2504():
         #10000011 DDDDDDDD
         self._set_rp(RP_HL, opcode & 0xFF)
         cycle_count = 2
-        opcode = self._ROM.getByte(self._PC)
+        opcode = self._ROM.get_byte(self._PC)
         while (opcode == 0b10000011):
             cycle_count += 1
             self._PC += self._execute[opcode][INSTR_SIZE]
-            opcode = self._ROM.getByte(self._PC)
+            opcode = self._ROM.get_byte(self._PC)
         return cycle_count
 
     def _ld_wx_imm(self, opcode):
@@ -1528,7 +1523,7 @@ class KS57C2504():
         new_A = self._get_reg(REG_A) + self._get_ahl() + self._CY
         self._set_reg(REG_A, new_A & 0xF)
         self._CY = new_A > 15
-        opcode = self._ROM.getByte(self._PC)
+        opcode = self._ROM.get_byte(self._PC)
         if ((opcode >> 4) == 0b1010):
             if (self._CY):
                 return 1 + self._skip_next()
@@ -1539,7 +1534,7 @@ class KS57C2504():
 
     def _jp_addr14(self, opcode):
         #11011011 00AAAAAA AAAAAAAA
-        self._PC = opcode & self._ROM.getMask()
+        self._PC = opcode & self._ROM.get_mask()
         return 3
 
     def _call_addr14(self, opcode):
@@ -1550,7 +1545,7 @@ class KS57C2504():
         self._stack_push(self._PC & 0x000F)
         self._stack_push((self._PC >> 12) & 0x0003)
         self._stack_push((self._PC >> 8) & 0x000F)
-        self._PC = opcode & self._ROM.getMask()
+        self._PC = opcode & self._ROM.get_mask()
         return 4
 
     def _xor_a_ahl(self, opcode):
@@ -1580,7 +1575,7 @@ class KS57C2504():
         new_A = self._get_reg(REG_A) - self._get_ahl() - self._CY
         self._set_reg(REG_A, new_A & 0xF)
         self._CY = new_A < 0
-        opcode = self._ROM.getByte(self._PC)
+        opcode = self._ROM.get_byte(self._PC)
         if ((opcode >> 4) == 0b1010):
             if (self._CY):
                 self._PC += 1
@@ -1618,7 +1613,7 @@ class KS57C2504():
     def _ldc_ea_aea(self, opcode):
         #11001000
         addr = (self._PC & 0xFF00) | self._get_rp(RP_EA)
-        self._set_rp(RP_EA, self._ROM.getByte(addr))
+        self._set_rp(RP_EA, self._ROM.get_byte(addr))
         return 3
 
     def _ads_a_ahl(self, opcode):
@@ -1632,7 +1627,7 @@ class KS57C2504():
     def _ldc_ea_awx(self, opcode):
         #11001100
         addr = (self._PC & 0xFF00) | self._get_rp(RP_WX)
-        self._set_rp(RP_EA, self._ROM.getByte(addr))
+        self._set_rp(RP_EA, self._ROM.get_byte(addr))
         return 3
 
     def _ccf(self, opcode):
@@ -1664,7 +1659,7 @@ class KS57C2504():
         self._EMB = (stack_value >> 1) & 0x1
         self._ERB = stack_value & 0x1
         self._stack_pop()
-        self._PC &= self._ROM.getMask()
+        self._PC &= self._ROM.get_mask()
         return 3 + self._skip_next()
 
     def _ld_a_ahl(self, opcode):
@@ -1770,7 +1765,7 @@ class KS57C2504():
         self._EMB = (stack_value >> 1) & 0x1
         self._ERB = stack_value & 0x1
         self._stack_pop()
-        self._PC &= self._ROM.getMask()
+        self._PC &= self._ROM.get_mask()
         return 3
 
     def _iret(self, opcode):
@@ -1786,12 +1781,12 @@ class KS57C2504():
         stack_value = self._stack_pop()
         self._CY = (stack_value >> 3) & 0x1
         self._SK = stack_value & 0x7
-        self._PC &= self._ROM.getMask()
+        self._PC &= self._ROM.get_mask()
         return 3
 
     def _jr_aea(self, opcode):
         #11011101 01100000
-        self._PC = ((self._PC & 0xFF00) | (self._get_reg(REG_E) << 4) | self._get_reg(REG_A)) & self._ROM.getMask()
+        self._PC = ((self._PC & 0xFF00) | (self._get_reg(REG_E) << 4) | self._get_reg(REG_A)) & self._ROM.get_mask()
         return 3
 
     def _incs_ahl(self, opcode):
@@ -1804,7 +1799,7 @@ class KS57C2504():
 
     def _jr_awx(self, opcode):
         #11011101 01100100
-        self._PC = ((self._PC & 0xFF00) | (self._get_reg(REG_W) << 4) | self._get_reg(REG_X)) & self._ROM.getMask()
+        self._PC = ((self._PC & 0xFF00) | (self._get_reg(REG_W) << 4) | self._get_reg(REG_X)) & self._ROM.get_mask()
         return 3
 
     def _pop_sb(self, opcode):

@@ -1,6 +1,6 @@
 class D750Xdasm():
 
-    def __init__(self):
+    def __init__(self, roots=None):
         self._addrbase = '%0.3X'
         self._opbase = '%0.3X'
         
@@ -150,7 +150,7 @@ class D750Xdasm():
 
             for i in range(len(listing)):
                 if (listing[i] is None):
-                    byte = rom.getByte(i)
+                    byte = rom.get_byte(i)
                     listing[i] = (1, byte, 'db 0x%0.2X' % byte)
                 listing[i] = (self._opbase % listing[i][1], listing[i][2])
             
@@ -169,19 +169,19 @@ class D750Xdasm():
     
     def _disassemble(self, pc, listing, rom):
         while (pc < len(listing) and pc >= 0 and listing[pc] is None):
-            opcode = rom.getByte(pc)
+            opcode = rom.get_byte(pc)
             instruction = self._instruction_tbl[opcode]
             if (instruction[1] == 2):
-                opcode = rom.getWord(pc)
+                opcode = rom.get_word(pc)
             next_pcs, mnemonic = instruction[0](self, pc, opcode, rom)
             instruction_size = instruction[1]
             listing[pc] = (instruction[1], opcode, mnemonic)
             if (instruction_size == 2):
-                listing[pc + 1] = (1, rom.getByte(pc + 1), '')
+                listing[pc + 1] = (1, rom.get_byte(pc + 1), '')
             pc = next_pcs[0]
             for i in range(1, len(next_pcs), +1):
                 if (next_pcs[i] == -1):
-                    next_op = rom.getByte(pc)
+                    next_op = rom.get_byte(pc)
                     next_size = self._instruction_tbl[next_op][1]
                     listing = self._disassemble(pc + next_size, listing, rom)
                 else:
@@ -216,7 +216,7 @@ class D750Xdasm():
         
     def _call_addr(self, pc, opcode, rom):
         #00110iii iiiiiiii SP <- PCm.PCl.PSW.PCh, pc10-0 <- i, SP <- SP - 4; 2; 2
-        next_op = rom.getByte(pc + 2)
+        next_op = rom.get_byte(pc + 2)
         next_size = self._instruction_tbl[next_op][1]
         
         self.last_call = pc + 2
@@ -604,9 +604,9 @@ class D750Xdasm():
     def _calt_addr(self, pc, opcode, rom):
         #11iiiiii (SP) <- PCm.PCl.PSW.PCh, PC <- [0xC0 + i]h.00.[0xC0 + i]l, SP <- SP - 4; 1; 2
         self.last_call = pc + 1
-        next_op = rom.getByte(pc + 1)
+        next_op = rom.get_byte(pc + 1)
         next_size = self._instruction_tbl[next_op][1]
                     
-        data = rom.getByte(opcode)
+        data = rom.get_byte(opcode)
         addr = ((data << 2) & 0x380) | (data & 0x1F)
         return (pc + 1, pc + 1 + next_size, addr), "calt %0.3X" % addr

@@ -1,6 +1,6 @@
 class KS57dasm():
 
-    def __init__(self):
+    def __init__(self, roots=None):
         self._base = '0x%X'
         self._nibbase = '0x%0.1X'
         self._bytebase = '0x%0.2X'
@@ -288,26 +288,26 @@ class KS57dasm():
     def disassemble(self, rom):
         if (rom.size() > 0):
             listing = [None] * rom.size()
-            vector = rom.getWord(0) & 0x3FFF
+            vector = rom.get_word(0) & 0x3FFF
             listing = self._disassemble(vector, listing, rom)
-            vector = rom.getWord(2) & 0x3FFF
+            vector = rom.get_word(2) & 0x3FFF
             listing = self._disassemble(vector, listing, rom)
-            vector = rom.getWord(4) & 0x3FFF
+            vector = rom.get_word(4) & 0x3FFF
             listing = self._disassemble(vector, listing, rom)
-            vector = rom.getWord(6) & 0x3FFF
+            vector = rom.get_word(6) & 0x3FFF
             listing = self._disassemble(vector, listing, rom)
-            vector = rom.getWord(8) & 0x3FFF
+            vector = rom.get_word(8) & 0x3FFF
             listing = self._disassemble(vector, listing, rom)
-            vector = rom.getWord(10) & 0x3FFF
+            vector = rom.get_word(10) & 0x3FFF
             listing = self._disassemble(vector, listing, rom)
-            vector = rom.getWord(12) & 0x3FFF
+            vector = rom.get_word(12) & 0x3FFF
             listing = self._disassemble(vector, listing, rom)
 
             listing = self._disassemble_pcea(listing, rom)
 
             for i in range(len(listing)):
                 if (listing[i] is None):
-                    byte = rom.getByte(i)
+                    byte = rom.get_byte(i)
                     listing[i] = (1, byte, 'db ' + self._bytebase % byte)
                 listing[i] = (self._opbase % listing[i][1], listing[i][2])
             
@@ -326,13 +326,13 @@ class KS57dasm():
     
     def _disassemble(self, pc, listing, rom):
         while (pc > 0 and pc < len(listing) and listing[pc] is None):
-            opcode = rom.getByte(pc)
+            opcode = rom.get_byte(pc)
             next_pcs, listing[pc] = self._instruction_tbl[opcode](self, pc, opcode, rom)
             instruction_size = listing[pc][0]
             while (instruction_size > 1  and (pc + 1) < len(listing)):
                 instruction_size -= 1
                 pc += 1
-                listing[pc] = (1, rom.getByte(pc), '')
+                listing[pc] = (1, rom.get_byte(pc), '')
             prev_pc = pc
             pc = next_pcs[0]
 
@@ -347,7 +347,7 @@ class KS57dasm():
     
     def _disassemble_pcea(self, listing, rom):
         for i in range(rom.size()):
-            opcode = rom.getWord(i)
+            opcode = rom.get_word(i)
             if (opcode == 0b1101110101100000):
                 for j in range(i, (i & 0xFF00) + 0x100):
                     if (listing[j] is None):
@@ -355,15 +355,15 @@ class KS57dasm():
         return listing
 
     def _disassemble_ref(self, pc, ref_pc, listing, rom):
-        opcode = rom.getByte(ref_pc)
+        opcode = rom.get_byte(ref_pc)
         if ((opcode & 0xC0) == 0x00):
-            opcode = rom.getWord(ref_pc)
+            opcode = rom.get_word(ref_pc)
             a = opcode & 0x3FFF
             listing[ref_pc] = (2, opcode, "tbr " + self._addrbase % a)
             listing[ref_pc + 1] = (1, opcode & 0xFF, '')
             listing = self._disassemble(a, listing, rom)
         elif ((opcode & 0xC0) == 0x40):
-            opcode = rom.getWord(ref_pc)
+            opcode = rom.get_word(ref_pc)
             a = opcode & 0x3FFF
             listing[ref_pc] = (2, opcode, "tcall " + self._addrbase % a)
             listing[ref_pc + 1] = (1, opcode & 0xFF, '')
@@ -373,9 +373,9 @@ class KS57dasm():
             instruction_size = listing[ref_pc][0]
             ref_pc += 1
             if (instruction_size == 2):
-                listing[ref_pc] = (1, rom.getByte(ref_pc), '')
+                listing[ref_pc] = (1, rom.get_byte(ref_pc), '')
             elif (instruction_size == 1):
-                opcode = rom.getByte(ref_pc)
+                opcode = rom.get_byte(ref_pc)
                 _, listing[ref_pc] = self._instruction_tbl[opcode](self, ref_pc, opcode, rom)
 
             listing = self._disassemble(self._get_instr_skip_pc(pc, rom), listing, rom)
@@ -383,64 +383,64 @@ class KS57dasm():
         return listing
         
     def _get_instr_skip_pc(self, pc, rom):
-        opcode = rom.getByte(pc)
+        opcode = rom.get_byte(pc)
         _, desc = self._instruction_tbl[opcode](self, pc, opcode, rom)
         return pc + desc[0]
 
     def _instruction_11011011(self, pc, opcode, rom):
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         return self._instruction_11011011_tbl[(op >> 6) & 0x1](self, pc, opcode, rom)
 
     def _instruction_11011101(self, pc, opcode, rom):
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         return self._instruction_11011101_tbl[op & 0x7F](self, pc, opcode, rom)
         
     def _instruction_11011001(self, pc, opcode, rom):
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         return self._instruction_11011001_tbl[(op >> 3) & 0x1](self, pc, opcode, rom)
 
     def _instruction_11111100(self, pc, opcode, rom):
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         return self._instruction_11111100_tbl[(op >> 6) & 0x3](self, pc, opcode, rom)
 
     def _instruction_11111110(self, pc, opcode, rom):
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         return self._instruction_11111110_tbl[(op >> 6) & 0x3](self, pc, opcode, rom)
 
     def _instruction_11111111(self, pc, opcode, rom):
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         return self._instruction_11111111_tbl[(op >> 6) & 0x3](self, pc, opcode, rom)
 
     def _instruction_11111101(self, pc, opcode, rom):
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         return self._instruction_11111101_tbl[(op >> 6) & 0x3](self, pc, opcode, rom)
 
     def _instruction_11011100(self, pc, opcode, rom):
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         return self._instruction_11011100_tbl[op](self, pc, opcode, rom)
 
     def _instruction_11110101(self, pc, opcode, rom):
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         return self._instruction_11110101_tbl[(op >> 6) & 0x3](self, pc, opcode, rom)
 
     def _instruction_11110110(self, pc, opcode, rom):
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         return self._instruction_11110110_tbl[(op >> 6) & 0x3](self, pc, opcode, rom)
     
     def _instruction_11110111(self, pc, opcode, rom):
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         return self._instruction_11110111_tbl[(op >> 6) & 0x3](self, pc, opcode, rom)
 
     def _instruction_11110100(self, pc, opcode, rom):
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         return self._instruction_11110100_tbl[(op >> 6) & 0x3](self, pc, opcode, rom)
 
     def _instruction_11111000(self, pc, opcode, rom):
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         return self._instruction_11111000_tbl[(op >> 6) & 0x3](self, pc, opcode, rom)
 
     def _instruction_11111001(self, pc, opcode, rom):
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         return self._instruction_11111001_tbl[(op >> 6) & 0x3](self, pc, opcode, rom)
 
     def _jr_raddr(self, pc, opcode, rom):
@@ -460,7 +460,7 @@ class KS57dasm():
 
     def _calls_addr11(self, pc, opcode, rom):
         #11101AAA AAAAAAAA
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         a = ((opcode & 0x7) << 8) | op
         return (pc + 2, a, self._get_instr_skip_pc(pc + 2, rom)), (2, (opcode << 8) | op, "calls " + self._addrbase % a)
 
@@ -498,7 +498,7 @@ class KS57dasm():
 
     def _jps_addr12(self, pc, opcode, rom):
         #1001AAAA AAAAAAAA
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         a = (pc & 0xF000) | ((opcode & 0xF) << 8) | op
         return (a,), (2, (opcode << 8) | op, "jps " + self._addrbase % a)
 
@@ -518,32 +518,32 @@ class KS57dasm():
 
     def _incs_da(self, pc, opcode, rom):
         #11001010 AAAAAAAA
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         return (pc + 2, self._get_instr_skip_pc(pc + 2, rom)), (2, (opcode << 8) | op, "incs RAM[" + self._nibbase % op + "]")
 
     def _bitr_da_bit(self, pc, opcode, rom):
         #11BB0000 AAAAAAAA
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         return (pc + 2,), (2, (opcode << 8) | op, "bitr RAM[" + self._nibbase % op + "].%d" % ((opcode >> 4) & 0x3))
 
     def _bits_da_bit(self, pc, opcode, rom):
         #11BB0001 AAAAAAAA
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         return (pc + 2,), (2, (opcode << 8) | op, "bits RAM[" + self._nibbase % op + "].%d" % ((opcode >> 4) & 0x3))
 
     def _btsf_da_bit(self, pc, opcode, rom):
         #11BB0010 AAAAAAAA
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         return (pc + 2, self._get_instr_skip_pc(pc + 2, rom)), (2, (opcode << 8) | op, "btsf RAM[" + self._nibbase % op + "].%d" % ((opcode >> 4) & 0x3))
 
     def _btst_da_bit(self, pc, opcode, rom):
         #11BB0011 AAAAAAAA
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         return (pc + 2, self._get_instr_skip_pc(pc + 2, rom)), (2, (opcode << 8) | op, "btst RAM[" + self._nibbase % op + "].%d" % ((opcode >> 4) & 0x3))
 
     def _ld_ea_imm(self, pc, opcode, rom):
         #10000001 DDDDDDDD
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         return (pc + 2,), (2, (opcode << 8) | op, "ld EA, " + self._bytebase % op)
 
     def _incs_hl(self, pc, opcode, rom):
@@ -552,7 +552,7 @@ class KS57dasm():
 
     def _ld_hl_imm(self, pc, opcode, rom):
         #10000011 DDDDDDDD
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         return (pc + 2,), (2, (opcode << 8) | op, "ld HL, " + self._bytebase % op)
         
     def _incs_wx(self, pc, opcode, rom):
@@ -561,7 +561,7 @@ class KS57dasm():
 
     def _ld_wx_imm(self, pc, opcode, rom):
         #10000101 DDDDDDDD
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         return (pc + 2,), (2, (opcode << 8) | op, "ld WX, " + self._bytebase % op)
 
     def _incs_yz(self, pc, opcode, rom):
@@ -570,7 +570,7 @@ class KS57dasm():
 
     def _ld_yz_imm(self, pc, opcode, rom):
         #10000111 DDDDDDDD
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         return (pc + 2,), (2, (opcode << 8) | op, "ld YZ, " + self._bytebase % op)
 
     def _and_a_ahl(self, pc, opcode, rom):
@@ -579,12 +579,12 @@ class KS57dasm():
 
     def _ld_da_ea(self, pc, opcode, rom):
         #11001101 AAAAAAAA
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         return (pc + 2,), (2, (opcode << 8) | op, "ld RAM[" + self._bytebase % op + "], EA")
 
     def _ld_da_a(self, pc, opcode, rom):
         #10001001 AAAAAAAA
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         return (pc + 2,), (2, (opcode << 8) | op, "ld RAM[" + self._bytebase % op + "], A")
 
     def _rrc_a(self, pc, opcode, rom):
@@ -597,12 +597,12 @@ class KS57dasm():
 
     def _ld_ea_da(self, pc, opcode, rom):
         #11001110 AAAAAAAA
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         return (pc + 2,), (2, (opcode << 8) | op, "ld EA, RAM[" + self._bytebase % op + "]")
 
     def _ld_a_da(self, pc, opcode, rom):
         #10001100 AAAAAAAA
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         return (pc + 2,), (2, (opcode << 8) | op, "ld A, RAM[" + self._bytebase % op + "]")
 
     def _sbs_a_ahl(self, pc, opcode, rom):
@@ -615,12 +615,12 @@ class KS57dasm():
 
     def _jp_addr14(self, pc, opcode, rom):
         #11011011 00AAAAAA AAAAAAAA
-        a = rom.getWord(pc + 1)
+        a = rom.get_word(pc + 1)
         return (pc + 3, a), (3, (opcode << 16) | a, "br " + self._addrbase % a)
 
     def _call_addr14(self, pc, opcode, rom):
         #11011011 01AAAAAA AAAAAAAA
-        a = rom.getWord(pc + 1) & 0x3FFF
+        a = rom.get_word(pc + 1) & 0x3FFF
         return (pc + 3, a, self._get_instr_skip_pc(pc + 3, rom)), (3, (opcode << 16) | a, "call " + self._addrbase % a)
 
     def _xor_a_ahl(self, pc, opcode, rom):
@@ -629,12 +629,12 @@ class KS57dasm():
 
     def _xch_ea_da(self, pc, opcode, rom):
         #11001111 AAAAAAAA
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         return (pc + 2,), (2, (opcode << 8) | op, "xch EA, RAM[" + self._bytebase % op + "]")
 
     def _xch_a_da(self, pc, opcode, rom):
         #01111001 AAAAAAAA
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         return (pc + 2,), (2, (opcode << 8) | op, "xch A, RAM[" + self._bytebase % op + "]")
 
     def _sbc_a_ahl(self, pc, opcode, rom):
@@ -643,7 +643,7 @@ class KS57dasm():
 
     def _ads_ea_imm(self, pc, opcode, rom):
         #11001001 DDDDDDDD
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         return (pc + 2, self._get_instr_skip_pc(pc + 2, rom)), (2, (opcode << 8) | op, "ads EA, " + self._bytebase % op)
 
     def _incs_r(self, pc, opcode, rom):
@@ -767,110 +767,110 @@ class KS57dasm():
 
     def _cpse_a_r(self, pc, opcode, rom):
         #11011101 01101RRR
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         r = op & 0x7
         return (pc + 2, self._get_instr_skip_pc(pc + 2, rom)), (2, (opcode << 8) | op, "cpse A, " + self._reg_tbl[r])
 
     def _smb_n(self, pc, opcode, rom):
         #11011101 0100NNNN
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         n = op & 0xF
         return (pc + 2,), (2, (opcode << 8) | op, "smb " + str(n))
 
     def _srb_n(self, pc, opcode, rom):
         #11011101 010100NN
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         n = op & 0x3
         return (pc + 2,), (2, (opcode << 8) | op, "srb " + str(n))
 
     def _and_a_im(self, pc, opcode, rom):
         #11011101 0001DDDD
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         i = op & 0xF
         return (pc + 2,), (2, (opcode << 8) | op, "and A, " + self._nibbase % i)
 
     def _or_a_im(self, pc, opcode, rom):
         #11011101 0010DDDD
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         i = op & 0xF
         return (pc + 2,), (2, (opcode << 8) | op, "or A, " + self._nibbase % i)
 
     def _xor_a_im(self, pc, opcode, rom):
         #11011101 0011DDDD
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         i = op & 0xF
         return (pc + 2,), (2, (opcode << 8) | op, "xor A, " + self._nibbase % i)
 
     def _cpse_ahl_im(self, pc, opcode, rom):
         #11011101 0111DDDD
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         i = op & 0xF
         return (pc + 2, self._get_instr_skip_pc(pc + 2, rom)), (2, (opcode << 8) | op, "cpse @HL, " + self._nibbase % i)
 
     def _ld_ra_a(self, pc, opcode, rom):
         #11011101 00000RRR
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         r = op & 0x7
         return (pc + 2,), (2, (opcode << 8) | op, "ld " + self._reg_tbl[r] + ", A")
 
     def _ld_a_r(self, pc, opcode, rom):
         #11011101 00001RRR
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         r = op & 0x7
         return (pc + 2,), (2, (opcode << 8) | op, "ld A, " + self._reg_tbl[r])
 
     def _cpse_r_im(self, pc, opcode, rom):
         #11011001 DDDD0RRR
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         r = op & 0x7
         i = (op >> 4) & 0xF
         return (pc + 2, self._get_instr_skip_pc(pc + 2, rom)), (2, (opcode << 8) | op, "cpse " + self._reg_tbl[r] + ", " + self._nibbase % i)
 
     def _ld_ra_im(self, pc, opcode, rom):
         #11011001 DDDD1RRR
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         r = op & 0x7
         i = (op >> 4) & 0xF
         return (pc + 2,), (2, (opcode << 8) | op, "ld " + self._reg_tbl[r] + ", " + self._nibbase % i)
 
     def _ldb_ahda_bit_cy(self, pc, opcode, rom):
         #11111100 00BBAAAA
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         d = op & 0xF
         b = (op >> 4) & 0x3
         return (pc + 2,), (2, (opcode << 8) | op, "ldb RAM[@H + " + self._nibbase % d + "]." + str(b) + ", CY")
 
     def _ldb_memb_al_cy(self, pc, opcode, rom):
         #11111100 0100AAAA
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         g = op & 0xF
         pmem =  0xFC0 + (g << 2)
         return (pc + 2,), (2, (opcode << 8) | op, "ldb RAM[" + self._rambase % pmem + " + @L3-2].@L1-0, CY")
 
     def _ldb_mema_bit_cy(self, pc, opcode, rom):
         #11111100 1XBBAAAA
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         b = (op >> 4) & 0x3
         fmem = 0xFB0 | (op & 0b01001111)
         return (pc + 2,), (2, (opcode << 8) | op, "ldb RAM[" + self._rambase % fmem + "]." + str(b) + ", CY")
 
     def _bitr_ahda_bit(self, pc, opcode, rom):
         #11111110 00BBAAAA
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         d = op & 0xF
         b = (op >> 4) & 0x3
         return (pc + 2,), (2, (opcode << 8) | op, "bitr RAM[@H + " + self._nibbase % d + "]." + str(b))
 
     def _bitr_memb_al(self, pc, opcode, rom):
         #11111110 0100AAAA
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         g = op & 0xF
         pmem =  0xFC0 + (g << 2)
         return (pc + 2,), (2, (opcode << 8) | op, "bitr RAM[" + self._rambase % pmem + " + @L3-2].@L1-0")
 
     def _bitr_mema_bit(self, pc, opcode, rom):
         #111111110 1XBBAAAA
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         b = (op >> 4) & 0x3
         fmem = 0xFB0 | (op & 0b01001111)
         if (op in self._clr_fmem_tbl):
@@ -880,21 +880,21 @@ class KS57dasm():
 
     def _bits_ahda_bit(self, pc, opcode, rom):
         #11111111 00BBAAAA
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         d = op & 0xF
         b = (op >> 4) & 0x3
         return (pc + 2,), (2, (opcode << 8) | op, "bits RAM[@H + " + self._nibbase % d + "]." + str(b))
 
     def _bits_memb_al(self, pc, opcode, rom):
         #11111111 0100AAAA
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         g = op & 0xF
         pmem =  0xFC0 + (g << 2)
         return (pc + 2,), (2, (opcode << 8) | op, "bits RAM[" + self._rambase % pmem + " + @L3-2].@L1-0")
 
     def _bits_mema_bit(self, pc, opcode, rom):
         #11111111 1XBBAAAA
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         b = (op >> 4) & 0x3
         fmem = 0xFB0 | (op & 0b01001111)
         if (op in self._set_fmem_tbl):
@@ -904,21 +904,21 @@ class KS57dasm():
 
     def _btstz_ahda_bit(self, pc, opcode, rom):
         #11111101 00BBAAAA
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         d = op & 0xF
         b = (op >> 4) & 0x3
         return (pc + 2, self._get_instr_skip_pc(pc + 2, rom)), (2, (opcode << 8) | op, "btstz RAM[@H + " + self._nibbase % d + "]." + str(b))
 
     def _btstz_memb_al(self, pc, opcode, rom):
         #11111101 0100AAAA
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         g = op & 0xF
         pmem =  0xFC0 + (g << 2)
         return (pc + 2, self._get_instr_skip_pc(pc + 2, rom)), (2, (opcode << 8) | op, "btstz RAM[" + self._rambase % pmem + " + @L3-2].@L1-0")
 
     def _btstz_mema_bit(self, pc, opcode, rom):
         #11111101 1XBBAAAA
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         b = (op >> 4) & 0x3
         fmem = 0xFB0 | (op & 0b01001111)
         return (pc + 2, self._get_instr_skip_pc(pc + 2, rom)), (2, (opcode << 8) | op, "btstz RAM[" + self._rambase % fmem + "]." + str(b))
@@ -941,240 +941,240 @@ class KS57dasm():
 
     def _xch_ea_rrb(self, pc, opcode, rom):
         #11011100 11100RR0
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         p = (op >> 1) & 0x3
         return (pc + 2,), (2, (opcode << 8) | op, "xch EA, " + self._rpe_tbl[p])
 
     def _cpse_ea_rr(self, pc, opcode, rom):
         #11011100 11101RR0
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         p = (op >> 1) & 0x3
         return (pc + 2, self._get_instr_skip_pc(pc + 2, rom)), (2, (opcode << 8) | op, "cpse EA, " + self._rpe_tbl[p])
 
     def _ld_rrb_ea(self, pc, opcode, rom):
         #11011100 11110RR0
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         p = (op >> 1) & 0x3
         return (pc + 2,), (2, (opcode << 8) | op, "ld " + self._rpe_tbl[p] + ", EA")
 
     def _ld_ea_rrb(self, pc, opcode, rom):
         #11011100 11111RR0
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         p = (op >> 1) & 0x3
         return (pc + 2,), (2, (opcode << 8) | op, "ld EA, " + self._rpe_tbl[p])
 
     def _decs_rr(self, pc, opcode, rom):
         #11011100 11011RR0
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         p = (op >> 1) & 0x3
         return (pc + 2, self._get_instr_skip_pc(pc + 2, rom)), (2, (opcode << 8) | op, "decs " + self._rpe_tbl[p])
 
     def _and_rrb_ea(self, pc, opcode, rom):
         #11011100 00010RR0
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         p = (op >> 1) & 0x3
         return (pc + 2,), (2, (opcode << 8) | op, "and " + self._rpe_tbl[p] + ", EA")
 
     def _and_ea_rr(self, pc, opcode, rom):
         #11011100 00011RR0
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         p = (op >> 1) & 0x3
         return (pc + 2,), (2, (opcode << 8) | op, "and EA, " + self._rpe_tbl[p])
 
     def _or_rrb_ea(self, pc, opcode, rom):
         #11011100 00100RR0
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         p = (op >> 1) & 0x3
         return (pc + 2,), (2, (opcode << 8) | op, "or " + self._rpe_tbl[p] + ", EA")
 
     def _or_ea_rr(self, pc, opcode, rom):
         #11011100 00101RR0
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         p = (op >> 1) & 0x3
         return (pc + 2,), (2, (opcode << 8) | op, "or EA, " + self._rpe_tbl[p])
 
     def _xor_rrb_ea(self, pc, opcode, rom):
         #11011100 00110RR0
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         p = (op >> 1) & 0x3
         return (pc + 2,), (2, (opcode << 8) | op, "xor " + self._rpe_tbl[p] + ", EA")
 
     def _xor_ea_rr(self, pc, opcode, rom):
         #11011100 00111RR0
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         p = (op >> 1) & 0x3
         return (pc + 2,), (2, (opcode << 8) | op, "xor EA, " + self._rpe_tbl[p])
 
     def _ads_rrb_ea(self, pc, opcode, rom):
         #11011100 10010RR0
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         p = (op >> 1) & 0x3
         return (pc + 2, self._get_instr_skip_pc(pc + 2, rom)), (2, (opcode << 8) | op, "ads " + self._rpe_tbl[p] + ", EA")
 
     def _ads_ea_rr(self, pc, opcode, rom):
         #11011100 10011RR0
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         p = (op >> 1) & 0x3
         return (pc + 2, self._get_instr_skip_pc(pc + 2, rom)), (2, (opcode << 8) | op, "ads EA, " + self._rpe_tbl[p])
 
     def _adc_rrb_ea(self, pc, opcode, rom):
         #11011100 10100RR0
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         p = (op >> 1) & 0x3
         return (pc + 2,), (2, (opcode << 8) | op, "adc " + self._rpe_tbl[p] + ", EA")
 
     def _adc_ea_rr(self, pc, opcode, rom):
         #11011100 10101RR0
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         p = (op >> 1) & 0x3
         return (pc + 2,), (2, (opcode << 8) | op, "adc EA, " + self._rpe_tbl[p])
 
     def _sbs_rrb_ea(self, pc, opcode, rom):
         #11011100 10110RR0
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         p = (op >> 1) & 0x3
         return (pc + 2, self._get_instr_skip_pc(pc + 2, rom)), (2, (opcode << 8) | op, "subs " + self._rpe_tbl[p] + ", EA")
 
     def _sbs_ea_rr(self, pc, opcode, rom):
         #11011100 10111RR0
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         p = (op >> 1) & 0x3
         return (pc + 2, self._get_instr_skip_pc(pc + 2, rom)), (2, (opcode << 8) | op, "subs EA, " + self._rpe_tbl[p])
 
     def _sbc_rrb_ea(self, pc, opcode, rom):
         #11011100 11000RR0
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         p = (op >> 1) & 0x3
         return (pc + 2,), (2, (opcode << 8) | op, "subc " + self._rpe_tbl[p] + ", EA")
 
     def _sbc_ea_rr(self, pc, opcode, rom):
         #11011100 11001RR0
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         p = (op >> 1) & 0x3
         return (pc + 2,), (2, (opcode << 8) | op, "subc EA, " + self._rpe_tbl[p])
 
     def _band_cy_ahda_bit(self, pc, opcode, rom):
         #11110101 00BBAAAA
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         d = op & 0xF
         b = (op >> 4) & 0x3
         return (pc + 2,), (2, (opcode << 8) | op, "band CY, RAM[@H + " + self._nibbase % d + "]." + str(b))
 
     def _band_cy_memb_al(self, pc, opcode, rom):
         #11110101 0100AAAA
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         g = op & 0xF
         pmem =  0xFC0 + (g << 2)
         return (pc + 2,), (2, (opcode << 8) | op, "band CY, RAM[" + self._rambase % pmem + " + @L3-2].@L1-0")
 
     def _band_cy_mema_bit(self, pc, opcode, rom):
         #11110101 1XBBAAAA
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         b = (op >> 4) & 0x3
         fmem = 0xFB0 | (op & 0b01001111)
         return (pc + 2,), (2, (opcode << 8) | op, "band CY, RAM[" + self._rambase % fmem + "]." + str(b))
 
     def _bor_cy_ahda_bit(self, pc, opcode, rom):
         #11110110 00BBAAAA
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         d = op & 0xF
         b = (op >> 4) & 0x3
         return (pc + 2,), (2, (opcode << 8) | op, "bor CY, RAM[@H + " + self._nibbase % d + "]." + str(b))
 
     def _bor_cy_memb_al(self, pc, opcode, rom):
         #11110110 0100AAAA
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         g = op & 0xF
         pmem =  0xFC0 + (g << 2)
         return (pc + 2,), (2, (opcode << 8) | op, "bor CY, RAM[" + self._rambase % pmem + " + @L3-2].@L1-0")
 
     def _bor_cy_mema_bit(self, pc, opcode, rom):
         #11110110 1XBBAAAA
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         b = (op >> 4) & 0x3
         fmem = 0xFB0 | (op & 0b01001111)
         return (pc + 2,), (2, (opcode << 8) | op, "or1 CY, RAM[" + self._rambase % fmem + "]." + str(b))
 
     def _bxor_cy_ahda_bit(self, pc, opcode, rom):
         #11110111 00BBAAAA
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         d = op & 0xF
         b = (op >> 4) & 0x3
         return (pc + 2,), (2, (opcode << 8) | op, "bxor CY, RAM[@H + " + self._nibbase % d + "]." + str(b))
 
     def _bxor_cy_memb_al(self, pc, opcode, rom):
         #11110111 0100AAAA
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         g = op & 0xF
         pmem =  0xFC0 + (g << 2)
         return (pc + 2,), (2, (opcode << 8) | op, "bxor CY, RAM[" + self._rambase % pmem + " + @L3-2].@L1-0")
 
     def _bxor_cy_mema_bit(self, pc, opcode, rom):
         #11110111 1XBBAAAA
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         b = (op >> 4) & 0x3
         fmem = 0xFB0 | (op & 0b01001111)
         return (pc + 2,), (2, (opcode << 8) | op, "bxor CY, RAM[" + self._rambase % fmem + "]." + str(b))
 
     def _ldb_cy_ahda_bit(self, pc, opcode, rom):
         #11110100 00BBAAAA
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         d = op & 0xF
         b = (op >> 4) & 0x3
         return (pc + 2,), (2, (opcode << 8) | op, "ldb CY, RAM[@H + " + self._nibbase % d + "]." + str(b))
 
     def _ldb_cy_memb_al(self, pc, opcode, rom):
         #11110100 0100AAAA
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         g = op & 0xF
         pmem =  0xFC0 + (g << 2)
         return (pc + 2,), (2, (opcode << 8) | op, "ldb CY, RAM[" + self._rambase % pmem + " + @L3-2].@L1-0")
 
     def _ldb_cy_mema_bit(self, pc, opcode, rom):
         #11110100 1XBBAAAA
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         b = (op >> 4) & 0x3
         fmem = 0xFB0 | (op & 0b01001111)
         return (pc + 2,), (2, (opcode << 8) | op, "ldb CY, RAM[" + self._rambase % fmem + "]." + str(b))
 
     def _btsf_ahda_bit(self, pc, opcode, rom):
         #11111000 00BBAAAA
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         d = op & 0xF
         b = (op >> 4) & 0x3
         return (pc + 2, self._get_instr_skip_pc(pc + 2, rom)), (2, (opcode << 8) | op, "btsf RAM[@H + " + self._nibbase % d + "]." + str(b))
 
     def _btsf_memb_al(self, pc, opcode, rom):
         #11111000 0100AAAA
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         g = op & 0xF
         pmem =  0xFC0 + (g << 2)
         return (pc + 2, self._get_instr_skip_pc(pc + 2, rom)), (2, (opcode << 8) | op, "btsf RAM[" + self._rambase % pmem + " + @L3-2].@L1-0")
 
     def _btsf_mema_bit(self, pc, opcode, rom):
         #111111000 1XBBAAAA
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         b = (op >> 4) & 0x3
         fmem = 0xFB0 | (op & 0b01001111)
         return (pc + 2, self._get_instr_skip_pc(pc + 2, rom)), (2, (opcode << 8) | op, "btsf RAM[" + self._rambase % fmem + "]." + str(b))
 
     def _btst_ahda_bit(self, pc, opcode, rom):
         #11111001 00BBAAAA
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         d = op & 0xF
         b = (op >> 4) & 0x3
         return (pc + 2, self._get_instr_skip_pc(pc + 2, rom)), (2, (opcode << 8) | op, "btst RAM[@H + " + self._nibbase % d + "]." + str(b))
 
     def _btst_memb_al(self, pc, opcode, rom):
         #11111001 0100AAAA
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         g = op & 0xF
         pmem =  0xFC0 + (g << 2)
         return (pc + 2, self._get_instr_skip_pc(pc + 2, rom)), (2, (opcode << 8) | op, "btst RAM[" + self._rambase % pmem + " + @L3-2].@L1-0")
 
     def _btst_mema_bit(self, pc, opcode, rom):
         #11111001 1XBBAAAA
-        op = rom.getByte(pc + 1)
+        op = rom.get_byte(pc + 1)
         b = (op >> 4) & 0x3
         fmem = 0xFB0 | (op & 0b01001111)
         return (pc + 2, self._get_instr_skip_pc(pc + 2, rom)), (2, (opcode << 8) | op, "btst RAM[" + self._rambase % fmem + "]." + str(b))

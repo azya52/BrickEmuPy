@@ -6,49 +6,67 @@
 	
 	"buttons": {
 		"btnOnPause": {
-			"port": "PORT6",
-			"pin": 2,
-			"level": 0,
 			"hot_keys": [49, 80]
 		},
 		"btnSound": {
-			"port": "PORT1",
-			"pin": 3,
-			"level": 0,
 			"hot_keys": [50]
 		},
 		"btnMode": {
-			"port": "PORT6",
-			"pin": 1,
-			"level": 0,
 			"hot_keys": [51, 82]
 		},
 		"btnLeft": {
-			"port": "PORT1",
-			"pin": 3,
-			"level": 0,
 			"hot_keys": [65, 16777234]
 		},
 		"btnRight": {
-			"port": "PORT1",
-			"pin": 2,
-			"level": 0,
 			"hot_keys": [68, 16777236]
 		},
 		"btnDown": {
-			"port": "PORT6",
-			"pin": 0,
-			"level": 0,
 			"hot_keys": [83, 16777237]
 		},
 		"btnRotate": {
-			"port": "PORT6",
-			"pin": 1,
-			"level": 0,
 			"hot_keys": [32, 16777220]
 		}
 	},
-	
+
+	"peripherals": {
+		"direct_input": {
+			"btnOnPause": {
+				"port": "PORT6",
+				"mask": 4,
+				"level": 0
+			},
+			"btnSound": {
+				"port": "PORT1",
+				"mask": 8,
+				"level": 0
+			},
+			"btnMode": {
+				"port": "PORT6",
+				"mask": 2,
+				"level": 0
+			},
+			"btnLeft": {
+				"port": "PORT1",
+				"mask": 8,
+				"level": 0
+			},
+			"btnRight": {
+				"port": "PORT1",
+				"mask": 4,
+				"level": 0
+			},
+			"btnDown": {
+				"port": "PORT6",
+				"mask": 1,
+				"level": 0
+			},
+			"btnRotate": {
+				"port": "PORT6",
+				"mask": 2,
+				"level": 0
+			}
+		}
+	},
 	"mask_options": {
 		"rom_path": "./assets/GA878.bin"
 	}

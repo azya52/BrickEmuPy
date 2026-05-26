@@ -6,49 +6,66 @@
 	
 	"buttons": {
 		"btnThrow": {
-			"port": "INP",
-			"pin": 3,
-			"level": {
-				"port": "OUTP",
-				"pin": 3
-			},
 			"hot_keys": [49, 32]
 		},
 		"btnStart": {
-			"port": "INP",
-			"pin": 2,
-			"level": {
-				"port": "OUTP",
-				"pin": 2
-			},
 			"hot_keys": [50, 77]
 		},
 		"btnRotateCCW": {
-			"port": "INP",
-			"pin": 1,
-			"level": {
-				"port": "OUTP",
-				"pin": 1
-			},
 			"hot_keys": [83, 16777237]
 		},
 		"btnRotateCW": {
-			"port": "INP",
-			"pin": 0,
-			"level": {
-				"port": "OUTP",
-				"pin": 0
-			},
 			"hot_keys": [87, 16777235]
 		},
 		"btnReset": {
-			"port": "RES",
-			"pin": 0,
-			"level": 1,
 			"hot_keys": [82]
 		}
 	},
 	
+	"peripherals": {
+		"matrix_input": {
+			"btnThrow": {
+				"port": "INP",
+				"mask": 8,
+				"level": {
+					"port": "OUTP",
+					"mask": 8
+				}
+			},
+			"btnStart": {
+				"port": "INP",
+				"mask": 4,
+				"level": {
+					"port": "OUTP",
+					"mask": 4
+				}
+			},
+			"btnRotateCCW": {
+				"port": "INP",
+				"mask": 2,
+				"level": {
+					"port": "OUTP",
+					"mask": 2
+				}
+			},
+			"btnRotateCW": {
+				"port": "INP",
+				"mask": 1,
+				"level": {
+					"port": "OUTP",
+					"mask": 1
+				}
+			}
+		},
+		"direct_input": {
+			"btnReset": {
+				"port": "RES",
+				"mask": 0,
+				"level": 1
+			}
+		}
+	},
+
 	"mask_options": {
 		"rom_path": "./assets/PowerFishing.bin",
 		"prescaler_div": [16, 32, 64],

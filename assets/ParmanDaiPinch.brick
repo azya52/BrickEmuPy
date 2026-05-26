@@ -6,70 +6,88 @@
 	
 	"buttons": {
 		"btnDown": {
-			"port": "INP",
-			"pin": 3,
-			"level": {
-				"port": "OUTP",
-				"pin": 1
-			},
 			"hot_keys": [83, 16777237]
 		},
 		"btnLeft": {
-			"port": "INP",
-			"pin": 2,
-			"level": {
-				"port": "OUTP",
-				"pin": 1
-			},
 			"hot_keys": [65, 16777234]
 		},
 		"btnRight": {
-			"port": "INP",
-			"pin": 0,
-			"level": {
-				"port": "OUTP",
-				"pin": 1
-			},
 			"hot_keys": [68, 16777236]
 		},
 		"btnUp": {
-			"port": "INP",
-			"pin": 1,
-			"level": {
-				"port": "OUTP",
-				"pin": 1
-			},
 			"hot_keys": [87, 16777235]
 		},
 		"btnMode": {
-			"port": "INP",
-			"pin": 0,
-			"level": {
-				"port": "OUTP",
-				"pin": 0
-			},
 			"hot_keys": [49, 77]
 		},
 		"btnAction": {
-			"port": "INP",
-			"pin": 3,
-			"level": {
-				"port": "OUTP",
-				"pin": 0
-			},
 			"hot_keys": [50, 32]
 		},
 		"btnACL": {
-			"port": "RES",
-			"pin": 0,
-			"level": {
-				"port": "OUTP",
-				"pin": 0
-			},
 			"hot_keys": [82]
 		}
 	},
 	
+	"peripherals": {
+		"matrix_input": {
+			"btnDown": {
+				"port": "INP",
+				"mask": 8,
+				"level": {
+					"port": "OUTP",
+					"mask": 2
+				}
+			},
+			"btnLeft": {
+				"port": "INP",
+				"mask": 4,
+				"level": {
+					"port": "OUTP",
+					"mask": 2
+				}
+			},
+			"btnRight": {
+				"port": "INP",
+				"mask": 1,
+				"level": {
+					"port": "OUTP",
+					"mask": 2
+				}
+			},
+			"btnUp": {
+				"port": "INP",
+				"mask": 2,
+				"level": {
+					"port": "OUTP",
+					"mask": 2
+				}
+			},
+			"btnMode": {
+				"port": "INP",
+				"mask": 1,
+				"level": {
+					"port": "OUTP",
+					"mask": 1
+				}
+			},
+			"btnAction": {
+				"port": "INP",
+				"mask": 8,
+				"level": {
+					"port": "OUTP",
+					"mask": 1
+				}
+			}
+		},
+		"direct_input": {
+			"btnACL": {
+				"port": "RES",
+				"mask": 0,
+				"level": 1
+			}
+		}
+	},
+
 	"mask_options": {
 		"rom_path": "./assets/ParmanDaiPinch.bin",
 		"prescaler_div": [2, 8, 32],

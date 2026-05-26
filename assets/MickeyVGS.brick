@@ -6,37 +6,52 @@
 	
 	"buttons": {
 		"btnEarLeft": {
-			"port": "PS",
-			"pin": 0,
-			"level": 0,
 			"hot_keys": [49, 65, 16777234]
 		},
 		"btnLeft": {
-			"port": "PS",
-			"pin": 1,
-			"level": 0,
 			"hot_keys": [50, 32]
 		},
 		"btnRight": {
-			"port": "PS",
-			"pin": 2,
-			"level": 0,
 			"hot_keys": [51, 83, 16777237]
 		},
 		"btnEarRight": {
-			"port": "PS",
-			"pin": 3,
-			"level": 0,
 			"hot_keys": [52, 68, 16777236]
 		},
 		"btnReset": {
-			"port": "PM",
-			"pin": 0,
-			"level": 0,
 			"hot_keys": [82]
 		}
 	},
 	
+	"peripherals": {
+		"direct_input": {
+			"btnEarLeft": {
+				"port": "PS",
+				"mask": 0,
+				"level": 0
+			},
+			"btnLeft": {
+				"port": "PS",
+				"mask": 1,
+				"level": 0
+			},
+			"btnRight": {
+				"port": "PS",
+				"mask": 2,
+				"level": 0
+			},
+			"btnEarRight": {
+				"port": "PS",
+				"mask": 3,
+				"level": 0
+			},
+			"btnReset": {
+				"port": "PM",
+				"mask": 0,
+				"level": 0
+			}
+		}
+	},
+
 	"mask_options": {
 		"rom_path": "./assets/MickeyVGS.bin",
 		"sound_rom_path": "./assets/MickeyVGS.srom",

@@ -6,49 +6,68 @@
 	
 	"buttons": {
 		"btnLeft": {
-			"port": "PORT1",
-			"pin": 0,
-			"level": 0,
 			"hot_keys": [65, 16777234]
 		},
 		"btnSpeed": {
-			"port": "PORT1",
-			"pin": 1,
-			"level": 0,
 			"hot_keys": [83, 16777237]
 		},
 		"btnRight": {
-			"port": "PORT1",
-			"pin": 2,
-			"level": 0,
 			"hot_keys": [68, 16777236]
 		},
 		"btnStartPause": {
-			"port": "PORT1",
-			"pin": 3,
-			"level": 0,
 			"hot_keys": [49, 80]
 		},
 		"btnSound": {
-			"port": "PORT6",
-			"pin": 0,
-			"level": 0,
 			"hot_keys": [50]
 		},
 		"btnOnOff": {
-			"port": "PORT6",
-			"pin": 1,
-			"level": 0,
 			"hot_keys": [51]
 		},
 		"btnRotate": {
-			"port": "PORT6",
-			"pin": 2,
-			"level": 0,
 			"hot_keys": [32, 16777220]
 		}
 	},
 	
+	"peripherals": {
+		"direct_input": {
+			"btnLeft": {
+				"port": "PORT1",
+				"mask": 1,
+				"level": 0
+			},
+			"btnSpeed": {
+				"port": "PORT1",
+				"mask": 2,
+				"level": 0
+			},
+			"btnRight": {
+				"port": "PORT1",
+				"mask": 4,
+				"level": 0
+			},
+			"btnStartPause": {
+				"port": "PORT1",
+				"mask": 8,
+				"level": 0
+			},
+			"btnSound": {
+				"port": "PORT6",
+				"mask": 1,
+				"level": 0
+			},
+			"btnOnOff": {
+				"port": "PORT6",
+				"mask": 2,
+				"level": 0
+			},
+			"btnRotate": {
+				"port": "PORT6",
+				"mask": 4,
+				"level": 0
+			}
+		}
+	},
+
 	"mask_options": {
 		"rom_path": "./assets/MiconKC32.bin"
 	}

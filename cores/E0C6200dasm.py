@@ -3,7 +3,7 @@ PSETMASK = 0b111111100000
 
 class E0C6200dasm():
 
-    def __init__(self):
+    def __init__(self, roots=None):
         self._base = '0x%X'
         self._nibbase = '0x%0.1X'
         self._bytebase = '0x%0.2X'
@@ -137,7 +137,7 @@ class E0C6200dasm():
                 pc = i
                 if (opcode & PSETMASK == PSETOP):
                     pc = opcode << 8 & 0x1F00
-                opcode = rom.getWord(i * 2) & 0xFFF
+                opcode = rom.get_word(i * 2) & 0xFFF
                 listing[i] = (self._opbase % opcode, self._instruction_tbl[opcode](self, pc, opcode))
             return {"LISTING": tuple(listing)}
         else:

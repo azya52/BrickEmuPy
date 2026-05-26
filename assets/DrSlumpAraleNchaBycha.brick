@@ -7,76 +7,99 @@
 	
 	"buttons": {
 		"btnNcha": {
-			"port": "INP",
-			"pin": 2,
-			"level": {
-				"port": "OUTP",
-				"pin": 0
-			},
 			"hot_keys": [49, 32]
 		},
 		"btnLeftTurn": {
-			"port": "INP",
-			"pin": 0,
-			"level": {
-				"port": "OUTP",
-				"pin": 0
-			},
 			"hot_keys": [65, 16777234]
 		},
 		"btnRightTurn": {
-			"port": "INP",
-			"pin": 1,
-			"level": {
-				"port": "OUTP",
-				"pin": 0
-			},
 			"hot_keys": [68, 16777236]
 		},
 		"btnGame1": {
-			"port": "INP",
-			"pin": 1,
-			"level": {
-				"port": "OUTP",
-				"pin": 1
-			},
 			"hot_keys": [50]
 		},
 		"btnGame2": {
-			"port": "INP",
-			"pin": 0,
-			"level": {
-				"port": "OUTP",
-				"pin": 1
-			},
 			"hot_keys": [51]
 		},
 		"btnMode": {
-			"port": "INP",
-			"pin": 2,
-			"level": {
-				"port": "OUTP",
-				"pin": 1
-			},
 			"hot_keys": [52]
 		},
 		"btnAlarm": {
-			"port": "INP",
-			"pin": 3,
-			"level": {
-				"port": "OUTP",
-				"pin": 1
-			},
 			"hot_keys": [53]
 		},
 		"btnACL": {
-			"port": "RES",
-			"pin": 0,
-			"level": 1,
 			"hot_keys": [82]
 		}
 	},
 	
+	"peripherals": {
+		"matrix_input": {
+			"btnNcha": {
+				"port": "INP",
+				"mask": 4,
+				"level": {
+					"port": "OUTP",
+					"mask": 1
+				}
+			},
+			"btnLeftTurn": {
+				"port": "INP",
+				"mask": 1,
+				"level": {
+					"port": "OUTP",
+					"mask": 1
+				}
+			},
+			"btnRightTurn": {
+				"port": "INP",
+				"mask": 2,
+				"level": {
+					"port": "OUTP",
+					"mask": 1
+				}
+			},
+			"btnGame1": {
+				"port": "INP",
+				"mask": 2,
+				"level": {
+					"port": "OUTP",
+					"mask": 2
+				}
+			},
+			"btnGame2": {
+				"port": "INP",
+				"mask": 1,
+				"level": {
+					"port": "OUTP",
+					"mask": 2
+				}
+			},
+			"btnMode": {
+				"port": "INP",
+				"mask": 4,
+				"level": {
+					"port": "OUTP",
+					"mask": 2
+				}
+			},
+			"btnAlarm": {
+				"port": "INP",
+				"mask": 8,
+				"level": {
+					"port": "OUTP",
+					"mask": 2
+				}
+			}
+		},
+		"direct_input": {
+			"btnACL": {
+				"port": "RES",
+				"mask": 0,
+				"level": 1
+			}
+		}
+	},
+
 	"mask_options": {
 		"rom_path": "./assets/DrSlumpAraleNchaBycha.bin",
 		"prescaler_div": [2, 8, 32],

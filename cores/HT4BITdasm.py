@@ -1,6 +1,6 @@
 class HT4BITdasm():
 
-    def __init__(self):
+    def __init__(self, roots=None):
         self._base = '0x%X'
         self._bytebase = '0x%0.2X'
         self._addrbase = '%0.3X'
@@ -123,7 +123,7 @@ class HT4BITdasm():
 
             for i in range(len(listing)):
                 if (listing[i] is None):
-                    byte = rom.getByte(i)
+                    byte = rom.get_byte(i)
                     listing[i] = (1, byte, 'db ' + self._bytebase % byte)
                 listing[i] = (self._opbase % listing[i][1], listing[i][2])
             
@@ -142,7 +142,7 @@ class HT4BITdasm():
     
     def _disassemble(self, pc, listing, rom):
         while (pc < len(listing) and listing[pc] is None):
-            opcode = rom.getWord(pc)
+            opcode = rom.get_word(pc)
             next_pcs, listing[pc] = self._instructions[opcode >> 8](self, pc, opcode)
             if (listing[pc][0] == 2 and (pc + 1) < len(listing)):
                 listing[pc + 1] = (1, opcode & 0xFF, '')

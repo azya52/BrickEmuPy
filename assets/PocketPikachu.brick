@@ -6,67 +6,92 @@
 	
 	"buttons": {
 		"btnA": {
-			"port": "P2",
-			"pin": 0,
-			"level": 0,
 			"hot_keys": [32, 88]
 		},
 		"btnB": {
-			"port": "P2",
-			"pin": 1,
-			"level": 0,
 			"hot_keys": [90]
 		},
 		"btnStart": {
-			"port": "P2",
-			"pin": 2,
-			"level": 0,
 			"hot_keys": [50, 16777220]
 		},
 		"btnSelect": {
-			"port": "P2",
-			"pin": 3,
-			"level": 0,
 			"hot_keys": [49]
 		},
 		"btnLeft": {
-			"port": "P2",
-			"pin": 7,
-			"level": 0,
 			"hot_keys": [65, 16777234]
 		},
 		"btnUp": {
-			"port": "P2",
-			"pin": 6,
-			"level": 0,
 			"hot_keys": [87, 16777235]
 		},
 		"btnRight": {
-			"port": "P2",
-			"pin": 5,
-			"level": 0,
 			"hot_keys": [68, 16777236]
 		},
 		"btnDown": {
-			"port": "P2",
-			"pin": 4,
-			"level": 0,
 			"hot_keys": [83, 16777237]
 		},
 		"btnReset": {
-			"port": "RES",
-			"pin": 0,
-			"level": 0,
 			"hot_keys": [82]
 		},
 		"reflector": {
-			"port": "P4",
-			"pin": 0,
-			"level": 0,
 			"hot_keys": [51]	
 		}
 	},
 	
+	"peripherals": {
+		"direct_input": {
+			"btnA": {
+				"port": "P2",
+				"mask": 1,
+				"level": 0
+			},
+			"btnB": {
+				"port": "P2",
+				"mask": 2,
+				"level": 0
+			},
+			"btnStart": {
+				"port": "P2",
+				"mask": 4,
+				"level": 0
+			},
+			"btnSelect": {
+				"port": "P2",
+				"mask": 8,
+				"level": 0
+			},
+			"btnLeft": {
+				"port": "P2",
+				"mask": 128,
+				"level": 0
+			},
+			"btnUp": {
+				"port": "P2",
+				"mask": 64,
+				"level": 0
+			},
+			"btnRight": {
+				"port": "P2",
+				"mask": 32,
+				"level": 0
+			},
+			"btnDown": {
+				"port": "P2",
+				"mask": 16,
+				"level": 0
+			},
+			"btnReset": {
+				"port": "RES",
+				"mask": 0,
+				"level": 0
+			},
+			"reflector": {
+				"port": "P4",
+				"mask": 1,
+				"level": 0
+			}
+		}
+	},
+
 	"mask_options": {
 		"rom_path": "./assets/PocketPikachu.bin",
 		"port_pullup": {

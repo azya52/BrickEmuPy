@@ -6,55 +6,76 @@
 	
 	"buttons": {
 		"btnPause": {
-			"port": "PS",
-			"pin": 1,
-			"level": 0,
 			"hot_keys": [49, 80]
 		},
 		"btnSound": {
-			"port": "PS",
-			"pin": 2,
-			"level": 0,
 			"hot_keys": [50, 77]
 		},
 		"btnOnReset": {
-			"port": "RES",
-			"pin": 0,
-			"level": 0,
 			"hot_keys": [51, 82]
 		},
 		"btnLeft": {
-			"port": "PP",
-			"pin": 1,
-			"level": 0,
 			"hot_keys": [65, 16777234]
 		},
 		"btnRight": {
-			"port": "PP",
-			"pin": 0,
-			"level": 0,
 			"hot_keys": [68, 16777236]
 		},
 		"btnLife": {
-			"port": "PP",
-			"pin": 2,
-			"level": 0,
 			"hot_keys": [83, 16777237]
 		},
 		"btnContinue": {
-			"port": "PP",
-			"pin": 2,
-			"level": 0,
 			"hot_keys": [87, 16777235]
 		},
 		"btnStartShoot": {
-			"port": "PS",
-			"pin": 0,
-			"level": 0,
 			"hot_keys": [32, 16777220]
 		}
 	},
 	
+	"peripherals": {
+		"direct_input": {
+			"btnPause": {
+				"port": "PS",
+				"mask": 1,
+				"level": 0
+			},
+			"btnSound": {
+				"port": "PS",
+				"mask": 2,
+				"level": 0
+			},
+			"btnOnReset": {
+				"port": "RES",
+				"mask": 0,
+				"level": 0
+			},
+			"btnLeft": {
+				"port": "PP",
+				"mask": 1,
+				"level": 0
+			},
+			"btnRight": {
+				"port": "PP",
+				"mask": 0,
+				"level": 0
+			},
+			"btnLife": {
+				"port": "PP",
+				"mask": 2,
+				"level": 0
+			},
+			"btnContinue": {
+				"port": "PP",
+				"mask": 2,
+				"level": 0
+			},
+			"btnStartShoot": {
+				"port": "PS",
+				"mask": 0,
+				"level": 0
+			}
+		}
+	},
+
 	"mask_options": {
 		"rom_path": "./assets/MameGalaxian.bin",
 		"sound_rom_path": "./assets/MameGalaxian.srom",

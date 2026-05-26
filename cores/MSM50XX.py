@@ -8,9 +8,12 @@ FULL_GRAM = tuple([255] * GRAM_SIZE)
 MCLOCK_DIV = 4
 
 class MSM50XX():
-    def __init__(self, mask, clock):
+    def __init__(self, mask, clock, interconnect):
         self._ROM = ROM(mask['rom_path'])
-        self._sound = MSM50XXsound(mask, clock)
+        self._sound = MSM50XXsound(mask, clock, interconnect)
+
+        self._interconnect = interconnect
+        self._interconnect.register_port_device(self)
 
         self._format_tbl_offset = (self._ROM.size() // 2) - 64
         self._instr_counter = 0
@@ -235,28 +238,25 @@ class MSM50XX():
             for i, value in state["GRAM"].items():
                 self._GRAM[i] = value & 0xF
         if ("MEMORY" in state):
-            self._ROM.writeWord(state["MEMORY"][0], state["MEMORY"][1])
+            self._rom.write_word(state["MEMORY"][0], state["MEMORY"][1])
     
-    def pin_set(self, port, pin, level):
+    def port_handler(self, port, mask, level):
         if (port == 'PS'):
-            self._PS = ~(1 << pin) & self._PS | level << pin
-            self._HALT = 0
+            self._PS &= ~mask
+            if (level > 0):
+                self._PS |= mask
+                self._HALT = 0
         elif (port == 'PK'):
-            self._PK = ~(1 << pin) & self._PK | level << pin
-            self._HALT = 0
+            self._PK &= ~mask
+            if (level > 0):
+                self._PK |= mask
+                self._HALT = 0
         elif (port == 'RES'):
-            self._reset()
-            self._HALT = 1
-
-    def pin_release(self, port, pin):
-        if (port == 'PS'):
-            self._PS &= ~(1 << pin)
-            self._HALT = 0
-        elif (port == 'PK'):
-            self._PK &= ~(1 << pin)
-            self._HALT = 0
-        elif (port == 'RES'):
-            self._HALT = 0
+            if (level >= 0):
+                self._reset()
+                self._HALT = 1
+            else:
+                self._HALT = 0
 
     def pc(self):
         return self._PC & 0xFFF
@@ -274,7 +274,7 @@ class MSM50XX():
             
     def clock(self):
         if (not self._HALT):
-            opcode = self._ROM.getWord(self._PC << 1)
+            opcode = self._ROM.get_word(self._PC << 1)
             self._PC += 1
             self._execute[opcode >> 4](self, opcode)
             self._instr_counter += 1
@@ -613,7 +613,7 @@ class MSM50XX():
             a = self._get_ap(opcode)
         d = (opcode >> 5 & 0x10) | ((opcode >> 4) & 0xF)
         offset = self._format_tbl_offset + (((self._FMT & 0x6) << 3) | self._RAM[a])
-        word = self._ROM.getWord(offset * 2)
+        word = self._ROM.get_word(offset * 2)
         if (self._FMT & 0x1):
             word >>= 7
         self._GRAM[d] = (word << 1) & 0xFE

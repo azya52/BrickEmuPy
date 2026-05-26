@@ -15,9 +15,12 @@ MCLOCK_DIV3 = 24
 MCLOCK_DIV4 = 32
 
 class T6770S():
-    def __init__(self, mask, clock):
+    def __init__(self, mask, clock, interconnect):
         self._ROM = ROM(mask['rom_path'])
-        self._sound = PinTogglingSound(clock)
+        self._sound = PinTogglingSound(interconnect)
+
+        self._interconnect = interconnect
+        self._interconnect.register_port_device(self)
 
         self._instr_counter = 0
         self._cycle_counter = 0
@@ -225,24 +228,20 @@ class T6770S():
             for i, value in state["GRAM"].items():
                 self._GRAM[i] = value & 0xF
         if ("MEMORY" in state):
-            self._ROM.writeWord(state["MEMORY"][0], state["MEMORY"][1])
+            self._rom.write_word(state["MEMORY"][0], state["MEMORY"][1])
     
-    def pin_set(self, port, pin, level):
+    def port_handler(self, port, mask, level):
         if (port == 'INP'):
-            self._INP = ~(1 << pin) & self._INP | level << pin
+            self._INP &= ~mask
+            if (level > 0):
+                self._INP |= mask
         elif (port == 'IOP'):
-            self._IOP = ~(1 << pin) & self._IOP | level << pin
+            self._IOP &= ~mask
+            if (level > 0):
+                self._IOP |= mask
         elif (port == 'RES'):
             self._reset()
-            self._HALT = 1
-
-    def pin_release(self, port, pin):
-        if (port == 'INP'):
-            self._INP &= ~(1 << pin)
-        elif (port == 'IOP'):
-            self._IOP &= ~(1 << pin)
-        elif (port == 'RES'):
-            self._HALT = 0
+            self._HALT = (level > 0)
 
     def pc(self):
         return self._PC & 0xFFF
@@ -259,7 +258,7 @@ class T6770S():
     def clock(self):
         exec_cycles = MCLOCK_DIV4
         if (not self._HALT):
-            opcode = self._ROM.getWord(self._PC << 1)
+            opcode = self._ROM.get_word(self._PC << 1)
             self._PC = (self._PC & 0xF00) | ((self._PC + 1) & 0xFF)
             exec_cycles = self._execute[opcode & 0x3FF](self, opcode)
             self._instr_counter += 1
@@ -419,7 +418,7 @@ class T6770S():
     def _out_bz_1(self, opcode):
         #00 0001 0110 BZ = 1; CF -, SF 1; CC32; Set buzzer pin (0V)
         self._BZ = 1
-        self._sound.toggle(self._sound_gnd ^ self._BZ, 0, self._cycle_counter)
+        self._sound.toggle(self._sound_gnd ^ self._BZ, 0)
         self._nSF = 0
         return MCLOCK_DIV4
 
@@ -531,10 +530,10 @@ class T6770S():
     def _exe_cf_a(self, opcode):
         #00 0010 1010 ?exe(PC + 1), exe(CF:A); CF -, SF 1; CC32; Execute the following instruction and then CF:A
         addr = ((self._PC & 0xFE0) | ((self._CF << 4) | self._A)) << 1
-        opcode = self._ROM.getWord(self._PC << 1)
+        opcode = self._ROM.get_word(self._PC << 1)
         exec_cycles = self._execute[opcode & 0x3FF](self, opcode)
         self._PC = (self._PC & 0xF00) | ((self._PC + 1) & 0xFF)
-        opcode = self._ROM.getWord(addr)
+        opcode = self._ROM.get_word(addr)
         exec_cycles += self._execute[opcode & 0x3FF](self, opcode)
         return exec_cycles + MCLOCK_DIV4
 
@@ -607,7 +606,7 @@ class T6770S():
     def _out_bz_0(self, opcode):
         #00 0011 0110 BZ = 0; CF -, SF 1; CC32, Reset buzzer pin (+3V)
         self._BZ = 0
-        self._sound.toggle(self._sound_gnd ^ self._BZ, 0, self._cycle_counter)
+        self._sound.toggle(self._sound_gnd ^ self._BZ, 0)
         self._nSF = 0
         return MCLOCK_DIV4
 

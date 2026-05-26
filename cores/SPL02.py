@@ -1,5 +1,3 @@
-from .rom import ROM
-from .SPL0Xsound import SPL0Xsound
 from .SPL0X import SPL0X
 
 class SPL02(SPL0X):

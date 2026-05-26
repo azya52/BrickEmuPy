@@ -187,9 +187,12 @@ IO_PUP0 = 1
 
 
 class E0C6200():
-    def __init__(self, mask, clock):
+    def __init__(self, mask, clock, interconnect):
         self._ROM = ROM(mask['rom_path'])
-        self._sound = E0C6200sound(OSC1_CLOCK)
+        self._sound = E0C6200sound(OSC1_CLOCK, interconnect)
+
+        self._interconnect = interconnect
+        self._interconnect.register_port_device(self)
 
         self._port_pullup = mask['port_pullup']
 
@@ -203,7 +206,6 @@ class E0C6200():
         self._timer_counter = 0
         self._ptimer_counter = 0
         self._stopwatch_counter = 0
-        self._execution_counter = 0
         self._instr_counter = 0
 
         self._if_delay = False
@@ -500,7 +502,7 @@ class E0C6200():
                 if i < len(self._io_tbl):
                     list(self._io_tbl.values())[i][1](self, value & 0xF)
         if ("MEMORY" in state):
-            self._ROM.writeWord(state["MEMORY"][0], state["MEMORY"][1])
+            self._rom.write_word(state["MEMORY"][0], state["MEMORY"][1])
 
     def _init_registers(self):
         self._A = 0
@@ -577,7 +579,6 @@ class E0C6200():
         self._OSC1_counter = 0
         self._timer_counter = 0
         self._stopwatch_counter = 0
-        self._execution_counter = 0
         
         self._sound.set_buzzer_off()
         self._sound.set_envelope_off()
@@ -869,7 +870,14 @@ class E0C6200():
     def _set_io_ptc(self, value):
         self._PTC = value
 
-    def pin_set(self, port, pin, level):
+    def port_handler(self, port, mask, level):
+        #to-do
+        if (level >= 0):
+            self._pin_set(port, mask, level)
+        else:
+            self._pin_release(port, mask)
+
+    def _pin_set(self, port, pin, level):
         if (port == 'K0'):
             new_K0 =  ~(1 << pin) & self._K0 | level << pin
             if (self._EIK0 and self._DFK0 >> pin != level and self._K0 >> pin != level):
@@ -898,7 +906,7 @@ class E0C6200():
             self._reset()
             self._RESET = 1
 
-    def pin_release(self, port, pin):
+    def _pin_release(self, port, pin):
         if (port == 'K0'):
             level = self._port_pullup['K0'] >> pin & 0x1
             new_K0 =  ~(1 << pin) & self._K0 | level << pin
@@ -950,7 +958,7 @@ class E0C6200():
         if (not self._RESET):
             if (not self._HALT):
                 self._if_delay = False
-                opcode = self._ROM.getWord(self._PC * 2)
+                opcode = self._ROM.get_word(self._PC * 2)
                 exec_cycles = self._execute[opcode](self, opcode)
                 self._instr_counter += 1
 

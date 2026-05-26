@@ -6,31 +6,44 @@
 	
 	"buttons": {
 		"btnMode": {
-			"port": "PA",
-			"pin": 2,
-			"level": 0,
 			"hot_keys": [49]
 		},
 		"btnEnter": {
-			"port": "PA",
-			"pin": 4,
-			"level": 0,
 			"hot_keys": [50]
 		},
 		"btnExit": {
-			"port": "PA",
-			"pin": 8,
-			"level": 0,
 			"hot_keys": [51]
 		},
 		"btnRev": {
-			"port": "PA",
-			"pin": 16,
-			"level": 0,
 			"hot_keys": [52]
 		}
 	},
 	
+	"peripherals": {
+		"direct_input": {
+			"btnMode": {
+				"port": "PA",
+				"mask": 2,
+				"level": 0
+			},
+			"btnEnter": {
+				"port": "PA",
+				"mask": 4,
+				"level": 0
+			},
+			"btnExit": {
+				"port": "PA",
+				"mask": 8,
+				"level": 0
+			},
+			"btnRev": {
+				"port": "PA",
+				"mask": 16,
+				"level": 0
+			}
+		}
+	},
+
 	"mask_options": {
 		"rom_path": "./assets/Apollo2in1.bin",
 		"non_crystal_mode": 0,

@@ -1,219 +1,120 @@
+import sys
+import multiprocessing
+
 from PyQt6 import QtCore
-from PyQt6.QtCore import QObject, pyqtSignal, pyqtSlot
-import time
+from PyQt6.QtCore import QObject, pyqtSignal
 
-from cores import *
+import audio_engine
+from emulator_process import *
 
-FPS = 60
-EXAMINE_RATE = 30
+def emulatorProcess(config, cmd_queue, data_queue):
+    timerPeriodSet = False
+    if sys.platform == "win32": 
+        import ctypes
+        try:
+            ctypes.windll.winmm.timeBeginPeriod(1)
+            timerPeriodSet = True
+        except Exception as e:
+            pass
 
-DISPLAY_UPDTE_NS = 1e9 / FPS
-EXAMINE_UPDTE_NS = 1e9 / EXAMINE_RATE
+    try:
+        EmulatorProcess(config, cmd_queue, data_queue).run()
+    finally:
+        try:
+            if sys.platform == "win32" and timerPeriodSet:
+                ctypes.windll.winmm.timeEndPeriod(1)
+        except Exception as e:
+            pass
+
 
 class Brick(QObject):
-    btnPressSignal = pyqtSignal(str, int, int)
-    btnMatrixPressSignal = pyqtSignal(str, int, dict)
-    btnReleaseSignal = pyqtSignal(str, int)
-    stepSignal = pyqtSignal()
-    pauseSignal = pyqtSignal()
-    runSignal = pyqtSignal()
-    stopSignal = pyqtSignal()
-    setSpeedSignal = pyqtSignal(float)
-    setBreakpointSignal = pyqtSignal(int, bool)
     examineSignal = pyqtSignal(dict)
-    editStateSignal = pyqtSignal(dict)
     uiDisplayUpdateSignal = pyqtSignal(tuple)
-    setConfigSignal = pyqtSignal(dict)
     errorSignal = pyqtSignal(str)
 
     def __init__(self, config):
         super().__init__()
         self._config = config
+        self._proc = None
+        self._audioEngine = audio_engine.getAudioEngine()
 
-        self.btnPressSignal.connect(self._btnPressed)
-        self.btnMatrixPressSignal.connect(self._btnMatrixPressed)
-        self.btnReleaseSignal.connect(self._btnReleased)
-        self.setBreakpointSignal.connect(self._setBreakpoint)
-        self.runSignal.connect(self._run)
-        self.pauseSignal.connect(self._pause)
-        self.stepSignal.connect(self._step)
-        self.setConfigSignal.connect(self._setConfig)
-        self.stopSignal.connect(self._stop)
-        self.setSpeedSignal.connect(self._setSpeed)
-        self.editStateSignal.connect(self._editState)
+    def start(self):
+        self._cmdQueue = multiprocessing.Queue()
+        self._dataQueue = multiprocessing.Queue()
 
-    @pyqtSlot()
-    def run(self):
-        self._breakpoints = {}
-        self._debug = False
-        self._cycleTimeNs = self._getCicleTimeNs()
-        self._icounterOnStop = 0
-        self._btn_matrix_out = {}
-        self._btn_matrix_in = {}
+        self._proc = multiprocessing.Process(
+            target=emulatorProcess,
+            args=(self._config, self._cmdQueue, self._dataQueue),
+            daemon=False,
+        )
+        self._proc.start()
 
-        try:
-            self._setConfig(self._config)
-        except Exception as e:
-            self.errorSignal.emit(str(e))
-            return
+        self._pollTimer = QtCore.QTimer(self)
+        self._pollTimer.setInterval(int(1000 / max(FPS, EXAMINE_RATE) / 2))
+        self._pollTimer.timeout.connect(self._poll)
+        self._pollTimer.start()
 
-        self._uiDisplayUpdate()
-        self._uiExamineUpdate()
-        
-        self._clock()
-    
-    @pyqtSlot(dict)
-    def _editState(self, state):
-        if ("BRKPT" in state):
-            self._setBreakpoint(state["BRKPT"][0], state["BRKPT"][1])
-        self._CPU.edit_state(state)
-        self._uiDisplayUpdate()
-        self._uiExamineUpdate()
+    def _poll(self):
+        while not self._dataQueue.empty():
+            try:
+                msg = self._dataQueue.get_nowait()
+            except Exception:
+                break
+            op = msg[0]
+            if op == MSG_VRAM: 
+                self.uiDisplayUpdateSignal.emit(msg[1])
+            elif op == MSG_EXAMINE:
+                self.examineSignal.emit(msg[1])
+            elif op == MSG_ERROR:
+                self.errorSignal.emit(msg[1])
+            elif op == MSG_SOUND_DATA:
+                self._soundProcess(msg[1], msg[2], msg[3])
+            elif op == MSG_SOUND_RESET:
+                self._soundReset()
+                
+    def close(self):
+        self._pollTimer.stop()
+        if self._proc and self._proc.is_alive():
+            self._cmdQueue.put((CMD_QUIT,))
+            self._proc.join(timeout=1.0)
+            if self._proc.is_alive():
+                self._proc.terminate()
+                self._proc.join()
+        self._cmdQueue = None
+        self._dataQueue = None
 
-    def _clock(self):
-        thread = self.thread().currentThread()
-        lastTick = time.perf_counter_ns()
-        lastExamine = lastTick
-        lastDisplayUpdate = lastTick
-        while not(thread.isInterruptionRequested() or self._debug):
-            cycleTimeNs = self._cycleTimeNs
-            ns = time.perf_counter_ns()
-            while (ns > lastTick and ns < lastDisplayUpdate and ns < lastExamine and not self._debug):
-                lastTick += self._CPU.clock() * cycleTimeNs
-                if (self._breakpoints and self._CPU.pc() in self._breakpoints):
-                    self.examineSignal.emit({"DEBUG": True})
-                    self._pause()
+    def _soundReset(self):
+        self._audioEngine.reset()
 
-                ns = time.perf_counter_ns()
-
-            if (ns > lastDisplayUpdate):
-                lastDisplayUpdate += DISPLAY_UPDTE_NS
-                self._uiDisplayUpdate()
-            elif (ns > lastExamine):
-                lastExamine += EXAMINE_UPDTE_NS
-                self._uiExamineUpdate()
-            elif (lastTick < ns):
-                lastTick = ns
-            if (lastTick > ns + 1000):
-                time.sleep((lastTick - ns) / 1e9)
-            else:
-                QtCore.QCoreApplication.processEvents()
-
-    def _set_pin_state(self, port, pin, level):
-        self._btn_matrix_out[(port, pin)] = level
-        for port, pin in self._btn_matrix_in.get((port, pin), ()):
-            self._CPU.pin_set(port, pin, level)
-
-    @pyqtSlot()
-    def _run(self):
-        self._debug = False
-        self._clock()
-
-    @pyqtSlot()
-    def _pause(self):
-        self._debug = True
-        self._uiDisplayUpdate()
-        self._uiExamineUpdate()
-        self._icounterOnStop = self._CPU.istr_counter()
-
-    @pyqtSlot()
-    def _step(self):
-        self._CPU.clock()
-        self._uiDisplayUpdate()
-        self._uiExamineUpdate()
-
-    @pyqtSlot()
-    def _stop(self):
-        self._debug = True
-        self._CPU.reset()
-        self._uiDisplayUpdate()
-        self._uiExamineUpdate()
-        self._icounterOnStop = self._CPU.istr_counter()
-            
-    @pyqtSlot(int, bool)
-    def _setBreakpoint(self, pc, add):
-        if (add):
-            self._breakpoints[pc] = True
+    def _soundProcess(self, channel, data, tick):
+        if (data):
+            self._audioEngine.play(channel, data[0], data[1], data[2], tick / 1e9, data[3])
         else:
-            if (pc in self._breakpoints):
-                del self._breakpoints[pc]
-
-    @pyqtSlot(dict)
-    def _setConfig(self, config):
-        self._config = config
-        core = self._config["core"]
-        if (core in cores_map):
-            self._CPU = cores_map[core]["core"](config['mask_options'], config["clock"])
-            self.examineSignal.emit(cores_map[core]["dasm"]().disassemble(self._CPU.get_ROM()))
-
-            if (hasattr(self._CPU, "set_pin_state_callback")):
-                self._CPU.set_pin_state_callback(self._set_pin_state)
-
-    def _uiDisplayUpdate(self):
-        self.uiDisplayUpdateSignal.emit(self._CPU.get_VRAM()) 
-
-    def _uiExamineUpdate(self):
-        self.examineSignal.emit({
-            **self._CPU.examine(),
-            "ICTR": self._CPU.istr_counter() - self._icounterOnStop
-        })
-
-    @pyqtSlot(str, int, int)
-    def _btnPressed(self, port, pin, level):
-        self._CPU.pin_set(port, pin, level)
-
-    @pyqtSlot(str, int)
-    def _btnReleased(self, port, pin):
-        for _, item in self._btn_matrix_in.items():
-            item.discard((port, pin))
-        self._CPU.pin_release(port, pin)
-
-    @pyqtSlot(str, int, dict)
-    def _btnMatrixPressed(self, port, pin, level):
-        key = (level["port"], level["pin"])
-        self._btn_matrix_in.setdefault(key, set()).add((port, pin))
-        if key in self._btn_matrix_out:
-            self._CPU.pin_set(port, pin, self._btn_matrix_out[key])
-
-    @pyqtSlot(float)
-    def _setSpeed(self, speed):
-        self._cycleTimeNs = self._getCicleTimeNs() * speed
-
-    def _getCicleTimeNs(self):
-        return 1e9 / self._config["clock"]
+            self._audioEngine.stop(channel, tick / 1e9)
 
     def debugRun(self):
-        self.runSignal.emit()
-
-    def debugStep(self):
-        self.stepSignal.emit()
+        self._cmdQueue.put((CMD_DEBUG, CMD_DEBUG_RUN))
 
     def debugPause(self):
-        self.pauseSignal.emit()
+        self._cmdQueue.put((CMD_DEBUG, CMD_DEBUG_PAUSE))
+
+    def debugStep(self):
+        self._cmdQueue.put((CMD_DEBUG, CMD_DEBUG_STEP))
 
     def debugStop(self):
-        self.stopSignal.emit()
-
-    def btnPressed(self, port, pin, level):
-        if (type(level) is dict):
-            self.btnMatrixPressSignal.emit(port, pin, level)
-        else:
-            self.btnPressSignal.emit(port, pin, level)
-
-    def btnReleased(self, port, pinMask):
-        self.btnReleaseSignal.emit(port, pinMask)
-
-    def setConfig(self, config):
-        self.setConfigSignal.emit(config)
+        self._cmdQueue.put((CMD_DEBUG, CMD_DEBUG_STOP))
 
     def setSpeed(self, speed):
-        self.setSpeedSignal.emit(speed)
-
-    def editState(self, state):
-        self.editStateSignal.emit(state)
+        self._cmdQueue.put((CMD_SPEED, speed))
 
     def setBreakpoint(self, pc, add):
-        self.setBreakpointSignal.emit(pc, add)
+        self._cmdQueue.put((CMD_BREAKPOINT, pc, add))
 
-    def close(self):
-        del self._CPU
+    def editState(self, state):
+        self._cmdQueue.put((CMD_EDIT_STATE, state))
+
+    def btnPressed(self, key):
+        self._cmdQueue.put((CMD_BTN_PRESS, key))
+
+    def btnReleased(self, key):
+        self._cmdQueue.put((CMD_BTN_RELEASE, key))

@@ -1090,7 +1090,7 @@
          </layout>
         </item>
         <item>
-         <widget class="QTableWidget" name="listingTable">
+         <widget class="QTableView" name="listingTable">
           <property name="focusPolicy">
            <enum>Qt::NoFocus</enum>
           </property>
@@ -1105,9 +1105,6 @@
           </property>
           <property name="showGrid">
            <bool>false</bool>
-          </property>
-          <property name="columnCount">
-           <number>3</number>
           </property>
           <property name="key" stdset="0">
            <string>LISTING</string>
@@ -1283,12 +1280,6 @@
     <slot>debugStepSignal()</slot>
   </connection>
   <connection>
-    <sender>listingTable</sender>
-    <signal>itemChanged(QTableWidgetItem*)</signal>
-    <receiver>DebugWidget</receiver>
-    <slot>listingTableChanged()</slot>
-  </connection>
-  <connection>
     <sender>ramTabWidget</sender>
     <signal>currentChanged(int)</signal>
     <receiver>DebugWidget</receiver>
@@ -1303,7 +1294,6 @@
   <slot>debugStopSignal()</slot>
   <slot>debugPauseSignal()</slot>
   <slot>debugStepSignal()</slot>
-  <slot>listingTableChanged()</slot>
   <slot>refrashStateSignal()</slot>
  </slots>
 </ui>

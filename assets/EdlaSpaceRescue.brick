@@ -6,31 +6,44 @@
 	
 	"buttons": {
 		"btnLeft": {
-			"port": "PS",
-			"pin": 4,
-			"level": 1,
 			"hot_keys": [65, 16777234]
 		},
 		"btnRight": {
-			"port": "PS",
-			"pin": 8,
-			"level": 1,
 			"hot_keys": [68, 16777236]
 		},
 		"btnMode": {
-			"port": "PS",
-			"pin": 1,
-			"level": 1,
 			"hot_keys": [50]
 		},
 		"btnStart": {
-			"port": "PS",
-			"pin": 2,
-			"level": 1,
 			"hot_keys": [49, 32]
 		}
 	},
-	
+
+	"peripherals": {
+		"direct_input": {
+			"btnLeft": {
+				"port": "PS",
+				"mask": 4,
+				"level": 1
+			},
+			"btnRight": {
+				"port": "PS",
+				"mask": 8,
+				"level": 1
+			},
+			"btnMode": {
+				"port": "PS",
+				"mask": 1,
+				"level": 1
+			},
+			"btnStart": {
+				"port": "PS",
+				"mask": 2,
+				"level": 1
+			}
+		}
+	},
+
 	"mask_options": {
 		"rom_path": "./assets/EdlaSpaceRescue.bin",
 		"sound_freq_tbl": [
