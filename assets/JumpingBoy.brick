@@ -22,7 +22,13 @@
 			"hot_keys": [82]
 		}
 	},
-	
+
+	"display": {
+		"motion_blur": 0.6,
+		"ghost_segments": 0,
+		"shadow": 8
+	},
+
 	"peripherals": {
 		"matrix_input": {
 			"btnGameA": {

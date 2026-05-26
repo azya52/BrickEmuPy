@@ -30,6 +30,12 @@
 			"hot_keys": [32]
 		}
 	},
+
+	"display": {
+		"motion_blur": 0.6,
+		"ghost_segments": 0.02,
+		"shadow": 24
+	},
 	
 	"peripherals": {
 		"direct_input": {

@@ -34,7 +34,13 @@
 			"hot_keys": [82]
 		}
 	},
-	
+
+	"display": {
+		"motion_blur": 0.6,
+		"ghost_segments": 0.08,
+		"shadow": 9
+	},
+
 	"peripherals": {
 		"direct_input": {
 			"btnFood": {

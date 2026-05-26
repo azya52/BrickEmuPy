@@ -30,7 +30,13 @@
 			"hot_keys": [87, 32, 16777235]
 		}
 	},
-	
+
+	"display": {
+		"motion_blur": 0.6,
+		"ghost_segments": 0.02,
+		"shadow": 8
+	},
+
 	"peripherals": {
 		"direct_input": {
 			"btnOnOff": {

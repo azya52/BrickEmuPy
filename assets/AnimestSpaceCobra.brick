@@ -28,6 +28,12 @@
 			"hot_keys": [52, 82]
 		}
 	},
+
+	"display": {
+		"motion_blur": 0.6,
+		"ghost_segments": 0,
+		"shadow": 4
+	},
 	
 	"peripherals": {
 		"matrix_input": {

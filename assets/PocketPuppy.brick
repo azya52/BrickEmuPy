@@ -19,6 +19,12 @@
 		}
 	},
 
+	"display": {
+		"motion_blur": 0.6,
+		"ghost_segments": 0.05,
+		"shadow": 16
+	},
+
 	"peripherals": {
 		"direct_input": {
 			"btnCircle": {

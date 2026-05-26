@@ -25,6 +25,12 @@
 		}
 	},
 
+	"display": {
+		"motion_blur": 0.6,
+		"ghost_segments": 0,
+		"shadow": 14
+	},
+
 	"peripherals": {
 		"direct_input": {
 			"btnAdjust": {

@@ -5,13 +5,23 @@ from functools import partial
 
 from brick import Brick
 
+DEFAULT_MOTION_BLUR = 0.6
+DEFAULT_GHOST_SEGMENTS = 0
+DEFAULT_SHADOW = 5
+
 class BrickWidget(QtWidgets.QGraphicsView):
     def __init__(self, examine, config, settings):
         super().__init__()
 
         self._config = config
         self._settings = settings
+
+        self._displaySettings = {}
         
+        self._motionBlur = DEFAULT_MOTION_BLUR
+        self._ghostSegments = DEFAULT_GHOST_SEGMENTS
+        self._shadow = DEFAULT_SHADOW
+
         self._loadSettings()
         
         self.setViewportUpdateMode(QtWidgets.QGraphicsView.ViewportUpdateMode.MinimalViewportUpdate)
@@ -43,6 +53,7 @@ class BrickWidget(QtWidgets.QGraphicsView):
         
     def _loadSettings(self):
         self._scene_rect = self._settings.value("brick/" + self._config["id"] + "/scene_rect")
+        self._displaySettings = self._settings.value("display", None)
 
     def _saveSettings(self):
         self._settings.setValue("brick/" + self._config["id"] + "/scene_rect", self.mapToScene(self.viewport().rect()).boundingRect())
@@ -122,13 +133,7 @@ class BrickWidget(QtWidgets.QGraphicsView):
         body.setSharedRenderer(faceRenderer)
         body.setElementId("body")
         self.scene().addItem(body)
-
-        self._motionGhosting = 0.4
-        self._ghostSegments = 0
-        self._shadow = 0
-
-        shadow_shift = self.scene().itemsBoundingRect().width() * self._shadow
-        
+                
         overlay = QtSvgWidgets.QGraphicsSvgItem()
         overlay.setSharedRenderer(faceRenderer)
         overlay.setElementId("overlay")
@@ -144,19 +149,19 @@ class BrickWidget(QtWidgets.QGraphicsView):
                     segment.setElementId(nextId)
                     segment.setPos(faceRenderer.boundsOnElement(nextId).topLeft())
                     group.addToGroup(segment)
-
-                    if (shadow_shift):
-                        segment_shadow = QtSvgWidgets.QGraphicsSvgItem()
-                        segment_shadow.setSharedRenderer(faceRenderer)
-                        segment_shadow.setElementId(nextId)
-                        segment_shadow.setPos(faceRenderer.boundsOnElement(nextId).topLeft().x() + shadow_shift,
-                                                faceRenderer.boundsOnElement(nextId).topLeft().y() + shadow_shift * 2)
-                        segment_shadow.setOpacity(0.1)                   
-                        group.addToGroup(segment_shadow)
+                    
+                    segment_shadow = QtSvgWidgets.QGraphicsSvgItem()
+                    segment_shadow.setSharedRenderer(faceRenderer)
+                    segment_shadow.setElementId(nextId)
+                    segment_shadow.setVisible(False)
+                    segment_shadow.setOpacity(0.1)
+                    group.addToGroup(segment_shadow)
 
                     self.scene().addItem(group)
                     self._segments.append([ramByte, ramBit, group, -1])
         
+        self._updateDisplaySettings()
+
         overlay.setPos(faceRenderer.boundsOnElement("overlay").topLeft())
         self.scene().addItem(overlay)
 
@@ -174,24 +179,52 @@ class BrickWidget(QtWidgets.QGraphicsView):
 
     @pyqtSlot(tuple)
     def render(self, RAM):
-        motion_ghosting = self._motionGhosting
-        ghost_segments = self._ghostSegments
+        k = 1 - self._motionBlur
+        ghostSegments = self._ghostSegments
         ramSize = len(RAM)
         for seg in self._segments:
             nibble, bit, segment, opacity = seg
             if nibble < ramSize:
-                target = (RAM[nibble] >> bit) & 0x1
+                target = ((RAM[nibble] >> bit) & 0x1) + ghostSegments
                 if (opacity != target):
-                    opacity += motion_ghosting * (target - opacity)
+                    opacity += k * (target - opacity)
                     if abs(opacity - target) < 1e-3:
                         opacity = target
-                    segment.setOpacity(opacity + ghost_segments)
+                    segment.setOpacity(opacity)
                     seg[-1] = opacity
             else:
                 seg[-1] = 0
-                segment.setOpacity(ghost_segments)
+                segment.setOpacity(ghostSegments)
 
     @pyqtSlot(str)
     def error(self, error):
         QMessageBox(parent=self, text=error).exec()
         self.close()
+    
+    def setDisplaySetting(self, key, value):
+        self._displaySettings[key] = value
+        self._updateDisplaySettings()
+    
+    def _updateDisplaySettings(self):
+        if (self._displaySettings):
+            if (self._displaySettings.get("motion_blur", False)):
+                self._motionBlur = self._config.get("display", {}).get("motion_blur", DEFAULT_MOTION_BLUR)
+            else:
+                self._motionBlur = 0
+            if (self._displaySettings.get("ghost_segments", False)):
+                self._ghostSegments = self._config.get("display", {}).get("ghost_segments", DEFAULT_GHOST_SEGMENTS)
+            else:
+                self._ghostSegments = 0
+            if (self._displaySettings.get("shadow", False)):
+                self._shadow = self._config.get("display", {}).get("shadow", DEFAULT_SHADOW)
+            else:
+                self._shadow = 0
+
+        for seg in self._segments:
+            segmentItem = seg[2].childItems()[0]
+            shadowItem = seg[2].childItems()[1]
+            if (self._shadow):
+                shadowItem.setPos(segmentItem.sceneBoundingRect().topLeft() + QtCore.QPointF(self._shadow, self._shadow))
+                shadowItem.setVisible(True)
+            else:
+                shadowItem.setVisible(False)

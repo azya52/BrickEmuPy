@@ -90,9 +90,18 @@
     <addaction name="actionSpeedx10"/>
     <addaction name="actionSpeedMax"/>
    </widget>
+   <widget class="QMenu" name="menuDisplay">
+    <property name="title">
+     <string>Display</string>
+    </property>
+    <addaction name="actionMotionBlur"/>
+    <addaction name="actionGhostSegments"/>
+    <addaction name="actionShadow"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuDebug"/>
    <addaction name="menuSpeed"/>
+   <addaction name="menuDisplay"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionStep">
@@ -260,6 +269,39 @@
     </property>
     </action>
   </actiongroup>
+  <action name="actionMotionBlur">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Motion Blur</string>
+   </property>
+  </action>
+  <action name="actionGhostSegments">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Ghost Segments</string>
+   </property>
+  </action>
+  <action name="actionShadow">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Shadow</string>
+   </property>
+  </action>
   <action name="actionactionKeyCodes">
    <property name="checkable">
     <bool>true</bool>

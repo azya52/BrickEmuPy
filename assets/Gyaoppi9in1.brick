@@ -15,7 +15,13 @@
 			"hot_keys": [51]
 		}
 	},
-	
+
+	"display": {
+		"motion_blur": 0.6,
+		"ghost_segments": 0.02,
+		"shadow": 20
+	},
+
 	"peripherals": {
 		"direct_input": {
 			"btnA": {

@@ -83,6 +83,10 @@ class Window(QtWidgets.QMainWindow):
         self.deviceWidget.layout().addWidget(self._brickWidget)
         self._brickWidget.setFocus()
         
+        self.actionMotionBlur.toggled.connect(lambda checked: self._brickWidget.setDisplaySetting("motion_blur", checked))
+        self.actionGhostSegments.toggled.connect(lambda checked: self._brickWidget.setDisplaySetting("ghost_segments", checked))
+        self.actionShadow.toggled.connect(lambda checked: self._brickWidget.setDisplaySetting("shadow", checked))
+        
     def _parseArgs(self):
         parser = argparse.ArgumentParser(
             description='BrickEmuPy, Brick Game family emulator.'
@@ -114,6 +118,11 @@ class Window(QtWidgets.QMainWindow):
                 [int(self.geometry().width() * 0.6), int(self.geometry().width() * 0.4)]
             )
 
+        state = self._settings.value("display", {})
+        self.actionMotionBlur.setChecked(state.get("motion_blur", True))
+        self.actionGhostSegments.setChecked(state.get("ghost_segments", True))
+        self.actionShadow.setChecked(state.get("shadow", True))
+
     def _openBrick(self, path):
         try:
             with open(path) as f:
@@ -134,6 +143,12 @@ class Window(QtWidgets.QMainWindow):
     def _saveSettings(self):
         self._settings.setValue('window/window_geometry', self.saveGeometry())
         self._settings.setValue('window/mainsplitter_state', self.mainSplitter.saveState())
+
+        self._settings.setValue("display", {
+            "motion_blur": self.actionMotionBlur.isChecked(),
+            "ghost_segments": self.actionGhostSegments.isChecked(),
+            "shadow": self.actionShadow.isChecked(),
+        })
 
     def closeEvent(self, event):
         self._saveSettings()
