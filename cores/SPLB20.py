@@ -49,7 +49,7 @@ class SPLB20():
             **mask['port_pullup']
         }
 
-        self._port_handler = {
+        self._port_input = {
             "PA": [0, 0]
         }
     
@@ -353,8 +353,8 @@ class SPLB20():
     def _port_read(self, port):
         return (
             (~self._PDIR[port] & self._PLATCH[port]) | 
-            (self._PDIR[port] & (~self._port_handler[port][0] & 
-            (self._port_handler[port][1] | self._PULLUP[port] | self._pullup_ext[port])))
+            (self._PDIR[port] & (~self._port_input[port][0] & 
+            (self._port_input[port][1] | self._PULLUP[port] | self._pullup_ext[port])))
         )
 
     def port_handler(self, port, mask, level):
@@ -363,10 +363,10 @@ class SPLB20():
                 self.reset()
         else:
             prev_port = self._port_read(port)
-            self._port_handler[port][0] &= ~mask
-            self._port_handler[port][1] &= ~mask
+            self._port_input[port][0] &= ~mask
+            self._port_input[port][1] &= ~mask
             if (level >= 0):
-                self._port_handler[port][level] |= mask
+                self._port_input[port][level] |= mask
             if (prev_port != self._port_read(port)):
                 if (port == "PA" and level == 0):
                     if (mask & 0xFE):
@@ -615,7 +615,7 @@ class SPLB20():
         if ((self._DF) and ((A & 0x0F) + (operand & 0x0F) + self._CF > 9)):
             new_value += 6
 
-        self._VF = (~(A ^ operand) & (A ^ new_value)) >> 7
+        self._VF = ((~(A ^ operand) & (A ^ new_value)) >> 7) & 0x1
         self._NF = (new_value >> 7) & 0x1
 
         if ((self._DF) and (new_value > 0x99)):
@@ -636,7 +636,7 @@ class SPLB20():
             if (new_value < 0):
                 new_value -= 0x60
 
-        self._VF = ((A ^ operand) & (A ^ new_value)) >> 7
+        self._VF = (((A ^ operand) & (A ^ new_value)) >> 7) & 0x1
         self._NF = (new_value >> 7) & 0x1
         self._ZF = not(new_value & 0xFF)
         self._CF = new_value >= 0

@@ -59,7 +59,7 @@ class SPL81408():
             **mask['port_pullup']
         }
 
-        self._port_handler = {
+        self._port_input = {
             "CD": [0, 0],
             "EF": [0, 0],
             "AB": [0, 0]
@@ -378,8 +378,8 @@ class SPL81408():
     def _port_read(self, port):
         return (
             (self._PDIR[port] & self._PLATCH[port]) | 
-            (~self._PDIR[port] & (~self._port_handler[port][0] & 
-            (self._port_handler[port][1] | self._pullup_ext[port])))
+            (~self._PDIR[port] & (~self._port_input[port][0] & 
+            (self._port_input[port][1] | self._pullup_ext[port])))
         )
 
     def port_handler(self, port, mask, level):
@@ -388,10 +388,10 @@ class SPL81408():
                 self.reset()
         else:
             prev_port = self._port_read(port)
-            self._port_handler[port][0] &= ~mask
-            self._port_handler[port][1] &= ~mask
+            self._port_input[port][0] &= ~mask
+            self._port_input[port][1] &= ~mask
             if (level >= 0):
-                self._port_handler[port][level] |= mask
+                self._port_input[port][level] |= mask
             
             if ((port == "CD") and (mask & 0x2)):
                 if ((prev_port & 0x2) > (self._port_read(port) & 0x2)):
@@ -655,7 +655,7 @@ class SPL81408():
         if ((self._DF) and ((A & 0x0F) + (operand & 0x0F) + self._CF > 9)):
             new_value += 6
 
-        self._VF = (~(A ^ operand) & (A ^ new_value)) >> 7
+        self._VF = ((~(A ^ operand) & (A ^ new_value)) >> 7) & 0x1
         self._NF = (new_value >> 7) & 0x1
 
         if ((self._DF) and (new_value > 0x99)):
@@ -676,7 +676,7 @@ class SPL81408():
             if (new_value < 0):
                 new_value -= 0x60
 
-        self._VF = ((A ^ operand) & (A ^ new_value)) >> 7
+        self._VF = (((A ^ operand) & (A ^ new_value)) >> 7) & 0x1
         self._NF = (new_value >> 7) & 0x1
         self._ZF = not(new_value & 0xFF)
         self._CF = new_value >= 0
