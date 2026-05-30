@@ -98,10 +98,20 @@
     <addaction name="actionGhostSegments"/>
     <addaction name="actionShadow"/>
    </widget>
+    <widget class="QMenu" name="menuSerial">
+     <property name="title">
+      <string>Serial</string>
+     </property>
+     <addaction name="actionSerialSettings"/>
+     <addaction name="separator"/>
+     <addaction name="actionSerialConnect"/>
+     <addaction name="actionSerialStatus"/>
+    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuDebug"/>
    <addaction name="menuSpeed"/>
    <addaction name="menuDisplay"/>
+   <addaction name="menuSerial"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionStep">
@@ -308,6 +318,27 @@
    </property>
    <property name="text">
     <string>actionKeyCodes</string>
+   </property>
+  </action>
+  <action name="actionSerialSettings">
+   <property name="text">
+    <string>Port Settings</string>
+   </property>
+  </action>
+  <action name="actionSerialConnect">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Connect</string>
+   </property>
+  </action>
+  <action name="actionSerialStatus">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Disconnected</string>
    </property>
   </action>
  </widget>

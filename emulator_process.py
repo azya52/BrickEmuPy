@@ -129,7 +129,8 @@ class EmulatorProcess:
                     self._icounter_on_stop = self._cpu.istr_counter()
 
                 elif cmd_debug == CMD_DEBUG_STEP:
-                    self._cpu.clock()
+                    cycles = self._cpu.clock()
+                    self._interconnect.emit_clock(cycles)
                     self._ui_display_update()
                     self._ui_examine_update()
 

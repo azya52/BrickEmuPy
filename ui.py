@@ -8,6 +8,7 @@ from PyQt6.QtGui import QShortcut
 
 from debug_widget import DebugWidget
 from brick_widget import BrickWidget
+from serial_engine import getSerialEngine
 
 class Window(QtWidgets.QMainWindow):    
     
@@ -18,7 +19,8 @@ class Window(QtWidgets.QMainWindow):
         self._setupUI()
         
         self._brickWidget = self._debugWidget = None
-        self._breakpoints = []
+        self._breakpoints = [0x71BA1, 0x01025, 0x01057]
+        self._breakpoints = []#[0x71BA1, 0x71BA9, 0x01073] 
         self._settings = QtCore.QSettings('azya', 'BrickEmuPy')
         args = self._parseArgs()
 
@@ -47,6 +49,9 @@ class Window(QtWidgets.QMainWindow):
             if act.menu():
                 for subact in act.menu().actions():
                     self.addAction(subact)
+
+        self.actionSerialSettings.triggered.connect(self._openSerialSettings)
+        self.actionSerialConnect.toggled.connect(self._toggleSerialConnect)
 
     def _setDeviceUI(self, config):
         if (self._brickWidget):
@@ -123,6 +128,10 @@ class Window(QtWidgets.QMainWindow):
         self.actionGhostSegments.setChecked(state.get("ghost_segments", True))
         self.actionShadow.setChecked(state.get("shadow", True))
 
+        serial_config = self._settings.value("serial", {})
+        self._serial_port = serial_config.get("port", "COM1")
+        self._serial_baudrate = serial_config.get("baudrate", 115200)
+
     def _openBrick(self, path):
         try:
             with open(path) as f:
@@ -149,6 +158,52 @@ class Window(QtWidgets.QMainWindow):
             "ghost_segments": self.actionGhostSegments.isChecked(),
             "shadow": self.actionShadow.isChecked(),
         })
+
+        self._settings.setValue("serial", {
+            "port": self._serial_port,
+            "baudrate": self._serial_baudrate,
+        })
+
+    def _openSerialSettings(self):
+        dialog = QtWidgets.QDialog(self)
+        dialog.setWindowTitle("Serial Port Settings")
+        layout = QtWidgets.QFormLayout()
+
+        port_label = QtWidgets.QLabel("Port:")
+        port_input = QtWidgets.QLineEdit(self._serial_port)
+
+        baudrate_label = QtWidgets.QLabel("Baudrate:")
+        baudrate_combo = QtWidgets.QComboBox()
+        baudrates = ["9600", "19200", "38400", "57600", "115200", "230400", "460800"]
+        baudrate_combo.addItems(baudrates)
+        baudrate_combo.setCurrentText(str(self._serial_baudrate))
+
+        layout.addRow(port_label, port_input)
+        layout.addRow(baudrate_label, baudrate_combo)
+
+        buttons = QtWidgets.QDialogButtonBox(
+            QtWidgets.QDialogButtonBox.StandardButton.Ok |
+            QtWidgets.QDialogButtonBox.StandardButton.Cancel
+        )
+        buttons.accepted.connect(dialog.accept)
+        buttons.rejected.connect(dialog.reject)
+        layout.addRow(buttons)
+
+        dialog.setLayout(layout)
+
+        if dialog.exec() == QtWidgets.QDialog.DialogCode.Accepted:
+            self._serial_port = port_input.text()
+            self._serial_baudrate = int(baudrate_combo.currentText())
+            self._updateSerialStatus()
+
+    def _toggleSerialConnect(self, checked):
+        self._updateSerialStatus()
+
+    def _updateSerialStatus(self):
+        if self.actionSerialConnect.isChecked():
+            self.actionSerialStatus.setText(f"Connected: {self._serial_port} @ {self._serial_baudrate} baud")
+        else:
+            self.actionSerialStatus.setText("Disconnected")
 
     def closeEvent(self, event):
         self._saveSettings()

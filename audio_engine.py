@@ -4,7 +4,7 @@ from PyQt6.QtCore import QIODeviceBase, QByteArray, QIODevice
 from PyQt6.QtMultimedia import QAudioFormat, QAudioSink, QMediaDevices
 
 BUFFER_SIZE = 4096
-SOUND_LEVEL = (int) (32767 * 0.02)
+SOUND_LEVEL = (int) (32767 * 0.1)
 SAMPLE_RATE = 44100
 
 class Channel:

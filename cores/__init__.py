@@ -24,6 +24,8 @@ from .T6770S import *
 from .T6770Sdasm import *
 from .T7741 import *
 from .T7741dasm import *
+from .T6847 import *
+from .T6847dasm import *
 from .D750X import *
 from .D750Xdasm import *
 from .SPL02 import *
@@ -31,6 +33,8 @@ from .SPL0Xdasm import *
 from .SPL03 import *
 from .SPL81408 import *
 from .SPL81408dasm import *
+from .SPLB32 import *
+from .SPLB32dasm import *
 
 __all__ = [
     "E0C6200",
@@ -59,6 +63,8 @@ __all__ = [
     "T6770Sdasm",
     "T7741",
     "T7741dasm",
+    "T6847",
+    "T6847dasm",
     "D750X",
     "D750Xdasm",
     "SPL02",
@@ -121,6 +127,10 @@ cores_map = {
         "core": T7741,
         "dasm": T7741dasm
     },
+    "T6847": {
+        "core": T6847,
+        "dasm": T6847dasm
+    },
     "D750X": {
         "core": D750X,
         "dasm": D750Xdasm
@@ -136,5 +146,9 @@ cores_map = {
     "SPL81408": {
         "core": SPL81408,
         "dasm": SPL81408dasm
+    },
+    "SPLB32": {
+        "core": SPLB32,
+        "dasm": SPLB32dasm
     }
 }
