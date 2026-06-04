@@ -123,7 +123,11 @@ class BrickWidget(QtWidgets.QGraphicsView):
 
     def _loadSettings(self):
         self._scene_rect = self._settings.value("brick/" + self._config["id"] + "/scene_rect")
-        self._displaySettings = self._settings.value("display", None)
+        self._displaySettings = self._settings.value("display", {
+            "motion_blur": True,
+            "ghost_segments": True,
+            "shadow": True,
+        })
 
     def _saveSettings(self):
         self._settings.setValue("brick/" + self._config["id"] + "/scene_rect", self.mapToScene(self.viewport().rect()).boundingRect())
