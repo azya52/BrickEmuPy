@@ -39,7 +39,6 @@ class HT24LC08:
         self._tx_byte = 0
 
     def __del__(self):
-        print("HT24LC08: Saving memory to file...")
         if self._mem_path:
             try:
                 with open(self._mem_path, "wb") as f:
