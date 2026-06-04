@@ -31,6 +31,8 @@ from .SPL0Xdasm import *
 from .SPL03 import *
 from .SPL81408 import *
 from .SPL81408dasm import *
+from .SPLB32 import *
+from .SPLB32dasm import *
 
 __all__ = [
     "E0C6200",
@@ -66,6 +68,8 @@ __all__ = [
     "SPL03",
     "SPL81408",
     "SPL81408dasm",
+    "SPLB32",
+    "SPLB32dasm",
     "cores_map"]
 
 cores_map = {
@@ -136,5 +140,9 @@ cores_map = {
     "SPL81408": {
         "core": SPL81408,
         "dasm": SPL81408dasm
+    },
+    "SPLB32": {
+        "core": SPLB32,
+        "dasm": SPLB32dasm
     }
 }
