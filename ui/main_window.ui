@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>MainWindow</class>
  <widget class="QMainWindow" name="MainWindow">
@@ -98,10 +98,18 @@
     <addaction name="actionGhostSegments"/>
     <addaction name="actionShadow"/>
    </widget>
+   <widget class="QMenu" name="menuSerial">
+    <property name="title">
+     <string>Serial</string>
+    </property>
+    <addaction name="menuSerialPorts"/>
+    <addaction name="actionSerialDisconnect"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuDebug"/>
    <addaction name="menuSpeed"/>
    <addaction name="menuDisplay"/>
+   <addaction name="menuSerial"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionStep">
@@ -269,6 +277,11 @@
     </property>
     </action>
   </actiongroup>
+  <actiongroup name="serialPortGroup">
+    <property name="exclusive">
+      <bool>true</bool>
+    </property>
+  </actiongroup>
   <action name="actionMotionBlur">
    <property name="checkable">
     <bool>true</bool>
@@ -302,6 +315,19 @@
     <string>Shadow</string>
    </property>
   </action>
+  <action name="actionSerialDisconnect">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Disconnect</string>
+   </property>
+  </action>
+  <widget class="QMenu" name="menuSerialPorts">
+   <property name="title">
+    <string>Ports</string>
+   </property>
+  </widget>
   <action name="actionactionKeyCodes">
    <property name="checkable">
     <bool>true</bool>

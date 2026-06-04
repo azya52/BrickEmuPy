@@ -1,3 +1,4 @@
+import sys
 from time import perf_counter_ns, sleep
 
 from cores import *
@@ -21,12 +22,14 @@ CMD_BREAKPOINT = 60
 CMD_EDIT_STATE = 70
 CMD_BTN_PRESS = 80
 CMD_BTN_RELEASE = 90
+CMD_SERIAL_RX = 100
 
 MSG_EXAMINE = 0
 MSG_VRAM = 10
 MSG_ERROR = 20
 MSG_SOUND_DATA = 30
 MSG_SOUND_RESET = 31
+MSG_SERIAL_TX = 40
 
 CYCLE_SKIP_TIMEOUT_NS = 100e6
 
@@ -54,14 +57,47 @@ class EmulatorProcess:
 
         self._init_config()
 
+    @staticmethod
+    def spawn(config, cmd_queue, data_queue):
+        timerPeriodSet = False
+        if (sys.platform == "win32"):
+            import ctypes
+            try:
+                ctypes.windll.winmm.timeBeginPeriod(1)
+                timerPeriodSet = True
+            except Exception as e:
+                pass
+
+        try:
+            EmulatorProcess(config, cmd_queue, data_queue).run()
+        finally:
+            try:
+                if (sys.platform == "win32" and timerPeriodSet):
+                    ctypes.windll.winmm.timeEndPeriod(1)
+            except Exception as e:
+                pass
+
+    def _write_data(self, msg):
+        self._data_queue.put((msg))
+
+    def _read_command(self):
+        try:
+            return self._cmd_queue.get_nowait()
+        except:
+            return None
+
     def audio_handler(self, channel, data):
-        self._data_queue.put((MSG_SOUND_DATA, channel, data, self._last_tick))
+        self._write_data((MSG_SOUND_DATA, channel, data, self._last_tick))
+
+    def serial_tx_handler(self, data):
+        self._write_data((MSG_SERIAL_TX, data))
 
     def _init_config(self):
         try:
             core = self._config["core"]
             self._interconnect = Interconnect()
             self._interconnect.register_audio_forwarder(self)
+            self._interconnect.register_serial_tx_device(self)
 
             self._cpu = cores_map[core]["core"](
                 self._config["mask_options"],
@@ -70,14 +106,14 @@ class EmulatorProcess:
             )
 
             for name, value in self._config.get("peripherals", {}).items():
-                if name in peripherals_map:
+                if (name in peripherals_map):
                     peripherals_map[name](value, self._interconnect)
 
             self._dasm = cores_map[core]["dasm"](self._config.get("disasm_roots", None))
             self._ui_listing_update()
         except Exception as e:
             self._data_queue.put((MSG_ERROR, str(e)))
-            raise
+            raise SystemExit
 
     def _ui_display_update(self):
         self._data_queue.put((MSG_VRAM, self._cpu.get_VRAM()))
@@ -100,57 +136,58 @@ class EmulatorProcess:
 
             op = cmd[0]
 
-            if op == CMD_QUIT:
+            if (op == CMD_QUIT):
                 self._cmd_queue.cancel_join_thread()
                 self._data_queue.cancel_join_thread()
                 self._cmd_queue.close()
                 self._data_queue.close()
                 raise SystemExit
 
-            elif op == CMD_DEBUG:
+            elif (op == CMD_DEBUG):
                 cmd_debug = cmd[1]
                 self._data_queue.put((MSG_SOUND_RESET,))
 
-                if cmd_debug == CMD_DEBUG_RUN:
+                if (cmd_debug == CMD_DEBUG_RUN):
                     self._debug = False
                     self._reset_timing()
 
-                elif cmd_debug == CMD_DEBUG_PAUSE:
+                elif (cmd_debug == CMD_DEBUG_PAUSE):
                     self._debug = True
                     self._ui_display_update()
                     self._ui_examine_update()
                     self._icounter_on_stop = self._cpu.istr_counter()
 
-                elif cmd_debug == CMD_DEBUG_STOP:
+                elif (cmd_debug == CMD_DEBUG_STOP):
                     self._debug = True
                     self._cpu.reset()
                     self._ui_display_update()
                     self._ui_examine_update()
                     self._icounter_on_stop = self._cpu.istr_counter()
 
-                elif cmd_debug == CMD_DEBUG_STEP:
-                    self._cpu.clock()
+                elif (cmd_debug == CMD_DEBUG_STEP):
+                    cycles = self._cpu.clock()
+                    self._interconnect.emit_clock(cycles)
                     self._ui_display_update()
                     self._ui_examine_update()
 
-            elif op == CMD_SPEED:
+            elif (op == CMD_SPEED):
                 self._data_queue.put((MSG_SOUND_RESET,))
                 self._cycle_time_ns = self.get_cycle_time_ns() * cmd[1]
                 self._reset_timing()
 
-            elif op == CMD_BREAKPOINT:
+            elif (op == CMD_BREAKPOINT):
                 _, pc, add = cmd
-                if add:
+                if (add):
                     self._breakpoints[pc] = True
                 else:
                     self._breakpoints.pop(pc, None)
 
-            elif op == CMD_EDIT_STATE:
+            elif (op == CMD_EDIT_STATE):
                 state = cmd[1]
 
                 if "BRKPT" in state:
                     pc, add = state["BRKPT"]
-                    if add:
+                    if (add):
                         self._breakpoints[pc] = True
                     else:
                         self._breakpoints.pop(pc, None)
@@ -159,11 +196,14 @@ class EmulatorProcess:
                 self._ui_display_update()
                 self._ui_examine_update()
 
-            elif op == CMD_BTN_PRESS:
+            elif (op == CMD_BTN_PRESS):
                 self._interconnect.emit_input(cmd[1], True)
 
-            elif op == CMD_BTN_RELEASE:
+            elif (op == CMD_BTN_RELEASE):
                 self._interconnect.emit_input(cmd[1], False)
+
+            elif (op == CMD_SERIAL_RX):
+                self._interconnect.emit_serial_rx(cmd[1])
 
     def _reset_timing(self):
         now = perf_counter_ns()
@@ -186,17 +226,17 @@ class EmulatorProcess:
         while True:
             self._process_commands()
 
-            if self._debug:
+            if (self._debug):
                 sleep(0.005)
                 continue
 
             ns = perf_counter_ns()
-            while ns > self._last_tick and ns < next_update:
+            while (ns > self._last_tick and ns < next_update):
                 cycles = cpu_clock()
                 self._last_tick += cycles * self._cycle_time_ns
                 emit_clock(cycles)
 
-                if self._breakpoints and cpu_pc() in self._breakpoints:
+                if (self._breakpoints and cpu_pc() in self._breakpoints):
                     self._debug = True
                     self._data_queue.put((MSG_EXAMINE, {"DEBUG": True}))
                     self._ui_display_update()
@@ -206,12 +246,12 @@ class EmulatorProcess:
 
                 ns = perf_counter_ns()
 
-            if ns > self._next_display:
+            if (ns > self._next_display):
                 self._next_display += DISPLAY_UPDTE_NS
                 next_update = min(self._next_display, self._next_examine)
                 self._ui_display_update()
 
-            elif ns > self._next_examine:
+            elif (ns > self._next_examine):
                 self._next_examine += EXAMINE_UPDTE_NS
                 next_update = min(self._next_display, self._next_examine)
                 self._ui_examine_update()

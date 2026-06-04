@@ -1,13 +1,14 @@
 import argparse
 import json
 
-from PyQt6 import uic, QtCore, QtWidgets
+from PyQt6 import uic, QtCore, QtWidgets, QtGui
 from PyQt6.QtCore import pyqtSlot, QByteArray
 from PyQt6.QtWidgets import QFileDialog, QMessageBox
 from PyQt6.QtGui import QShortcut
 
 from debug_widget import DebugWidget
 from brick_widget import BrickWidget
+from serial_connection import SerialConnection
 
 class Window(QtWidgets.QMainWindow):    
     
@@ -16,6 +17,7 @@ class Window(QtWidgets.QMainWindow):
 
         uic.loadUi('ui/main_window.ui', self)
         self._setupUI()
+        self._serial = SerialConnection()
         
         self._brickWidget = self._debugWidget = None
         self._breakpoints = []
@@ -48,11 +50,24 @@ class Window(QtWidgets.QMainWindow):
                 for subact in act.menu().actions():
                     self.addAction(subact)
 
+        self.serialPortGroup.triggered.connect(self._onSerialPortSelected)
+
     def _setDeviceUI(self, config):
         if (self._brickWidget):
+            self.actionRun.triggered.disconnect(self._brickWidget.run)
+            self.actionPause.triggered.disconnect(self._brickWidget.pause)
+            self.actionStop.triggered.disconnect(self._brickWidget.stop)
+            self.actionStep.triggered.disconnect(self._brickWidget.step)
+            self.speedGroup.triggered.disconnect(self._brickWidget.setSpeed)
+            self.actionMotionBlur.toggled.disconnect()
+            self.actionGhostSegments.toggled.disconnect()
+            self.actionShadow.toggled.disconnect()
+            self._brickWidget.close()
             self._brickWidget.deleteLater()
             self._brickWidget = None
         if (self._debugWidget):
+            self.actionDebug.toggled['bool'].disconnect(self._debugWidget.actionDebug.toggle)
+            self._debugWidget.close()
             self._debugWidget.deleteLater()
             self._debugWidget = None
 
@@ -67,7 +82,8 @@ class Window(QtWidgets.QMainWindow):
         self._debugWidget.debugStepSignal.connect(self.actionStep.trigger)
         self.actionDebug.toggled['bool'].connect(self._debugWidget.actionDebug.toggle)
 
-        self._brickWidget = BrickWidget(self._examine, config, self._settings)
+        self._brickWidget = BrickWidget(config, self._settings, self._serial)
+        self._brickWidget.examineSignal.connect(self._examine)
         self._debugWidget.editStateSignal.connect(self._brickWidget.editState)
         self.actionRun.triggered.connect(self._brickWidget.run)
         self.actionPause.triggered.connect(self._brickWidget.pause)
@@ -83,10 +99,51 @@ class Window(QtWidgets.QMainWindow):
         self.deviceWidget.layout().addWidget(self._brickWidget)
         self._brickWidget.setFocus()
         
+        self._refreshSerialPorts()
+        
         self.actionMotionBlur.toggled.connect(lambda checked: self._brickWidget.setDisplaySetting("motion_blur", checked))
         self.actionGhostSegments.toggled.connect(lambda checked: self._brickWidget.setDisplaySetting("ghost_segments", checked))
         self.actionShadow.toggled.connect(lambda checked: self._brickWidget.setDisplaySetting("shadow", checked))
         
+    def _refreshSerialPorts(self):       
+        for action in list(self.serialPortGroup.actions()):
+            self.serialPortGroup.removeAction(action)
+        self.menuSerialPorts.clear()
+        try:
+            ports = self._serial.get_available_ports()
+        except Exception:
+            ports = []
+            
+        if ports:
+            current = self._serial.get_port_name()
+            for device, desc in ports:
+                action = QtGui.QAction(self)
+                action.setCheckable(True)
+                action.setText(f"{device} ({desc})")
+                action.setData(device)
+                self.menuSerialPorts.addAction(action)
+                self.serialPortGroup.addAction(action)
+                if device == current:
+                    action.setChecked(True)
+        else:
+            placeholder = QtGui.QAction("No ports", self)
+            placeholder.setEnabled(False)
+            self.menuSerialPorts.addAction(placeholder)
+
+        self.actionSerialDisconnect.setEnabled(self._serial.is_connected())
+
+    @pyqtSlot()
+    def on_actionSerialDisconnect_triggered(self):
+        if self._serial:
+            self._serial.close_port()
+        self._refreshSerialPorts()
+
+    @pyqtSlot(QtGui.QAction)
+    def _onSerialPortSelected(self, action):
+        if action and action.data() and self._serial:
+            self._serial.open_port(action.data())
+            self._refreshSerialPorts()
+
     def _parseArgs(self):
         parser = argparse.ArgumentParser(
             description='BrickEmuPy, Brick Game family emulator.'
@@ -126,10 +183,10 @@ class Window(QtWidgets.QMainWindow):
     def _openBrick(self, path):
         try:
             with open(path) as f:
-                self._settings.setValue("brick/config", path)
                 brick_config = json.loads(f.read())
                 self._setDeviceUI(brick_config)
-        except FileNotFoundError as e:
+                self._settings.setValue("brick/config", path)
+        except Exception as e:
             QMessageBox(parent=self, text=str(e)).exec()
 
     @pyqtSlot()
@@ -153,12 +210,13 @@ class Window(QtWidgets.QMainWindow):
     def closeEvent(self, event):
         self._saveSettings()
         if (self._brickWidget):
+            self._brickWidget.close()
             self._brickWidget.deleteLater()
             self._brickWidget = None
         if (self._debugWidget):
+            self._debugWidget.close()
             self._debugWidget.deleteLater()
             self._debugWidget = None
-        
         super().closeEvent(event)
 
     def _examine(self, info):

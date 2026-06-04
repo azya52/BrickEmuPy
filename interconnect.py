@@ -4,6 +4,8 @@ class Interconnect:
         self._input_devices = []
         self._clock_devices = []
         self._audio_forwarder_devices = []
+        self._serial_rx_devices = []
+        self._serial_tx_device = None
 
     def register_port_device(self, dev):
         self._port_devices.append(dev)
@@ -33,3 +35,17 @@ class Interconnect:
     def emit_audio(self, channel, data):
         for dev in self._audio_forwarder_devices:
             dev.audio_handler(channel, data)
+
+    def register_serial_rx_device(self, dev):
+        self._serial_rx_devices.append(dev)
+
+    def emit_serial_rx(self, data):
+        for dev in self._serial_rx_devices:
+            dev.serial_rx_handler(data)
+
+    def register_serial_tx_device(self, dev):
+        self._serial_tx_device = dev
+
+    def emit_serial_tx(self, data):
+        if self._serial_tx_device:
+            self._serial_tx_device.serial_tx_handler(data)

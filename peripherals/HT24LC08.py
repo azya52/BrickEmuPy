@@ -25,7 +25,7 @@ class HT24LC08:
         if self._mem_path:
             try:
                 with open(self._mem_path, "rb") as f:
-                    self._mem = bytearray(f.read(ROM_SIZE)).ljust(ROM_SIZE, b'\xFF')
+                    self._mem = bytearray(f.read(ROM_SIZE)).ljust(ROM_SIZE, b'\x00')
             except FileNotFoundError:
                 pass
 
@@ -39,6 +39,7 @@ class HT24LC08:
         self._tx_byte = 0
 
     def __del__(self):
+        print("HT24LC08: Saving memory to file...")
         if self._mem_path:
             try:
                 with open(self._mem_path, "wb") as f:
@@ -84,10 +85,11 @@ class HT24LC08:
                         self._bit_count = 0
 
                 else:
-                    self._rx_byte = (self._rx_byte << 1) | (self._sda > 0)
+                    self._interconnect.emit_port(self, self._port, self._SDA_mask, -1)
+                    self._rx_byte = ((self._rx_byte << 1) | (self._sda > 0)) & 0xFF
                     self._bit_count += 1
                     if (self._bit_count == 8):
-                        rx_byte = self._rx_byte & 0xFF
+                        rx_byte = self._rx_byte
                         self._bit_count = 0
                         
                         if self._state == ADDR_BYTE:
