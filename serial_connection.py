@@ -11,18 +11,16 @@ class SerialConnection(QObject):
         super().__init__()
         self._serial_port = QSerialPort()
         self._serial_port.readyRead.connect(self._read_data)
+        self._serial_port.errorOccurred.connect(self._on_error)
         self._port_name = None
 
     def open_port(self, port_name):
-        try:
-            if (self._serial_port.isOpen()):
-                self._serial_port.close()
-            self._serial_port.setPortName(port_name)
-            self._serial_port.setBaudRate(BAUD_RATE)
-            self._serial_port.open(QSerialPort.OpenModeFlag.ReadWrite)
+        if (self._serial_port.isOpen()):
+            self._serial_port.close()
+        self._serial_port.setPortName(port_name)
+        self._serial_port.setBaudRate(BAUD_RATE)
+        if self._serial_port.open(QSerialPort.OpenModeFlag.ReadWrite):
             self._port_name = port_name
-        except Exception as e:
-            self.error.emit(f"Failed to open {port_name}: {str(e)}")
 
     def close_port(self):
         if (self._serial_port.isOpen()):
@@ -35,6 +33,13 @@ class SerialConnection(QObject):
 
     def _read_data(self):
         self.dataReceived.emit(bytes(self._serial_port.readAll()))
+
+    def _on_error(self, error):
+        if error != QSerialPort.SerialPortError.NoError:
+            self.error.emit(self._serial_port.errorString())
+            if (error in (QSerialPort.SerialPortError.ResourceError,
+                          QSerialPort.SerialPortError.DeviceNotFoundError)):
+                self.close_port()
 
     def is_connected(self):
         return self._serial_port.isOpen()
