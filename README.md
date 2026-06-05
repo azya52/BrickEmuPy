@@ -25,6 +25,7 @@ Handheld LCD games emulator in Python with PyQt6.
   * Tamagotchi Morino (distributed without ROM)
   * Tamagotchi Genjintch (distributed without ROM)
   * Tamagotchi Yasashii (distributed without ROM)
+  * Tamagotchi Connection V3 (SPLB32) (distributed without ROM) (High probability of errors in the dump)
   * Digimon Ver. 1JA (distributed without ROM)
   * Digimon Ver. 1JB (distributed without ROM)
   * Digimon Ver. 1ES (distributed without ROM) 
