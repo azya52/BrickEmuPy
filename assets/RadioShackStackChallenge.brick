@@ -38,37 +38,37 @@
 		"direct_input": {
 			"btnPause": {
 				"port": "K1",
-				"mask": 1,
+				"mask": 2,
 				"level": 0
 			},
 			"btnSound": {
 				"port": "K1",
-				"mask": 2,
+				"mask": 4,
 				"level": 0
 			},
 			"btnOnOff": {
 				"port": "K1",
-				"mask": 0,
+				"mask": 1,
 				"level": 0
 			},
 			"btnLeft": {
 				"port": "K0",
-				"mask": 0,
+				"mask": 1,
 				"level": 0
 			},
 			"btnDown": {
 				"port": "K0",
-				"mask": 1,
+				"mask": 2,
 				"level": 0
 			},
 			"btnRight": {
 				"port": "K0",
-				"mask": 2,
+				"mask": 4,
 				"level": 0
 			},
 			"btnRotate": {
 				"port": "K0",
-				"mask": 3,
+				"mask": 8,
 				"level": 0
 			}
 		}

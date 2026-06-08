@@ -45,42 +45,42 @@
 		"direct_input": {
 			"btnFood": {
 				"port": "K1",
-				"mask": 3,
+				"mask": 8,
 				"level": 0
 			},
 			"btnSmile": {
 				"port": "K1",
-				"mask": 2,
+				"mask": 4,
 				"level": 0
 			},
 			"btnHeart": {
 				"port": "K1",
-				"mask": 1,
+				"mask": 2,
 				"level": 0
 			},
 			"btnClean": {
 				"port": "K1",
-				"mask": 0,
+				"mask": 1,
 				"level": 0
 			},
 			"btnBulb": {
 				"port": "K0",
-				"mask": 3,
+				"mask": 8,
 				"level": 0
 			},
 			"btnWeight": {
 				"port": "K0",
-				"mask": 2,
+				"mask": 4,
 				"level": 0
 			},
 			"btnSelect": {
 				"port": "K0",
-				"mask": 1,
+				"mask": 2,
 				"level": 0
 			},
 			"btnCancel": {
 				"port": "K0",
-				"mask": 0,
+				"mask": 1,
 				"level": 0
 			},
 			"btnReset": {
@@ -97,6 +97,13 @@
 			"K0": 15,
 			"K1": 15
 		},
-		"p3_dedicated": 1
+		"port_pushpull": {
+			"R0": 15,
+			"R1": 15,
+			"R2": 15,
+			"R3": 15,
+			"R4": 15
+		},
+		"p3_dedicated": 0
 	}
 }

@@ -194,7 +194,38 @@ class E0C6200():
         self._interconnect = interconnect
         self._interconnect.register_port_device(self)
 
-        self._port_pullup = mask['port_pullup']
+        self._pullup_ext = {
+            **{
+                "K0": 0,
+                "K1": 0,
+                "R0": 0,
+                "R1": 0,
+                "R2": 0,
+                "R3": 0,
+                "R4": 0,
+                "P0": 0,
+                "P1": 0,
+                "P2": 0,
+                "P3": 0
+            },
+            **mask['port_pullup']
+        }
+
+        self._mask_pushpull = mask.get('port_pushpull', {})
+
+        self._port_input = {
+            "K0": [0, 0],
+            "K1": [0, 0],
+            "R0": [0, 0],
+            "R1": [0, 0],
+            "R2": [0, 0],
+            "R3": [0, 0],
+            "R4": [0, 0],
+            "P0": [0, 0],
+            "P1": [0, 0],
+            "P2": [0, 0],
+            "P3": [0, 0],
+        }
 
         self._p3_dedicated = mask['p3_dedicated']
         
@@ -431,18 +462,18 @@ class E0C6200():
                 self._RD >> 4,
                 self._SD & 0xF,
                 self._SD >> 4,
-                self._K0,
+                self._port_read("K0"),
                 self._DFK0,
-                self._K1,
-                self._R0,
-                self._R1,
-                self._R2,
-                self._R3,
-                self._R4,
-                self._P0,
-                self._P1,
-                self._P2,
-                self._P3,
+                self._port_read("K1"),
+                self._PLATCH["R0"],
+                self._PLATCH["R1"],
+                self._PLATCH["R2"],
+                self._PLATCH["R3"],
+                self._PLATCH["R4"],
+                self._port_read("P0"),
+                self._port_read("P1"),
+                self._port_read("P2"),
+                self._port_read("P3"),
                 self._CTRL_OSC,
                 self._CTRL_LCD,
                 self._LC,
@@ -524,10 +555,64 @@ class E0C6200():
         
         self._HALT = 0
 
-        self._P0_OUTPUT_DATA = 0
-        self._P1_OUTPUT_DATA = 0
-        self._P2_OUTPUT_DATA = 0
-        self._P3_OUTPUT_DATA = 0
+        self._PDIR = {
+            "K0": 0,
+            "K1": 0,
+            "R0": 0xF,
+            "R1": 0xF,
+            "R2": 0xF,
+            "R3": 0xF,
+            "R4": 0xF,
+            "P0": 0,
+            "P1": 0,
+            "P2": 0,
+            "P3": 0
+        }
+
+        self._PUSHPULL = {
+            **{
+                "K0": 0,
+                "K1": 0,
+                "R0": 0,
+                "R1": 0,
+                "R2": 0,
+                "R3": 0,
+                "R4": 0,
+                "P0": 0xF,
+                "P1": 0xF,
+                "P2": 0xF,
+                "P3": 0xF
+            },
+            **self._mask_pushpull
+        }
+
+        self._PLATCH = {
+            "K0": 0,
+            "K1": 0,
+            "R0": 0,
+            "R1": 0,
+            "R2": 0,
+            "R3": 0,
+            "R4": 0,
+            "P0": 0,
+            "P1": 0,
+            "P2": 0,
+            "P3": 0
+        }
+
+        self._PULLUP = {
+            "K0": 0,
+            "K1": 0,
+            "R0": 0,
+            "R1": 0,
+            "R2": 0,
+            "R3": 0,
+            "R4": 0,
+            "P0": 0xF,
+            "P1": 0xF,
+            "P2": 0xF,
+            "P3": 0xF
+        }
 
         self._IT = 0
         self._ISW = 0
@@ -547,18 +632,7 @@ class E0C6200():
         self._PT = 0
         self._RD = 0
         self._SD = 0
-        self._K0 = self._port_pullup['K0']
         self._DFK0 = 0xF
-        self._K1 = self._port_pullup['K1']
-        self._R0 = 0
-        self._R1 = 0
-        self._R2 = 0
-        self._R3 = 0
-        self._R4 = 0xF
-        self._P0 = 0
-        self._P1 = 0
-        self._P2 = 0
-        self._P3 = 0
         self._CTRL_OSC = 0
         self._CTRL_LCD = IO_ALOFF
         self._LC = 0
@@ -701,7 +775,7 @@ class E0C6200():
         self._SD = (self._SD & 0x0F) | (value << 4 & 0xF0)
     
     def _get_io_k0(self):
-        return self._K0
+        return self._port_read("K0")
 
     def _get_io_dfk0(self):
         return self._DFK0
@@ -710,94 +784,106 @@ class E0C6200():
         self._DFK0 = value
     
     def _get_io_k1(self):
-        return self._K1
+        return self._port_read("K1")
 
     def _get_io_r0(self):
-        return self._R0
+        return self._PLATCH["R0"]
 
     def _set_io_r0(self, value):
-        self._R0 = value
+        self._PLATCH["R0"] = value
+        self._interconnect.emit_port(self, "R0", self._port_read("R0"), 1)
 
     def _get_io_r1(self):
-        return self._R1
+        return self._PLATCH["R1"]
 
     def _set_io_r1(self, value):
-        self._R1 = value
+        self._PLATCH["R1"] = value
+        self._interconnect.emit_port(self, "R1", self._port_read("R1"), 1)
 
     def _get_io_r2(self):
-        return self._R2
+        return self._PLATCH["R2"]
 
     def _set_io_r2(self, value):
-        self._R2 = value
+        self._PLATCH["R2"] = value
+        self._interconnect.emit_port(self, "R2", self._port_read("R2"), 1)
 
     def _get_io_r3(self):
-        return self._R3
+        return self._PLATCH["R3"]
 
     def _set_io_r3(self, value):
-        self._R3 = value
+        self._PLATCH["R3"] = value
+        self._interconnect.emit_port(self, "R3", self._port_read("R3"), 1)
 
     def _get_io_r4(self):
-        return self._R4
+        return self._PLATCH["R4"]
 
     def _set_io_r4(self, value):
-        self._R4 = value
+        self._PLATCH["R4"] = value
         if (value & IO_R43):
             self._sound.set_buzzer_off()
         else:
             self._sound.set_buzzer_on()
+        self._interconnect.emit_port(self, "R4", self._port_read("R4"), 1)
 
     def _get_io_p0(self):
-        return self._P0
+        return self._port_read("P0")
 
     def _set_io_p0(self, value):
-        self._P0_OUTPUT_DATA = value
-        if (self._IOC & IO_IOC0):
-            self._P0 = value
+        self._PLATCH["P0"] = value
+        self._interconnect.emit_port(self, "P0", self._port_read("P0"), 1)
 
     def _get_io_p1(self):
-        return self._P1
+        return self._port_read("P1")
 
     def _set_io_p1(self, value):
-        self._P1_OUTPUT_DATA = value
-        if (self._IOC & IO_IOC1):
-            self._P1 = value
+        self._PLATCH["P1"] = value
+        self._interconnect.emit_port(self, "P1", self._port_read("P1"), 1)
 
     def _get_io_p2(self):
-        return self._P2
+        return self._port_read("P2")
 
     def _set_io_p2(self, value):
-        self._P2_OUTPUT_DATA = value
-        if (self._IOC & IO_IOC2):
-            self._P2 = value
+        self._PLATCH["P2"] = value
+        self._interconnect.emit_port(self, "P2", self._port_read("P2"), 1)
 
     def _get_io_p3(self):
-        return self._P3
+        return self._port_read("P3")
 
     def _set_io_p3(self, value):
-        self._P3_OUTPUT_DATA = value
-        if (self._IOC & IO_IOC3 or self._p3_dedicated):
-            self._P3 = value
-
+        self._PLATCH["P3"] = value
+        self._interconnect.emit_port(self, "P3", self._port_read("P3"), 1)
 
     def _get_io_ioc(self):
         return self._IOC
     
     def _set_io_ioc(self, value):
         self._IOC = value
-        if (self._IOC & IO_IOC0):
-            self._P0 = self._P0_OUTPUT_DATA
-        if (self._IOC & IO_IOC1):
-            self._P1 = self._P1_OUTPUT_DATA
-        if (self._IOC & IO_IOC2):
-            self._P2 = self._P2_OUTPUT_DATA
-        if (self._IOC & IO_IOC3):
-            self._P3 = self._P3_OUTPUT_DATA
+
+        self._PDIR["P0"] = ((value & IO_IOC0) > 0) * 0xF
+        self._PDIR["P1"] = ((value & IO_IOC1) > 0) * 0xF
+        self._PDIR["P2"] = ((value & IO_IOC2) > 0) * 0xF
+        self._PDIR["P3"] = ((value & IO_IOC3) > 0) * 0xF
+
+        self._interconnect.emit_port(self, "P0", self._port_read("P0"), 1)
+        self._interconnect.emit_port(self, "P1", self._port_read("P1"), 1)
+        self._interconnect.emit_port(self, "P2", self._port_read("P2"), 1)
+        self._interconnect.emit_port(self, "P3", self._port_read("P3"), 1)
 
     def _get_io_pup(self):
         return self._PUP
     
     def _set_io_pup(self, value):
         self._PUP = value
+
+        self._PULLUP["P0"] = ((value & IO_PUP0) == 0) * 0xF
+        self._PULLUP["P1"] = ((value & IO_PUP1) == 0) * 0xF
+        self._PULLUP["P2"] = ((value & IO_PUP2) == 0) * 0xF
+        self._PULLUP["P3"] = ((value & IO_PUP3) == 0) * 0xF
+
+        self._interconnect.emit_port(self, "P0", self._port_read("P0"), 1)
+        self._interconnect.emit_port(self, "P1", self._port_read("P1"), 1)
+        self._interconnect.emit_port(self, "P2", self._port_read("P2"), 1)
+        self._interconnect.emit_port(self, "P3", self._port_read("P3"), 1)
 
     def _get_io_ctrl_osc(self):
         return self._CTRL_OSC
@@ -843,7 +929,6 @@ class E0C6200():
         if (value & IO_ENVRST):
             self._sound.reset_envelope()
 
-
     def _set_io_ctrl_tm(self, value):
         if (value & IO_TMRST):
             self._TM = 0
@@ -870,72 +955,37 @@ class E0C6200():
     def _set_io_ptc(self, value):
         self._PTC = value
 
+    def _port_read(self, port):
+        return (
+            (~self._PDIR[port] & (self._port_input[port][1] | ((self._pullup_ext[port] | self._PULLUP[port]) & ~self._port_input[port][0]))) |
+            (self._PDIR[port] & self._PLATCH[port] & ((self._pullup_ext[port] | self._PULLUP[port]) | self._PUSHPULL[port]))
+        )
+    
     def port_handler(self, port, mask, level):
-        #to-do
-        if (level >= 0):
-            self._pin_set(port, mask, level)
+        if (port == 'RES'):
+            if (level == -1):
+                self._RESET = 0
+            else:
+                self._reset()
+                self._RESET = 1
         else:
-            self._pin_release(port, mask)
-
-    def _pin_set(self, port, pin, level):
-        if (port == 'K0'):
-            new_K0 =  ~(1 << pin) & self._K0 | level << pin
-            if (self._EIK0 and self._DFK0 >> pin != level and self._K0 >> pin != level):
-               self._IK0 |= IO_IK0
-            if (pin == 3 and self._PTC & IO_PTC < 2 and self._DFK0 >> pin != level and self._K0 >> pin != level):
-               self._process_ptimer()
-            self._K0 = new_K0
-        if (port == 'K1'):
-            new_K1 =  ~(1 << pin) & self._K1 | level << pin
-            if (self._EIK1 and level == 0 and self._K1 >> pin != level):
-               self._IK1 |= IO_IK1
-            self._K1 = new_K1
-        elif (port == 'P0'):
-            if (not(self._IOC & IO_IOC0)):
-                self._P0 = ~(1 << pin) & self._P0 | level << pin
-        elif (port == 'P1'):
-            if (not(self._IOC & IO_IOC1)):
-                self._P1 = ~(1 << pin) & self._P1 | level << pin
-        elif (port == 'P2'):
-            if (not(self._IOC & IO_IOC2)):
-                self._P2 = ~(1 << pin) & self._P2 | level << pin
-        elif (port == 'P3'):
-            if (not(self._IOC & IO_IOC3) and (not self._p3_dedicated)):
-                self._P3 = ~(1 << pin) & self._P3 | level << pin
-        elif (port == 'RES'):
-            self._reset()
-            self._RESET = 1
-
-    def _pin_release(self, port, pin):
-        if (port == 'K0'):
-            level = self._port_pullup['K0'] >> pin & 0x1
-            new_K0 =  ~(1 << pin) & self._K0 | level << pin
-            if (self._EIK0 and self._DFK0 >> pin != level and self._K0 >> pin != level):
-                self._IK0 |= IO_IK0
-            if (pin == 3 and self._PTC & IO_PTC < 2 and self._DFK0 >> pin != level and self._K0 >> pin != level):
-               self._process_ptimer()
-            self._K0 = new_K0
-        if (port == 'K1'):
-            level = self._port_pullup['K1'] >> pin & 0x1
-            new_K1 =  ~(1 << pin) & self._K1 | level << pin
-            if (self._EIK1 and level == 0 and self._K1 >> pin != level):
-                self._IK1 |= IO_IK1
-            self._K1 = new_K1
-        elif (port == 'P0'):
-            if (not(self._IOC & IO_IOC0)):
-                self._P0 = ~(1 << pin) & self._P0 | (self._PUP & IO_PUP0)
-        elif (port == 'P1'):
-            if (not(self._IOC & IO_IOC1)):
-                self._P1 = ~(1 << pin) & self._P1 | (self._PUP & IO_PUP1)
-        elif (port == 'P2'):
-            if (not(self._IOC & IO_IOC2)):
-                self._P2 = ~(1 << pin) & self._P2 | (self._PUP & IO_PUP2)
-        elif (port == 'P3'):
-            if (not(self._IOC & IO_IOC3) and (not self._p3_dedicated)):
-                self._P3 = ~(1 << pin) & self._P3 | (self._PUP & IO_PUP3)
-        elif (port == 'RES'):
-            self._RESET = 0
-
+            prev_state = self._port_read(port) & mask
+            self._port_input[port][0] &= ~mask
+            self._port_input[port][1] &= ~mask
+            if (level >= 0):
+                self._port_input[port][level] |= mask
+            if (port == 'K0'):
+                new_state = self._port_read(port) & mask
+                if (prev_state & self._EIK0 != new_state & self._EIK0):
+                    if (self._DFK0 & mask != new_state):
+                        self._IK0 |= IO_IK0
+                        if (mask & 0x8):
+                            self._process_ptimer()
+            if (port == 'K1'):
+                new_state = self._port_read(port) & mask
+                if (prev_state & self._EIK1 != new_state & self._EIK1):
+                    if (mask != new_state):
+                        self._IK1 |= IO_IK1
 
     def pc(self):
         return self._PC & 0x1FFF
@@ -945,7 +995,10 @@ class E0C6200():
             return EMPTY_VRAM
         elif (self._CTRL_LCD & IO_ALON):
             return FULL_VRAM
-        return tuple(self._VRAM) + (self._P0, self._P1, self._P2, self._P3, self._R0, self._R1, self._R2, self._R4)
+        return tuple(self._VRAM) + ( #to-do
+                self._PLATCH["P0"], self._PLATCH["P1"], self._PLATCH["P2"], self._PLATCH["P3"], 
+                self._port_read("R0"), self._port_read("R1"), self._port_read("R2"), self._port_read("R3"), self._port_read("R4")
+            )
 
     def get_ROM(self):
         return self._ROM
@@ -1011,7 +1064,7 @@ class E0C6200():
             self._PT = self._RD
             self._IPT |= IO_IPT
         if (self._PTC & IO_PTCOUT):
-            self._R3 ^= IO_R33
+            self._PLATCH["R3"] ^= IO_R33
 
     def _process_stopwatch(self):
         if (self._CTRL_SW & IO_SWRUN):

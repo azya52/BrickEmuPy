@@ -29,17 +29,17 @@
 		"direct_input": {
 			"btnTop": {
 				"port": "K0",
-				"mask": 2,
+				"mask": 4,
 				"level": 0
 			},
 			"btnCenter": {
 				"port": "K0",
-				"mask": 1,
+				"mask": 2,
 				"level": 0
 			},
 			"btnBottom": {
 				"port": "K0",
-				"mask": 0,
+				"mask": 1,
 				"level": 0
 			},
 			"btnReset": {

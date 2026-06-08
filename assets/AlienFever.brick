@@ -29,22 +29,22 @@
 		"direct_input": {
 			"btnMode": {
 				"port": "K0",
-				"mask": 0,
+				"mask": 1,
 				"level": 0
 			},
 			"btnSelect": {
 				"port": "K0",
-				"mask": 1,
+				"mask": 2,
 				"level": 0
 			},
 			"btnSound": {
 				"port": "K0",
-				"mask": 2,
+				"mask": 4,
 				"level": 0
 			},
 			"btnHandle": {
 				"port": "K0",
-				"mask": 3,
+				"mask": 8,
 				"level": 0
 			}
 		}
