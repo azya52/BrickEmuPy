@@ -13,6 +13,8 @@ DEFAULT_MOTION_BLUR = 0.6
 DEFAULT_GHOST_SEGMENTS = 0
 DEFAULT_SHADOW = 5
 
+DATA_QUEUE_MAXSIZE = 1000
+
 class QueueReaderThread(QThread):
     messageSignal = pyqtSignal(list)
 
@@ -68,7 +70,7 @@ class BrickWidget(QtWidgets.QGraphicsView):
 
     def _start_emulator(self):
         self._cmdQueue = multiprocessing.Queue()
-        self._dataQueue = multiprocessing.Queue(maxsize=100)
+        self._dataQueue = multiprocessing.Queue(maxsize=DATA_QUEUE_MAXSIZE)
 
         self._QueueReaderThread = QueueReaderThread(self._dataQueue)
         self._QueueReaderThread.messageSignal.connect(self._processMessage)
