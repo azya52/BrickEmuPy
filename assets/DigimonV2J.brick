@@ -26,6 +26,10 @@
 	},
 
 	"peripherals": {
+		"CON_DGM": {
+			"port": "P2",
+			"mask": 1
+		},
 		"direct_input": {
 			"btnTop": {
 				"port": "K0",

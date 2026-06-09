@@ -17,8 +17,7 @@ class Window(QtWidgets.QMainWindow):
 
         uic.loadUi('ui/main_window.ui', self)
         self._setupUI()
-        self._serial = SerialConnection()
-        
+        self._serialConnection = None
         self._brickWidget = self._debugWidget = None
         self._breakpoints = []
         self._settings = QtCore.QSettings('azya', 'BrickEmuPy')
@@ -82,8 +81,9 @@ class Window(QtWidgets.QMainWindow):
         self._debugWidget.debugStepSignal.connect(self.actionStep.trigger)
         self.actionDebug.toggled['bool'].connect(self._debugWidget.actionDebug.toggle)
 
-        self._brickWidget = BrickWidget(config, self._settings, self._serial)
+        self._brickWidget = BrickWidget(config, self._settings)
         self._brickWidget.examineSignal.connect(self._examine)
+        self._brickWidget.connectionSignal.connect(self._serialSendData)
         self._debugWidget.editStateSignal.connect(self._brickWidget.editState)
         self.actionRun.triggered.connect(self._brickWidget.run)
         self.actionPause.triggered.connect(self._brickWidget.pause)
@@ -109,13 +109,16 @@ class Window(QtWidgets.QMainWindow):
         for action in list(self.serialPortGroup.actions()):
             self.serialPortGroup.removeAction(action)
         self.menuSerialPorts.clear()
+
         try:
-            ports = self._serial.get_available_ports()
+            ports = SerialConnection.get_available_ports()
         except Exception:
             ports = []
-            
+
         if ports:
-            current = self._serial.get_port_name()
+            current = None
+            if (self._serialConnection):
+                current = self._serialConnection.get_port_name()
             for device, desc in ports:
                 action = QtGui.QAction(self)
                 action.setCheckable(True)
@@ -129,19 +132,39 @@ class Window(QtWidgets.QMainWindow):
             placeholder = QtGui.QAction("No ports", self)
             placeholder.setEnabled(False)
             self.menuSerialPorts.addAction(placeholder)
-
-        self.actionSerialDisconnect.setEnabled(self._serial.is_connected())
+        
+        self.actionDisconnect.setEnabled(self._serialConnection != None and self._serialConnection.is_connected())
 
     @pyqtSlot()
-    def on_actionSerialDisconnect_triggered(self):
-        if self._serial:
-            self._serial.close_port()
+    def on_actionDisconnect_triggered(self):
+        if self._serialConnection:
+            self._serialConnection.close_port()
+        
         self._refreshSerialPorts()
+
+    @pyqtSlot(bytes)
+    def _serialSendData(self, data):
+        if (self._serialConnection):
+            self._serialConnection.send_data(data)
+
+    @pyqtSlot(bytes)
+    def _serialReceiveData(self, data):
+        if (self._brickWidget):
+            self._brickWidget.receiveData(data)
 
     @pyqtSlot(QtGui.QAction)
     def _onSerialPortSelected(self, action):
-        if action and action.data() and self._serial:
-            self._serial.open_port(action.data())
+        if action and action.data():
+            new_port = action.data()
+            if (not self._serialConnection):
+                self._serialConnection = SerialConnection(self)
+                self._serialConnection.dataReceived.connect(self._serialReceiveData)
+                self._serialConnection.error.connect(self._error)
+            
+            prev_port = self._serialConnection.get_port_name()
+            self._serialConnection.close_port()
+            if (new_port != prev_port):
+                self._serialConnection.open_port(new_port)
             self._refreshSerialPorts()
 
     def _parseArgs(self):
@@ -209,6 +232,8 @@ class Window(QtWidgets.QMainWindow):
 
     def closeEvent(self, event):
         self._saveSettings()
+        if self._serialConnection:
+            self._serialConnection.close_port()
         if (self._brickWidget):
             self._brickWidget.close()
             self._brickWidget.deleteLater()
@@ -219,6 +244,7 @@ class Window(QtWidgets.QMainWindow):
             self._debugWidget = None
         super().closeEvent(event)
 
+    @pyqtSlot(dict)
     def _examine(self, info):
         if (self._debugWidget):
             self._debugWidget.examine(info)
@@ -239,3 +265,7 @@ class Window(QtWidgets.QMainWindow):
         self.showNormal()
         self.menuBar().show()
         self.statusBar().show()
+
+    @pyqtSlot(str)
+    def _error(self, error):
+        QMessageBox(parent=self, text=error).exec()

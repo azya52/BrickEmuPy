@@ -7,8 +7,8 @@ class SerialConnection(QObject):
     dataReceived = pyqtSignal(bytes)
     error = pyqtSignal(str)
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self,  parent=None):
+        super().__init__(parent)
         self._serial_port = QSerialPort()
         self._serial_port.readyRead.connect(self._read_data)
         self._serial_port.errorOccurred.connect(self._on_error)

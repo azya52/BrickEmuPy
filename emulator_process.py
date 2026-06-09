@@ -22,14 +22,14 @@ CMD_BREAKPOINT = 60
 CMD_EDIT_STATE = 70
 CMD_BTN_PRESS = 80
 CMD_BTN_RELEASE = 90
-CMD_SERIAL_RX = 100
+CMD_RECEIVE_DATA = 100
 
 MSG_EXAMINE = 0
 MSG_VRAM = 10
 MSG_ERROR = 20
 MSG_SOUND_DATA = 30
 MSG_SOUND_RESET = 31
-MSG_SERIAL_TX = 40
+MSG_SEND_DATA = 40
 
 CYCLE_SKIP_TIMEOUT_NS = 100e6
 
@@ -90,14 +90,12 @@ class EmulatorProcess:
         self._write_data((MSG_SOUND_DATA, channel, data, self._last_tick))
 
     def serial_tx_handler(self, data):
-        self._write_data((MSG_SERIAL_TX, data))
+        self._write_data((MSG_SEND_DATA, data))
 
     def _init_config(self):
         try:
             core = self._config["core"]
-            self._interconnect = Interconnect()
-            self._interconnect.register_audio_forwarder(self)
-            self._interconnect.register_serial_tx_device(self)
+            self._interconnect = Interconnect(self)
 
             self._cpu = cores_map[core]["core"](
                 self._config["mask_options"],
@@ -202,7 +200,7 @@ class EmulatorProcess:
             elif (op == CMD_BTN_RELEASE):
                 self._interconnect.emit_input(cmd[1], False)
 
-            elif (op == CMD_SERIAL_RX):
+            elif (op == CMD_RECEIVE_DATA):
                 self._interconnect.emit_serial_rx(cmd[1])
 
     def _reset_timing(self):

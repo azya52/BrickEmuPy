@@ -100,10 +100,10 @@
    </widget>
    <widget class="QMenu" name="menuSerial">
     <property name="title">
-     <string>Serial</string>
+     <string>Connection</string>
     </property>
     <addaction name="menuSerialPorts"/>
-    <addaction name="actionSerialDisconnect"/>
+    <addaction name="actionDisconnect"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuDebug"/>
@@ -315,7 +315,7 @@
     <string>Shadow</string>
    </property>
   </action>
-  <action name="actionSerialDisconnect">
+  <action name="actionDisconnect">
    <property name="enabled">
     <bool>false</bool>
    </property>

@@ -35,8 +35,9 @@ class QueueReaderThread(QThread):
 
 class BrickWidget(QtWidgets.QGraphicsView):
     examineSignal = pyqtSignal(dict)
+    connectionSignal = pyqtSignal(bytes)
 
-    def __init__(self, config, settings, serial=None):
+    def __init__(self, config, settings):
         super().__init__()
 
         self.setViewportUpdateMode(QtWidgets.QGraphicsView.ViewportUpdateMode.MinimalViewportUpdate)
@@ -58,11 +59,6 @@ class BrickWidget(QtWidgets.QGraphicsView):
         self._shadow = DEFAULT_SHADOW
 
         self._loadSettings()
-
-        self._serial = serial
-        if (self._serial is not None):
-            self._serial.dataReceived.connect(self._serialRX)
-            self._serial.error.connect(self._error)
 
         self._audioEngine = audio_engine.getAudioEngine()
 
@@ -97,12 +93,10 @@ class BrickWidget(QtWidgets.QGraphicsView):
             self._soundProcess(msg[1], msg[2], msg[3])
         elif (op == MSG_SOUND_RESET):
             self._audioEngine.reset()
-        elif (op == MSG_SERIAL_TX):
-            self._serialTX(msg[1])
+        elif (op == MSG_SEND_DATA):
+            self.connectionSignal.emit(msg[1])
 
     def close(self):
-        self._serial = None
-
         if (self._QueueReaderThread):
             self._QueueReaderThread.stop()
             self._QueueReaderThread = None
@@ -306,9 +300,5 @@ class BrickWidget(QtWidgets.QGraphicsView):
             else:
                 shadowItem.setVisible(False)
 
-    def _serialRX(self, data: bytes):
-        self._cmdQueue.put((CMD_SERIAL_RX, data))
-
-    def _serialTX(self, data):
-        if self._serial:
-            self._serial.send_data(data)
+    def receiveData(self, data):
+        self._cmdQueue.put((CMD_RECEIVE_DATA, data))
