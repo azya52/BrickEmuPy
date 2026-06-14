@@ -61,9 +61,6 @@ class SPLB20():
 
         self._clock = clock
 
-        if (not self._non_crystal_mode):
-            self._sound.set_clock_div(self._sub_clock_div)
-
         self.reset()
 
         self._io_tbl = {
@@ -412,12 +409,9 @@ class SPLB20():
         if (self._SYS_CTRL & IO_SYS_CTRL_TIMER_ENBL):
             self._timer_counter -= exec_cycles
             while (self._timer_counter <= 0):
-                if (self._non_crystal_mode):
-                    self._timer_counter += (1 << self._PRESCALAR)
-                else:
-                    self._timer_counter += self._sub_clock_div
+                self._timer_counter += (1 << self._PRESCALAR)
                 self._TC -= 1
-                if (self._TC <= 0):
+                if (self._TC < 0):
                     self._TC = self._TC_PRESET
                     if (self._INT_CFG & IO_INT_CFG_COUNTER_INT):
                         self._IREQ |= IO_INT_CFG_COUNTER_INT
@@ -546,8 +540,7 @@ class SPLB20():
     
     def _set_io_Prescalar_Ctrl(self, value):
         self._PRESCALAR = value
-        if (self._non_crystal_mode):
-            self._sound.set_clock_div(1 << value)
+        self._sound.set_clock_div(1 << value)
 
     def _get_io_KeyScan_Ctrl(self):
         return self._KEYSCAN_CTRL

@@ -2,7 +2,7 @@
 	"id": "677fa65a-c880-41dd-8c26-7a29d5cf5a4b",
 	"core": "SPLB20",
 	"face_path": "./assets/Apollo2in1.svg",
-	"clock": 500000,
+	"clock": 360000,
 	
 	"buttons": {
 		"btnMode": {
@@ -54,7 +54,7 @@
 		"rom_path": "./assets/Apollo2in1.bin",
 		"non_crystal_mode": 0,
 		"port_pullup": {
-			"PA": 255
+			"PA": 63
 		}
 	}
 }

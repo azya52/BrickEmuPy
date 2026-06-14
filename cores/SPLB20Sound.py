@@ -14,7 +14,7 @@ class SPLB20sound():
         self._tone()
 
     def set_tc_div(self, tc_div):
-        self._tc_div = tc_div
+        self._tc_div = tc_div + 1
         self._tone()
 
     def set_enable(self, enable):
@@ -22,8 +22,8 @@ class SPLB20sound():
         self._tone()
 
     def _tone(self):
-        if (self._tc_div > 0 and self._enable):
-            freq = self._system_clock / self._clock_div / self._tc_div / 2
+        if (self._tc_div > 1 and self._enable):
+            freq = self._system_clock / self._clock_div / self._tc_div
             self._interconnect.emit_audio(CHANNEL, (freq, False, SQUARENESS_FACTOR, 0))
         else:
             self._tone_on = False

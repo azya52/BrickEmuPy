@@ -2,7 +2,7 @@
 	"id": "96e65a3e-37c3-4b8d-83cf-c700207f313b",
 	"core": "SPLB20",
 	"face_path": "./assets/BigCat9in1.svg",
-	"clock": 950000,
+	"clock": 1100000,
 	
 	"buttons": {
 		"btnA": {
