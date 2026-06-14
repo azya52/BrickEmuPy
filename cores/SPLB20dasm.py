@@ -145,7 +145,7 @@ class SPLB20dasm():
                     addr = (rom.get_byte(vector) | (rom.get_byte(vector + 1) << 8)) - self._rom_offset
                     if (addr != 0xFFFF):
                         listing = self._disassemble(addr, listing, rom)
-            result = [(0, 0)] * ADDRESS_SPACE_SIZE
+            result = [None] * ADDRESS_SPACE_SIZE
             for i in range(len(listing)):
                 if (listing[i] is None):
                     byte = rom.get_byte(i)
@@ -407,4 +407,4 @@ class SPLB20dasm():
         return (pc + 1,), "sed"
 
     def _dummy(self, pc, opcode):
-        return (pc + 1,), "illegal instruction"
+        return (pc,), "illegal instruction"
