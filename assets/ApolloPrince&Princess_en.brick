@@ -1,0 +1,60 @@
+{
+	"id": "9afd96f6-fffc-4ab1-a03d-4b46379d8521",
+	"core": "SPLB20",
+	"face_path": "./assets/ApolloPrince&Princess.svg",
+	"clock": 500000,
+
+	"buttons": {
+		"btnMode": {
+			"hot_keys": [49]
+		},
+		"btnLeft": {
+			"hot_keys": [50]
+		},
+		"btnRight": {
+			"hot_keys": [51]
+		},
+		"btnEnter": {
+			"hot_keys": [52]
+		}
+	},
+
+	"display": {
+		"motion_blur": 0.6,
+		"ghost_segments": 0.02,
+		"shadow": 3
+	},
+	
+	"peripherals": {
+		"direct_input": {
+			"btnMode": {
+				"port": "PA",
+				"mask": 4,
+				"level": 0
+			},
+			"btnLeft": {
+				"port": "PA",
+				"mask": 8,
+				"level": 0
+			},
+			"btnRight": {
+				"port": "PA",
+				"mask": 16,
+				"level": 0
+			},
+			"btnEnter": {
+				"port": "PA",
+				"mask": 32,
+				"level": 0
+			}
+		}
+	},
+
+	"mask_options": {
+		"rom_path": "./assets/ApolloPrince&Princess.bin",
+		"non_crystal_mode": 0,
+		"port_pullup": {
+			"PA": 60
+		}
+	}
+}
