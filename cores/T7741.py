@@ -282,19 +282,19 @@ class T7741():
             self._instr_counter += 1
 
         if (self._CLC_SRC):
-            self._counter += exec_cycles
             exec_cycles /= self._sub_clock_div
-        else:
-            self._counter += exec_cycles * self._sub_clock_div
 
-        if (self._counter % self._pz_div < exec_cycles * self._sub_clock_div):
+        counts = exec_cycles * self._sub_clock_div
+        self._counter += counts
+        self._cycle_counter += counts
+
+        if (self._counter % self._pz_div < counts):
             self._PZF = True
-            if (self._counter % self._py_div < exec_cycles * self._sub_clock_div):
+            if (self._counter % self._py_div < counts):
                 self._PYF = True
-                if (self._counter % self._px_div < exec_cycles * self._sub_clock_div):
-                    self._PXF = True
+                if (self._counter % self._px_div < counts):
+                    self._PXF = True  
 
-        self._cycle_counter += exec_cycles
         return exec_cycles
     
     def _nop(self, opcode):
