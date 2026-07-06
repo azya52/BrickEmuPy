@@ -435,7 +435,7 @@ class T7741():
     def _out_bz_1(self, opcode):
         #00 0001 1011 BZ = 1; CF -, SF 1; CC16; Set buzzer pin (0V)
         self._BZ = 1
-        self._sound.toggle(self._sound_gnd ^ self._BZ, self._sound_gnd)
+        self._sound.toggle(self._BZ, self._sound_gnd)
         self._nSF = 0
         return MCLOCK_DIV1
 
@@ -614,7 +614,7 @@ class T7741():
     def _out_bz_0(self, opcode):
         #00 0011 1011 BZ = 0; CF -, SF 1; CC16, Reset buzzer pin (+3V)
         self._BZ = 0
-        self._sound.toggle(self._sound_gnd ^ self._BZ, self._sound_gnd)
+        self._sound.toggle(self._BZ, self._sound_gnd)
         self._nSF = 0
         return MCLOCK_DIV1
 
