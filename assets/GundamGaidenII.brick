@@ -1,0 +1,82 @@
+{
+	"id": "00e5b048-f7f4-4842-9b04-4056941eafd4",
+	"credits": "ROM dump and photos for tracing courtesy of Milan Galcik. Game donated by MikeG.",
+	"core": "T7741",
+	"face_path": "./assets/test/GundamGaidenII.svg",
+	"clock": 195000,
+	
+	"buttons": {
+		"btnStart": {
+			"hot_keys": [49, 32]
+		},
+		"btnLeft": {
+			"hot_keys": [50, 83, 16777237, 65, 16777234]
+		},
+		"btnRight": {
+			"hot_keys": [51, 68, 16777236, 87, 16777235]
+		},
+		"btnACL": {
+			"hot_keys": [52, 82]
+		}
+	},
+
+	"display": {
+		"motion_blur": 0.6,
+		"ghost_segments": 0,
+		"shadow": 4
+	},
+	
+	"peripherals": {
+		"matrix_input": {
+			"btnRight": {
+				"port": "INP",
+				"mask": 4,
+				"level": {
+					"port": "OUTP",
+					"mask":4
+				}
+			},
+			"btnLeft": {
+				"port": "INP",
+				"mask": 8,
+				"level": {
+					"port": "OUTP",
+					"mask": 4
+				}
+			},
+			"btnStart": {
+				"port": "IOP",
+				"mask": 1,
+				"level": {
+					"port": "OUTP",
+					"mask": 4
+				}
+			}
+		},
+		"direct_input": {
+			"btnACL": {
+				"port": "RES",
+				"mask": 0,
+				"level": 1
+			}
+		},
+		"direct_connection": {
+			"input": {
+				"port": "INP",
+				"mask": 1
+			},
+			"output": {
+				"port": "OUTP",
+				"mask": 2
+			}
+		}
+	},
+
+	"mask_options": {
+		"rom_path": "./assets/test/GundamGaidenII.bin",
+		"prescaler_div": [2, 8, 16],
+		"sub_clock": 195000,
+		"com_div": 768,
+		"sound_gnd": 1
+	}
+}
