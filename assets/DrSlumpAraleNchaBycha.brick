@@ -3,7 +3,7 @@
 	"credits": "ROM dump by Milan Galcik (https://www.septimus.sk/KB1013dbg/index.html)",
 	"core": "T7741",
 	"face_path": "./assets/DrSlumpAraleNchaBycha.svg",
-	"clock": 200000,
+	"clock": 210000,
 	
 	"buttons": {
 		"btnNcha": {
@@ -108,7 +108,7 @@
 
 	"mask_options": {
 		"rom_path": "./assets/DrSlumpAraleNchaBycha.bin",
-		"prescaler_div": [2, 8, 32],
+		"prescaler_div": [2, 16, 32],
 		"sub_clock": 32768,
 		"com_div": 768,
 		"sound_gnd": 0

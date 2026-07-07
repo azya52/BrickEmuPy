@@ -2,7 +2,7 @@
 	"id": "424b36d8-0bbd-4193-a40f-0283aa0ecda9",
 	"core": "T7741",
 	"face_path": "./assets/Pengo.svg",
-	"clock": 180000,
+	"clock": 190000,
 	
 	"buttons": {
 		"btnLeft": {

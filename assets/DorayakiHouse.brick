@@ -2,7 +2,7 @@
 	"id": "44fac13e-0043-4042-a894-e23ccef690f0",
 	"core": "T7741",
 	"face_path": "./assets/DorayakiHouse.svg",
-	"clock": 180000,
+	"clock": 195000,
 	
 	"buttons": {
 		"btnDown": {
@@ -70,7 +70,7 @@
 			},
 			"btnMode": {
 				"port": "INP",
-				"mask": 2,
+				"mask": 1,
 				"level": {
 					"port": "OUTP",
 					"mask": 1
@@ -96,7 +96,7 @@
 	
 	"mask_options": {
 		"rom_path": "./assets/DorayakiHouse.bin",
-		"prescaler_div": [2, 8, 32],
+		"prescaler_div": [2, 8, 16],
 		"sub_clock": 32768,
 		"com_div": 768,
 		"sound_gnd": 0
