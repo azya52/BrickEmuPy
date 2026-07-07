@@ -1,5 +1,6 @@
 {
 	"id": "677fa65a-c880-41dd-8c26-7a29d5cf5a4b",
+	"credits": "Device for reverse engineering provided by t.me/oksiniah."
 	"core": "SPLB20",
 	"face_path": "./assets/Apollo2in1.svg",
 	"clock": 360000,

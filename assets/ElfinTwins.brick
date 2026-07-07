@@ -1,5 +1,6 @@
 {
 	"id": "87d5d943-7069-48bd-9bd6-6f4e0e4bc3c9",
+	"credits": "Device for reverse engineering provided by t.me/oksiniah."
 	"core": "SPLB20",
 	"face_path": "./assets/ElfinTwins.svg",
 	"clock": 560000,

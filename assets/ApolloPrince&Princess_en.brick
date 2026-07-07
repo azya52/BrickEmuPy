@@ -1,5 +1,6 @@
 {
 	"id": "9afd96f6-fffc-4ab1-a03d-4b46379d8521",
+	"credits": "Devices for reverse engineering provided by t.me/oksiniah and Crazy_Emulator.",
 	"core": "SPLB20",
 	"face_path": "./assets/ApolloPrince&Princess.svg",
 	"clock": 500000,

@@ -1,5 +1,6 @@
 {
 	"id": "d3350175-5103-4bed-ab70-db69de633ac6",
+	"credits": "Device for reverse engineering provided by t.me/oksiniah."
 	"core": "SPLB20",
 	"face_path": "./assets/Gyaoppi9in1.svg",
 	"clock": 1100000,
