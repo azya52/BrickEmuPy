@@ -1,0 +1,83 @@
+{
+	"id": "d93a6c9d-1296-4cee-b472-639206a6d781",
+	"core": "STK55C324",
+	"face_path": "./assets/test/MiniClassicSoccer.svg",
+	"clock":590000,
+	
+	"buttons": {
+		"btnStart": {
+			"hot_keys": [32, 88]
+		},
+		"btnGame": {
+			"hot_keys": [90]
+		},
+		"btnPause": {
+			"hot_keys": [50, 16777220]
+		},
+		"btnLeft": {
+			"hot_keys": [65, 16777234]
+		},
+		"btnUp": {
+			"hot_keys": [87, 16777235]
+		},
+		"btnRight": {
+			"hot_keys": [68, 16777236]
+		},
+		"btnDown": {
+			"hot_keys": [83, 16777237]
+		}
+	},
+
+	"display": {
+		"motion_blur": 0.6,
+		"ghost_segments": 0.03,
+		"shadow": 10
+	},
+
+	"peripherals": {
+		"direct_input": {
+			"btnStart": {
+				"port": "P1",
+				"mask": 1,
+				"level": 0
+			},
+			"btnGame": {
+				"port": "P1",
+				"mask": 2,
+				"level": 0
+			},
+			"btnPause": {
+				"port": "P1",
+				"mask": 4,
+				"level": 0
+			},
+			"btnLeft": {
+				"port": "P1",
+				"mask": 64,
+				"level": 0
+			},
+			"btnUp": {
+				"port": "P1",
+				"mask": 16,
+				"level": 0
+			},
+			"btnRight": {
+				"port": "P1",
+				"mask": 8,
+				"level": 0
+			},
+			"btnDown": {
+				"port": "P1",
+				"mask": 32,
+				"level": 0
+			}
+		}
+	},
+
+	"mask_options": {
+		"rom_path": "./assets/test/MiniClassicSoccer.bin",
+		"port_pullup": {
+			"P1": 255
+		}
+	}
+}
