@@ -1,7 +1,7 @@
 {
 	"id": "d93a6c9d-1296-4cee-b472-639206a6d781",
 	"core": "STK55C324",
-	"face_path": "./assets/test/MiniClassicSoccer.svg",
+	"face_path": "./assets/test/MiniClassicsSoccer.svg",
 	"clock":590000,
 	
 	"buttons": {
@@ -75,7 +75,7 @@
 	},
 
 	"mask_options": {
-		"rom_path": "./assets/test/MiniClassicSoccer.bin",
+		"rom_path": "./assets/test/MiniClassicsSoccer.bin",
 		"port_pullup": {
 			"P1": 255
 		}
