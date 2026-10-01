@@ -1,0 +1,105 @@
+{
+	"id": "d7301e70-9620-4e6d-aafb-f5ec0b7efad7",
+	"core": "HT943",
+	"face_path": "./assets/Puyolin.svg",
+	"clock": 925000,
+	
+	"buttons": {
+		"btnStart": {
+			"hot_keys": [32]
+		},
+		"btnOnOff": {
+			"hot_keys": [50]
+		},
+		"btnMute": {
+			"hot_keys": [49]
+		},
+		"btnPause": {
+			"hot_keys": [51]
+		},
+		"btnLeft": {
+			"hot_keys": [65, 16777234]
+		},
+		"btnDown": {
+			"hot_keys": [83, 16777237]
+		},
+		"btnRight": {
+			"hot_keys": [68, 16777236]
+		},
+		"btnACL": {
+			"hot_keys": [82]
+		}
+	},
+
+	"display": {
+		"motion_blur": 0.6,
+		"ghost_segments": 0.015,
+		"shadow": 8
+	},
+	
+	"peripherals": {
+		"direct_input": {
+			"btnStart": {
+				"port": "PS",
+				"mask": 2,
+				"level": 0
+			},
+			"btnOnOff": {
+				"port": "PS",
+				"mask": 0,
+				"level": 0
+			},
+			"btnMute": {
+				"port": "PP",
+				"mask": 0,
+				"level": 0
+			},
+			"btnPause": {
+				"port": "PS",
+				"mask": 1,
+				"level": 0
+			},
+			"btnLeft": {
+				"port": "PP",
+				"mask": 2,
+				"level": 0
+			},
+			"btnDown": {
+				"port": "PP",
+				"mask": 3,
+				"level": 0
+			},
+			"btnRight": {
+				"port": "PP",
+				"mask": 1,
+				"level": 0
+			},
+			"btnACL": {
+				"port": "RES",
+				"mask": 0,
+				"level": 1
+			}
+		}
+	},
+
+	"mask_options": {
+		"rom_path": "./assets/Puyolin.bin",
+		"sound_rom_path": "./assets/Puyolin.srom",
+		"port_pullup": {
+			"PP": 15,
+			"PM": 15,
+			"PS": 15
+		},
+		"port_wakeup": {
+			"PP": 0,
+			"PM": 0,
+			"PS": 1
+		},
+		"PA_open_drain": 0,
+		"timer_clock_div": 128,
+		"sound_freq_div": 32,
+		"sound_speed_div":  [62, 62, 105, 62, 15, 1, 75, 125, 0, 44, 59, 123, 62, 27, 0, 0],
+		"sound_effect":  [2, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0],
+		"sound_unknown":  [0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0]
+	}
+}
