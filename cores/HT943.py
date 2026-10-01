@@ -33,7 +33,7 @@ class HT943(HT4BIT):
     def _reset(self):
         super()._reset()
         
-        self._RAM = [0] * RAM_SIZE
+        self._RAM = [0xF] * RAM_SIZE
         
         self._PA = 0
         self._PP = self._PP_pullup_mask

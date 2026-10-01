@@ -114,15 +114,12 @@ class HT4BIT():
         ]
 
     def _instructions_override(self, overrides):
+        instructions = list(self._instructions)
         for index, instruction in overrides.items():
-            if isinstance(instruction, list):
-                for i, m in enumerate(instruction):
-                    if index + i < len(self._instructions):
-                        self._instructions[index + i] = m
-            elif index < len(self._instructions):
-                self._instructions[index] = instruction
+            if index < len(instructions):
+                instructions[index] = instruction
 
-        return tuple(self._instructions)
+        return tuple(instructions)
     
     def _reset(self):
         self._ACC = 0
@@ -269,7 +266,7 @@ class HT4BIT():
         return 4
     
     def _sbc_a_r1r0(self, opcode):
-        self._ACC += (~self._read_RAM(0) & 0xF) + self._CF
+        self._ACC += (self._read_RAM(0) ^ 0xF) + self._CF
         self._CF = self._ACC > 15
         self._ACC &= 0xF
         self._PC += 1
@@ -277,7 +274,7 @@ class HT4BIT():
         return 4
     
     def _sub_a_r1r0(self, opcode):
-        self._ACC += (~self._read_RAM(0) & 0xF) + 1
+        self._ACC += (self._read_RAM(0) ^ 0xF) + 1
         self._CF = self._ACC > 15
         self._ACC &= 0xF
         self._PC += 1
@@ -389,13 +386,13 @@ class HT4BIT():
         return 4
         
     def _ret(self, opcode):
-        self._PC =  (self._PC & 0xF000) | (self._STACK & 0xFFF)
+        self._PC = (self._PC & 0xF000) | (self._STACK & 0xFFF)
         self._STACK = 0
 
         return 4
 
     def _reti(self, opcode):
-        self._PC =  (self._PC & 0xF000) | (self._STACK & 0xFFF)
+        self._PC = (self._PC & 0xF000) | (self._STACK & 0xFFF)
         self._CF = (self._STACK >> 12)
         self._STACK = 0
 
@@ -490,7 +487,7 @@ class HT4BIT():
         return 8
 
     def _sub_a_x(self, opcode):
-        self._ACC += (~self._ROM.get_byte(self._PC + 1) & 0xF) + 1
+        self._ACC += (self._ROM.get_byte(self._PC + 1) ^ 0xF) + 1
         self._CF = self._ACC > 15
         self._ACC &= 0xF
         self._PC += 2

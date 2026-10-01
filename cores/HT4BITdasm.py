@@ -104,15 +104,12 @@ class HT4BITdasm():
         ]
 
     def _instructions_override(self, overrides):
+        instructions = list(self._instructions)
         for index, instruction in overrides.items():
-            if isinstance(instruction, list):
-                for i, m in enumerate(instruction):
-                    if index + i < len(self._instructions):
-                        self._instructions[index + i] = m
-            elif index < len(self._instructions):
-                self._instructions[index] = instruction
+            if index < len(instructions):
+                instructions[index] = instruction
 
-        return tuple(self._instructions)
+        return tuple(instructions)
 
     def disassemble(self, rom):
         if (rom.size() > 0):
