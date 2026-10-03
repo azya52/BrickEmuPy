@@ -69,6 +69,7 @@ Handheld LCD games emulator in Python with PyQt6.
   * Edla Game Space Rescue, 1989? (Sanyo LC5732)
   * Bandai SD Gundam Gaiden II, 1985 (Toshiba 7704)
   * Mini Classics Soccer, 1998/2004 (STK55C324) (distributed without ROM)
+  * Puyolin (ぷよりん), 1997 (HT-943Q0)
 
 ## Running on Windows
 * Install Python ([latest version](https://www.python.org/downloads/)) and make sure to add it to PATH.
