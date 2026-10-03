@@ -215,37 +215,37 @@ class E0C6200dasm():
     def _add_r_q(self, pc, opcode):
         r = opcode >> 2 & 0x3
         q = opcode & 0x3
-        return "add " + self._abmxmy_tbl[r] + ", " + self._abmxmy_tbl[r]
+        return "add " + self._abmxmy_tbl[r] + ", " + self._abmxmy_tbl[q]
 
     def _adc_r_q(self, pc, opcode):
         r = opcode >> 2 & 0x3
         q = opcode & 0x3
-        return "adc " + self._abmxmy_tbl[r] + ", " + self._abmxmy_tbl[r]
+        return "adc " + self._abmxmy_tbl[r] + ", " + self._abmxmy_tbl[q]
 
     def _sub_r_q(self, pc, opcode):
         r = opcode >> 2 & 0x3
         q = opcode & 0x3
-        return "sub " + self._abmxmy_tbl[r] + ", " + self._abmxmy_tbl[r]
+        return "sub " + self._abmxmy_tbl[r] + ", " + self._abmxmy_tbl[q]
 
     def _sbc_r_q(self, pc, opcode):
         r = opcode >> 2 & 0x3
         q = opcode & 0x3
-        return "sbc " + self._abmxmy_tbl[r] + ", " + self._abmxmy_tbl[r]
+        return "sbc " + self._abmxmy_tbl[r] + ", " + self._abmxmy_tbl[q]
 
     def _and_r_q(self, pc, opcode):
         r = opcode >> 2 & 0x3
         q = opcode & 0x3
-        return "and " + self._abmxmy_tbl[r] + ", " + self._abmxmy_tbl[r]
+        return "and " + self._abmxmy_tbl[r] + ", " + self._abmxmy_tbl[q]
 
     def _or_r_q(self, pc, opcode):
         r = opcode >> 2 & 0x3
         q = opcode & 0x3
-        return "or " + self._abmxmy_tbl[r] + ", " + self._abmxmy_tbl[r]
+        return "or " + self._abmxmy_tbl[r] + ", " + self._abmxmy_tbl[q]
 
     def _xor_r_q(self, pc, opcode):
         r = opcode >> 2 & 0x3
         q = opcode & 0x3
-        return "xor " + self._abmxmy_tbl[r] + ", " + self._abmxmy_tbl[r]
+        return "xor " + self._abmxmy_tbl[r] + ", " + self._abmxmy_tbl[q]
    
     def _rlc_r(self, pc, opcode):
         r = opcode & 0x3
