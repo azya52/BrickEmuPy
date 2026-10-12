@@ -1,7 +1,7 @@
 {
 	"id": "b72ad273-191f-4dec-893c-ef9f7ca14679",
 	"core": "GPL191X",
-	"face_path": "./assets/test/TamagotchiMini2017.svg",
+	"face_path": "./assets/TamagotchiMini2017.svg",
 	"clock": 1500000,
 	
 	"buttons": {
@@ -43,7 +43,7 @@
 	},
 
 	"mask_options": {
-		"rom_path": "./assets/test/TamagotchiMini2017.bin",
+		"rom_path": "./assets/TamagotchiMini2017.bin",
 		"port_pullup": {
 		}
 	},
