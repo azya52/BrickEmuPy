@@ -30,6 +30,7 @@ MSG_ERROR = 20
 MSG_SOUND_DATA = 30
 MSG_SOUND_RESET = 31
 MSG_SEND_DATA = 40
+MSG_SVG_ELEMENT = 50
 
 CYCLE_SKIP_TIMEOUT_NS = 100e6
 
@@ -91,6 +92,9 @@ class EmulatorProcess:
 
     def serial_tx_handler(self, data):
         self._write_data((MSG_SEND_DATA, data))
+
+    def svg_element_handler(self, element, visible):
+        self._write_data((MSG_SVG_ELEMENT, element, visible))
 
     def _init_config(self):
         try:

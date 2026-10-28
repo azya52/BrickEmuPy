@@ -31,6 +31,9 @@ class Interconnect:
     def emit_audio(self, channel, data):
         self._emulator.audio_handler(channel, data)
 
+    def emit_svg_element(self, element, visible):
+        self._emulator.svg_element_handler(element, visible)
+
     def register_serial_rx_device(self, dev):
         self._serial_rx_devices.append(dev)
 

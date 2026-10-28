@@ -4,6 +4,7 @@ from .direct_connection import *
 from .HT24LC08 import *
 from .CON_V3_IR import *
 from .CON_DGM import *
+from .svg_output import *
 
 __all__ = [
     "DirectInput",
@@ -12,6 +13,7 @@ __all__ = [
     "HT24LC08",
     "CON_V3_IR",
     "CON_DGM",
+    "SVGOutput",
     "peripherals_map"]
 
 peripherals_map = {
@@ -20,5 +22,6 @@ peripherals_map = {
     "direct_connection": DirectConnection,
     "HT24LC08": HT24LC08,
     "CON_V3_IR": CON_V3_IR,
-    "CON_DGM": CON_DGM
+    "CON_DGM": CON_DGM,
+    "svg_output": SVGOutput
 }

@@ -59,6 +59,7 @@ class BrickWidget(QtWidgets.QGraphicsView):
         self._motionBlur = DEFAULT_MOTION_BLUR
         self._ghostSegments = DEFAULT_GHOST_SEGMENTS
         self._shadow = DEFAULT_SHADOW
+        self._svg_outputs = {}
 
         self._loadSettings()
 
@@ -97,6 +98,10 @@ class BrickWidget(QtWidgets.QGraphicsView):
             self._audioEngine.reset()
         elif (op == MSG_SEND_DATA):
             self.connectionSignal.emit(msg[1])
+        elif (op == MSG_SVG_ELEMENT):
+            item = self._svg_outputs.get(msg[1])
+            if (item):
+                item.setVisible(msg[2])
 
     def close(self):
         if (self._QueueReaderThread):
@@ -235,6 +240,20 @@ class BrickWidget(QtWidgets.QGraphicsView):
 
                     self.scene().addItem(group)
                     self._segments.append([ramByte, ramBit, group, -1])
+
+        self._svg_outputs = {}
+        mutableElements = self._config.get("peripherals", {}).get("svg_output", {})
+        for element in mutableElements:
+            if (not faceRenderer.elementExists(element)):
+                QMessageBox(parent=self, text="SVG element not found: " + element).exec()
+                continue
+            item = QtSvgWidgets.QGraphicsSvgItem()
+            item.setSharedRenderer(faceRenderer)
+            item.setElementId(element)
+            item.setPos(faceRenderer.boundsOnElement(element).topLeft())
+            item.setVisible(False)
+            self.scene().addItem(item)
+            self._svg_outputs[element] = item
 
         self._updateDisplaySettings()
 
