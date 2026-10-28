@@ -426,28 +426,28 @@ class EM73000dasm():
         opcode = opcode << 8 | rom.get_byte(pc + 1)
         b = opcode >> 4 & 0x03
         y = opcode & 0x0F
-        return (pc + 2,), (2, opcode, "tf RAM[" + self._nibblebase % y + "]" + "%X" % b)
+        return (pc + 2,), (2, opcode, "tf RAM[" + self._nibblebase % y + "]." + "%X" % b)
 
     def _set_y_b(self, pc, opcode, rom):
         #0110 1100 01bb yyyy RAM[y]b¬1 2 2 - - 1
         opcode = opcode << 8 | rom.get_byte(pc + 1)
         b = opcode >> 4 & 0x03
         y = opcode & 0x0F
-        return (pc + 2,), (2, opcode, "set RAM[" + self._nibblebase % y + "]" + "%X" % b)
+        return (pc + 2,), (2, opcode, "set RAM[" + self._nibblebase % y + "]." + "%X" % b)
 
     def _tt_y_b(self, pc, opcode, rom):
         #0110 1100 10bb yyyy SF¬RAM[y]b 2 2 - - *
         opcode = opcode << 8 | rom.get_byte(pc + 1)
         b = opcode >> 4 & 0x03
         y = opcode & 0x0F
-        return (pc + 2,), (2, opcode, "tt RAM[" + self._nibblebase % y + "]" + "%X" % b)
+        return (pc + 2,), (2, opcode, "tt RAM[" + self._nibblebase % y + "]." + "%X" % b)
 
     def _clr_y_b(self, pc, opcode, rom):
         #0110 1100 11bb yyyy RAM[y]b¬0 2 2 - - 1
         opcode = opcode << 8 | rom.get_byte(pc + 1)
         b = opcode >> 4 & 0x03
         y = opcode & 0x0F
-        return (pc + 2,), (2, opcode, "clr RAM[" + self._nibblebase % y + "]" + "%X" % b)
+        return (pc + 2,), (2, opcode, "clr RAM[" + self._nibblebase % y + "]." + "%X" % b)
 
     def _bit_p_b(self, pc, opcode, rom):
         #0110 1101
@@ -459,28 +459,28 @@ class EM73000dasm():
         opcode = opcode << 8 | rom.get_byte(pc + 1)
         b = opcode >> 4 & 0x03
         p = opcode & 0x0F
-        return (pc + 2,), (2, opcode, "tfp PORT[" + self._portbase % p + "]" + "%X" % b)
+        return (pc + 2,), (2, opcode, "tfp PORT[" + self._portbase % p + "]." + "%X" % b)
 
     def _sep_p_b(self, pc, opcode, rom):
         #0110 1101 01bb pppp PORT[p]b¬1 2 2 - - 1
         opcode = opcode << 8 | rom.get_byte(pc + 1)
         b = opcode >> 4 & 0x03
         p = opcode & 0x0F
-        return (pc + 2,), (2, opcode, "sep PORT[" + self._portbase % p + "]" + "%X" % b)
+        return (pc + 2,), (2, opcode, "sep PORT[" + self._portbase % p + "]." + "%X" % b)
 
     def _ttp_p_b(self, pc, opcode, rom):
         #0110 1101 10bb pppp SF¬PORT[p]b 2 2 - - *
         opcode = opcode << 8 | rom.get_byte(pc + 1)
         b = opcode >> 4 & 0x03
         p = opcode & 0x0F
-        return (pc + 2,), (2, opcode, "ttp PORT[" + self._portbase % p + "]" + "%X" % b)
+        return (pc + 2,), (2, opcode, "ttp PORT[" + self._portbase % p + "]." + "%X" % b)
 
     def _clp_p_b(self, pc, opcode, rom):
         #0110 1101 11bb pppp PORT[p]b¬0 2 2 - - 1
         opcode = opcode << 8 | rom.get_byte(pc + 1)
         b = opcode >> 4 & 0x03
         p = opcode & 0x0F
-        return (pc + 2,), (2, opcode, "clp PORT[" + self._portbase % p + "]" + "%X" % b)
+        return (pc + 2,), (2, opcode, "clp PORT[" + self._portbase % p + "]." + "%X" % b)
 
     def _math_k(self, pc, opcode, rom):
         #0110 1110
