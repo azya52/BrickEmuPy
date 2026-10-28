@@ -7,6 +7,6 @@ class DirectConnection:
         self._output_port = config["output"]["port"]
         self._output_mask = config["output"]["mask"]
 
-    def port_handler(self, port, mask, value):
+    def port_handler(self, port, mask):
         if (port == self._output_port):
-            self._interconnect.emit_port(self, self._input_port, self._input_mask, (mask & self._output_mask))
+            self._interconnect.emit_pin(self, self._input_port, self._input_mask, (mask & self._output_mask))

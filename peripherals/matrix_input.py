@@ -7,7 +7,7 @@ class MatrixInput:
         self._pressed_keys = []
         self._port_states = {}
 
-    def port_handler(self, port, mask, value):
+    def port_handler(self, port, mask):
         if self._port_states.get(port) != mask:
             self._port_states[port] = mask
             self._update_matrix_inputs()
@@ -32,4 +32,4 @@ class MatrixInput:
         
         for cfg in self._config.values():
             key = (cfg["port"], cfg["mask"])
-            self._interconnect.emit_port(self, cfg["port"], cfg["mask"], states.get(key, -1))
+            self._interconnect.emit_pin(self, cfg["port"], cfg["mask"], states.get(key, -1))

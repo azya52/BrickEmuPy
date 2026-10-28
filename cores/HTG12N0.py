@@ -15,7 +15,7 @@ class HTG12N0(HT4BIT):
         super().__init__(mask, clock, interconnect)
 
         self._interconnect = interconnect
-        self._interconnect.register_port_device(self)
+        self._interconnect.register_pin_device(self)
 
         self._PS_pullup_mask = mask['port_pullup']['PS']
         self._PM_pullup_mask = mask['port_pullup']['PM']
@@ -122,7 +122,7 @@ class HTG12N0(HT4BIT):
         if ("MEMORY" in state):
             self._rom.write_word(state["MEMORY"][0], state["MEMORY"][1])
     
-    def port_handler(self, port, mask, level):
+    def pin_handler(self, port, mask, level):
         #to-do
         if (level >= 0):
             self._pin_set(port, mask, level)

@@ -36,7 +36,7 @@ class STK55C324():
         self._sound = STK55C324sound(clock, interconnect)
 
         self._interconnect = interconnect
-        self._interconnect.register_port_device(self)
+        self._interconnect.register_pin_device(self)
 
         self._rom_offset = ADDRESS_SPACE_SIZE - self._ROM.size()
 
@@ -465,7 +465,7 @@ class STK55C324():
             (self._port_input[port][1] | self._pullup[port])))
         )
 
-    def port_handler(self, port, mask, level):
+    def pin_handler(self, port, mask, level):
         if (port == 'RES'):
             if (level == 0):
                 self.reset()

@@ -33,7 +33,7 @@ class SPL0X():
         self._ROM = ROM(mask['rom_path'])
 
         self._interconnect = interconnect
-        self._interconnect.register_port_device(self)
+        self._interconnect.register_pin_device(self)
 
         self._cycle_counter = 0
 
@@ -344,7 +344,7 @@ class SPL0X():
             (self._port_input[port][1] | self._pullup_ext[port])))
         )
 
-    def port_handler(self, port, mask, level):
+    def pin_handler(self, port, mask, level):
         if (port == 'RES'):
             if (level == 0):
                 self.reset()

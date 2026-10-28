@@ -13,7 +13,7 @@ class MSM50XX():
         self._sound = MSM50XXsound(mask, clock, interconnect)
 
         self._interconnect = interconnect
-        self._interconnect.register_port_device(self)
+        self._interconnect.register_pin_device(self)
 
         self._format_tbl_offset = (self._ROM.size() // 2) - 64
         self._instr_counter = 0
@@ -240,7 +240,7 @@ class MSM50XX():
         if ("MEMORY" in state):
             self._rom.write_word(state["MEMORY"][0], state["MEMORY"][1])
     
-    def port_handler(self, port, mask, level):
+    def pin_handler(self, port, mask, level):
         if (port == 'PS'):
             self._PS &= ~mask
             if (level > 0):

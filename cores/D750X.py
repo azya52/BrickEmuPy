@@ -22,7 +22,7 @@ class D750X():
         self._sound = PinTogglingSound(interconnect)
         
         self._interconnect = interconnect
-        self._interconnect.register_port_device(self)
+        self._interconnect.register_pin_device(self)
 
         self._rom_mask = self._ROM.get_mask()
 
@@ -263,7 +263,7 @@ class D750X():
             self._rom.write_word(state["MEMORY"][0], state["MEMORY"][1])
     
 
-    def port_handler(self, port, mask, level):
+    def pin_handler(self, port, mask, level):
         port = int(port)
         self._P[port] &= ~mask
         if (level > 0):

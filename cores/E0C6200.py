@@ -192,7 +192,7 @@ class E0C6200():
         self._sound = E0C6200sound(OSC1_CLOCK, interconnect)
 
         self._interconnect = interconnect
-        self._interconnect.register_port_device(self)
+        self._interconnect.register_pin_device(self)
 
         self._pullup_ext = {
             **{
@@ -791,28 +791,28 @@ class E0C6200():
 
     def _set_io_r0(self, value):
         self._PLATCH["R0"] = value
-        self._interconnect.emit_port(self, "R0", self._port_read("R0"), 1)
+        self._interconnect.emit_port(self, "R0", self._port_read("R0"))
 
     def _get_io_r1(self):
         return self._PLATCH["R1"]
 
     def _set_io_r1(self, value):
         self._PLATCH["R1"] = value
-        self._interconnect.emit_port(self, "R1", self._port_read("R1"), 1)
+        self._interconnect.emit_port(self, "R1", self._port_read("R1"))
 
     def _get_io_r2(self):
         return self._PLATCH["R2"]
 
     def _set_io_r2(self, value):
         self._PLATCH["R2"] = value
-        self._interconnect.emit_port(self, "R2", self._port_read("R2"), 1)
+        self._interconnect.emit_port(self, "R2", self._port_read("R2"))
 
     def _get_io_r3(self):
         return self._PLATCH["R3"]
 
     def _set_io_r3(self, value):
         self._PLATCH["R3"] = value
-        self._interconnect.emit_port(self, "R3", self._port_read("R3"), 1)
+        self._interconnect.emit_port(self, "R3", self._port_read("R3"))
 
     def _get_io_r4(self):
         return self._PLATCH["R4"]
@@ -823,35 +823,35 @@ class E0C6200():
             self._sound.set_buzzer_off()
         else:
             self._sound.set_buzzer_on()
-        self._interconnect.emit_port(self, "R4", self._port_read("R4"), 1)
+        self._interconnect.emit_port(self, "R4", self._port_read("R4"))
 
     def _get_io_p0(self):
         return self._port_read("P0")
 
     def _set_io_p0(self, value):
         self._PLATCH["P0"] = value
-        self._interconnect.emit_port(self, "P0", self._port_read("P0"), 1)
+        self._interconnect.emit_port(self, "P0", self._port_read("P0"))
 
     def _get_io_p1(self):
         return self._port_read("P1")
 
     def _set_io_p1(self, value):
         self._PLATCH["P1"] = value
-        self._interconnect.emit_port(self, "P1", self._port_read("P1"), 1)
+        self._interconnect.emit_port(self, "P1", self._port_read("P1"))
 
     def _get_io_p2(self):
         return self._port_read("P2")
 
     def _set_io_p2(self, value):
         self._PLATCH["P2"] = value
-        self._interconnect.emit_port(self, "P2", self._port_read("P2"), 1)
+        self._interconnect.emit_port(self, "P2", self._port_read("P2"))
 
     def _get_io_p3(self):
         return self._port_read("P3")
 
     def _set_io_p3(self, value):
         self._PLATCH["P3"] = value
-        self._interconnect.emit_port(self, "P3", self._port_read("P3"), 1)
+        self._interconnect.emit_port(self, "P3", self._port_read("P3"))
 
     def _get_io_ioc(self):
         return self._IOC
@@ -864,10 +864,10 @@ class E0C6200():
         self._PDIR["P2"] = ((value & IO_IOC2) > 0) * 0xF
         self._PDIR["P3"] = ((value & IO_IOC3) > 0) * 0xF
 
-        self._interconnect.emit_port(self, "P0", self._port_read("P0"), 1)
-        self._interconnect.emit_port(self, "P1", self._port_read("P1"), 1)
-        self._interconnect.emit_port(self, "P2", self._port_read("P2"), 1)
-        self._interconnect.emit_port(self, "P3", self._port_read("P3"), 1)
+        self._interconnect.emit_port(self, "P0", self._port_read("P0"))
+        self._interconnect.emit_port(self, "P1", self._port_read("P1"))
+        self._interconnect.emit_port(self, "P2", self._port_read("P2"))
+        self._interconnect.emit_port(self, "P3", self._port_read("P3"))
 
     def _get_io_pup(self):
         return self._PUP
@@ -880,10 +880,10 @@ class E0C6200():
         self._PULLUP["P2"] = ((value & IO_PUP2) == 0) * 0xF
         self._PULLUP["P3"] = ((value & IO_PUP3) == 0) * 0xF
 
-        self._interconnect.emit_port(self, "P0", self._port_read("P0"), 1)
-        self._interconnect.emit_port(self, "P1", self._port_read("P1"), 1)
-        self._interconnect.emit_port(self, "P2", self._port_read("P2"), 1)
-        self._interconnect.emit_port(self, "P3", self._port_read("P3"), 1)
+        self._interconnect.emit_port(self, "P0", self._port_read("P0"))
+        self._interconnect.emit_port(self, "P1", self._port_read("P1"))
+        self._interconnect.emit_port(self, "P2", self._port_read("P2"))
+        self._interconnect.emit_port(self, "P3", self._port_read("P3"))
 
     def _get_io_ctrl_osc(self):
         return self._CTRL_OSC
@@ -961,7 +961,7 @@ class E0C6200():
             (self._PDIR[port] & self._PLATCH[port] & ((self._pullup_ext[port] | self._PULLUP[port]) | self._PUSHPULL[port]))
         )
     
-    def port_handler(self, port, mask, level):
+    def pin_handler(self, port, mask, level):
         if (port == 'RES'):
             if (level == -1):
                 self._RESET = 0

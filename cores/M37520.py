@@ -88,7 +88,7 @@ class M37520():
         self._sound = PinTogglingSound(interconnect)
 
         self._interconnect = interconnect
-        self._interconnect.register_port_device(self)
+        self._interconnect.register_pin_device(self)
 
         self._rom_offset = ADDRESS_SPACE_SIZE - self._ROM.size()
 
@@ -567,7 +567,7 @@ class M37520():
             (self._port_input[port][1] | self._PULLUP[port] | self._pullup_ext[port])))
         )
 
-    def port_handler(self, port, mask, level):
+    def pin_handler(self, port, mask, level):
         if (port == 'RES'):
             if (level == 0):
                 self.reset()

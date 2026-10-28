@@ -1,6 +1,7 @@
 class Interconnect:
     def __init__(self, emulator):
         self._port_devices = []
+        self._pin_devices = []
         self._input_devices = []
         self._clock_devices = []
         self._serial_rx_devices = []
@@ -9,10 +10,18 @@ class Interconnect:
     def register_port_device(self, dev):
         self._port_devices.append(dev)
 
-    def emit_port(self, sender, port, mask, value):
+    def emit_port(self, sender, port, mask):
         for dev in self._port_devices:
             if dev is not sender:
-                dev.port_handler(port, mask, value)
+                dev.port_handler(port, mask)
+
+    def register_pin_device(self, dev):
+        self._pin_devices.append(dev)
+
+    def emit_pin(self, sender, port, mask, value):
+        for dev in self._pin_devices:
+            if dev is not sender:
+                dev.pin_handler(port, mask, value)
 
     def register_input_device(self, dev):
         self._input_devices.append(dev)

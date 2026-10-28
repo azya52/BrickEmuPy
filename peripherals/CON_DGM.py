@@ -52,13 +52,13 @@ class CON_DGM:
             self._rx_hi_cycles_counter += cycles
             if (self._rx_hi_cycles_counter >= 0):
                 if (self._rx_step == RX_STOP):
-                    self._interconnect.emit_port(self, self._port, self._mask, -1)
+                    self._interconnect.emit_pin(self, self._port, self._mask, -1)
                     self._rx_step = RX_IDLE
                 else:
-                    self._interconnect.emit_port(self, self._port, self._mask, 0)
+                    self._interconnect.emit_pin(self, self._port, self._mask, 0)
                     self._rx_lo_cycles_counter += cycles
                     if (self._rx_lo_cycles_counter >= 0):
-                        self._interconnect.emit_port(self, self._port, self._mask, 1)
+                        self._interconnect.emit_pin(self, self._port, self._mask, 1)
                         self._rx_period_count += 1
                         if (self._rx_period_count < PERIOD_SKIP):
                             self._rx_hi_cycles_counter = -HI_AGC_CYCLES
@@ -86,7 +86,7 @@ class CON_DGM:
             self._rx_lo_cycles_counter = -LO_START_CYCLES
             self._rx_step = RX_TRANSMIT
 
-    def port_handler(self, port, mask, value):
+    def port_handler(self, port, mask):
         if (port == self._port):
             if (self._prev_pin_state != mask):
                 self._prev_pin_state = mask

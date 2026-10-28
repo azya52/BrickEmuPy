@@ -12,7 +12,6 @@ class HT4BIT():
         self._sound = HT4BITsound(mask, clock, interconnect)
 
         self._interconnect = interconnect
-        self._interconnect.register_port_device(self)
 
         self._timer_div = mask['timer_clock_div']
 

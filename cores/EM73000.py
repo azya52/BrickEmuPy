@@ -70,7 +70,7 @@ class EM73000():
         self._sound = EM73000sound(clock, interconnect)
 
         self._interconnect = interconnect
-        self._interconnect.register_port_device(self)
+        self._interconnect.register_pin_device(self)
         
         self._P0_pullup_mask = mask['port_pullup']['P0']
         self._P7_pullup_mask = mask['port_pullup']['P7']
@@ -410,7 +410,7 @@ class EM73000():
         if ("MEMORY" in state):
             self._rom.write_word(state["MEMORY"][0], state["MEMORY"][1])
     
-    def port_handler(self, port, mask, level):
+    def pin_handler(self, port, mask, level):
         #to-do
         if (level >= 0):
             self._pin_set(port, mask, level)

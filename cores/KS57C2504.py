@@ -126,7 +126,7 @@ class KS57C2504():
         self._sound = PinTogglingSound(interconnect)
 
         self._interconnect = interconnect
-        self._interconnect.register_port_device(self)
+        self._interconnect.register_pin_device(self)
 
         self._instr_counter = 0
         self._basic_timer_counter = 0
@@ -903,7 +903,7 @@ class KS57C2504():
     def _set_io_port4(self, value):
         self._PORT4_OUT_LATCH = value
 
-    def port_handler(self, port, mask, level):
+    def pin_handler(self, port, mask, level):
         if (port == 'PORT0'):
             prev_port = self._get_io_port0()
             self._PORT0[0] &= ~mask

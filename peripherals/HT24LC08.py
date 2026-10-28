@@ -46,12 +46,12 @@ class HT24LC08:
             except Exception:
                 pass
 
-    def port_handler(self, port, mask, value):
+    def port_handler(self, port, mask):
         if (port == self._port):
             prev_scl = self._scl
             prev_sda = self._sda
-            self._scl = mask & self._SCL_mask and value
-            self._sda = mask & self._SDA_mask and value
+            self._scl = mask & self._SCL_mask
+            self._sda = mask & self._SDA_mask
 
             if (self._scl and (prev_scl != self._scl or prev_sda != self._sda)):
                 
@@ -59,7 +59,7 @@ class HT24LC08:
                     self._state = ADDR_BYTE
                     self._bit_count = 0
                     self._ack_phase = False
-                    self._interconnect.emit_port(self, self._port, self._SDA_mask, -1)
+                    self._interconnect.emit_pin(self, self._port, self._SDA_mask, -1)
 
                 elif (prev_sda < self._sda): #STOP
                     self._state = IDLE
@@ -68,15 +68,15 @@ class HT24LC08:
                 #SCL Rise
                 
                 elif self._ack_phase:
-                    self._interconnect.emit_port(self, self._port, self._SDA_mask, 0)
+                    self._interconnect.emit_pin(self, self._port, self._SDA_mask, 0)
                     self._ack_phase = False
 
                 elif (self._state == READ_DATA):
                     if self._bit_count < 8:
                         if (self._tx_byte >> (7 - self._bit_count)) & 1:
-                            self._interconnect.emit_port(self, self._port, self._SDA_mask, -1)
+                            self._interconnect.emit_pin(self, self._port, self._SDA_mask, -1)
                         else:
-                            self._interconnect.emit_port(self, self._port, self._SDA_mask, 0)                          
+                            self._interconnect.emit_pin(self, self._port, self._SDA_mask, 0)                          
                         self._bit_count += 1
                     else:
                         self._curr_addr = (self._curr_addr + 1) % ROM_SIZE
@@ -84,7 +84,7 @@ class HT24LC08:
                         self._bit_count = 0
 
                 else:
-                    self._interconnect.emit_port(self, self._port, self._SDA_mask, -1)
+                    self._interconnect.emit_pin(self, self._port, self._SDA_mask, -1)
                     self._rx_byte = ((self._rx_byte << 1) | (self._sda > 0)) & 0xFF
                     self._bit_count += 1
                     if (self._bit_count == 8):

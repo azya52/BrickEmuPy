@@ -89,7 +89,7 @@ ROM_BANK_LH_OFFSET = 0x4000
 class SPLB32():
     def __init__(self, mask, clock, interconnect):
         self._interconnect = interconnect
-        self._interconnect.register_port_device(self)
+        self._interconnect.register_pin_device(self)
 
         self._ROM = ROM(mask['rom_path'])
 
@@ -624,7 +624,7 @@ class SPLB32():
             (self._PDIR[port] & self._PLATCH[port] & (self._pullup_ext[port] | ~self._ATTR[port]))
             ) & 0xFF
 
-    def port_handler(self, port, mask, level):
+    def pin_handler(self, port, mask, level):
         if (port == 'RES'):
             if (level == 0):
                 self.reset()
@@ -750,63 +750,63 @@ class SPLB32():
     
     def _set_sfr_io_portA_attr(self, value):
         self._ATTR["PA"] = value
-        self._interconnect.emit_port(self, "PA", self._port_read("PA"), 1)
+        self._interconnect.emit_port(self, "PA", self._port_read("PA"))
     
     def _set_sfr_io_portA_dir(self, value):
         self._PDIR["PA"] = value
-        self._interconnect.emit_port(self, "PA", self._port_read("PA"), 1)
+        self._interconnect.emit_port(self, "PA", self._port_read("PA"))
 
     def _get_sfr_io_portA_data(self):
         return self._port_read("PA")
     
     def _set_sfr_io_portA_data(self, value):
         self._PLATCH["PA"] = value
-        self._interconnect.emit_port(self, "PA", self._port_read("PA"), 1)
+        self._interconnect.emit_port(self, "PA", self._port_read("PA"))
     
     def _set_sfr_io_portB_attr(self, value):
         self._ATTR["PB"] = ((value & 0x1) * 0x3) | ((value & 0x2) * 0x6) | ((value & 0x4) * 0xC) | ((value & 0x8) * 0x18)
-        self._interconnect.emit_port(self, "PB", self._port_read("PB"), 1)
+        self._interconnect.emit_port(self, "PB", self._port_read("PB"))
 
     def _set_sfr_io_portB_dir(self, value):
         self._PDIR["PB"] = ((value & 0x1) * 0x3) | ((value & 0x2) * 0x6) | ((value & 0x4) * 0xC) | ((value & 0x8) * 0x18)
-        self._interconnect.emit_port(self, "PB", self._port_read("PB"), 1)
+        self._interconnect.emit_port(self, "PB", self._port_read("PB"))
 
     def _get_sfr_io_portB_data(self):
         return self._port_read("PB")
     
     def _set_sfr_io_portB_data(self, value):
         self._PLATCH["PB"] = value
-        self._interconnect.emit_port(self, "PB", self._port_read("PB"), 1)
+        self._interconnect.emit_port(self, "PB", self._port_read("PB"))
 
     def _set_sfr_io_portC_attr(self, value):
         self._ATTR["PC"] = value
-        self._interconnect.emit_port(self, "PC", self._port_read("PC"), 1)
+        self._interconnect.emit_port(self, "PC", self._port_read("PC"))
     
     def _set_sfr_io_portC_dir(self, value):
         self._PDIR["PC"] = value
-        self._interconnect.emit_port(self, "PC", self._port_read("PC"), 1)
+        self._interconnect.emit_port(self, "PC", self._port_read("PC"))
 
     def _get_sfr_io_portC_data(self):
         return self._port_read("PC")
     
     def _set_sfr_io_portC_data(self, value):
         self._PLATCH["PC"] = value
-        self._interconnect.emit_port(self, "PC", self._port_read("PC"), 1)
+        self._interconnect.emit_port(self, "PC", self._port_read("PC"))
 
     def _set_sfr_io_portD_dir(self, value):
         self._PDIR["PD"] = value & SFR_IO_PORTD_MASK
-        self._interconnect.emit_port(self, "PD", self._port_read("PD"), 1)
+        self._interconnect.emit_port(self, "PD", self._port_read("PD"))
 
     def _set_sfr_io_portD_attr(self, value):
         self._ATTR["PD"] = value & SFR_IO_PORTD_MASK
-        self._interconnect.emit_port(self, "PD", self._port_read("PD"), 1)
+        self._interconnect.emit_port(self, "PD", self._port_read("PD"))
 
     def _get_sfr_io_portD_data(self):
         return self._port_read("PD")
     
     def _set_sfr_io_portD_data(self, value):
         self._PLATCH["PD"] = value & SFR_IO_PORTD_MASK
-        self._interconnect.emit_port(self, "PD", self._port_read("PD"), 1)
+        self._interconnect.emit_port(self, "PD", self._port_read("PD"))
 
     def _get_sfr_audio_ch0_ctrl(self):
         return self._AUDIO_CH0_CTRL

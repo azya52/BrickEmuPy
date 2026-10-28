@@ -17,7 +17,7 @@ MCLOCK_DIV4 = 32
 class T7741():
     def __init__(self, mask, clock, interconnect):
         self._interconnect = interconnect
-        self._interconnect.register_port_device(self)
+        self._interconnect.register_pin_device(self)
 
         self._ROM = ROM(mask['rom_path'])
         self._sound = PinTogglingSound(interconnect)
@@ -151,7 +151,7 @@ class T7741():
         elif (port == "IOP"):
             self._IOP = value
 
-        self._interconnect.emit_port(self, port, value, 1)
+        self._interconnect.emit_port(self, port, value)
 
     def _reset(self):
         self._PC = 0xF00
@@ -248,7 +248,7 @@ class T7741():
         if ("MEMORY" in state):
             self._rom.write_word(state["MEMORY"][0], state["MEMORY"][1])
     
-    def port_handler(self, port, mask, level):
+    def pin_handler(self, port, mask, level):
         if (port == 'INP'):
             self._INP &= ~mask
             if (level > 0):

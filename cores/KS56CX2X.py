@@ -93,7 +93,7 @@ class KS56CX2X():
         self._sound = PinTogglingSound(interconnect)
 
         self._interconnect = interconnect
-        self._interconnect.register_port_device(self)
+        self._interconnect.register_pin_device(self)
 
         self._instr_counter = 0
         self._basic_timer_counter = 0
@@ -871,7 +871,7 @@ class KS56CX2X():
     def _set_io_port9(self, value):
         self._PORT9_OUT_LATCH = value
 
-    def port_handler(self, port, mask, level):
+    def pin_handler(self, port, mask, level):
         if (port == 'PORT1'):
             prev_port = self._get_io_port1()
             self._PORT1[0] &= ~mask

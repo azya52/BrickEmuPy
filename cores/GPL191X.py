@@ -80,7 +80,7 @@ DPRAM_SIZE = 0x80
 class GPL191X():
     def __init__(self, mask, clock, interconnect):
         self._interconnect = interconnect
-        self._interconnect.register_port_device(self)
+        self._interconnect.register_pin_device(self)
 
         self._open_rom(mask['rom_path'])
 
@@ -544,7 +544,7 @@ class GPL191X():
             (self._PDIR[port] & self._PLATCH[port])
             ) & 0xFF
 
-    def port_handler(self, port, mask, level):
+    def pin_handler(self, port, mask, level):
         if (port == 'RES'):
             if (level == 0):
                 self.reset()
@@ -725,18 +725,18 @@ class GPL191X():
     
     def _set_sfr_io_portAB_dir(self, value):
         self._PDIR["AB"] = value
-        self._interconnect.emit_port(self, "AB", self._port_read("AB"), 1)
+        self._interconnect.emit_port(self, "AB", self._port_read("AB"))
 
     def _get_sfr_io_portAB_data(self):
         return self._port_read("AB")
     
     def _set_sfr_io_portAB_data(self, value):
         self._PLATCH["AB"] = value
-        self._interconnect.emit_port(self, "AB", self._port_read("AB"), 1)
+        self._interconnect.emit_port(self, "AB", self._port_read("AB"))
     
     def _set_sfr_io_portCD_dir(self, value):
         self._PDIR["CD"] = value
-        self._interconnect.emit_port(self, "CD", self._port_read("CD"), 1)
+        self._interconnect.emit_port(self, "CD", self._port_read("CD"))
         self._update_timers_div()
 
     def _get_sfr_io_portCD_data(self):
@@ -744,21 +744,21 @@ class GPL191X():
     
     def _set_sfr_io_portCD_data(self, value):
         self._PLATCH["CD"] = value
-        self._interconnect.emit_port(self, "CD", self._port_read("CD"), 1)
+        self._interconnect.emit_port(self, "CD", self._port_read("CD"))
         self._update_timers_div()
     
     def _set_sfr_io_portEF_dir(self, value):
-        #self._PDIR["EF"] = value 
+        self._PDIR["EF"] = value & 0xFE
         #TODO: In the Tamagotchi Mini 2017, EF dir is set to 1, although EF.0 is used for the button. 
         # Perhaps the port direction is set more complexly than bit-by-bit, or there's an error somewhere.
-        self._interconnect.emit_port(self, "EF", self._port_read("EF"), 1)
+        self._interconnect.emit_port(self, "EF", self._port_read("EF"))
 
     def _get_sfr_io_portEF_data(self):
         return self._port_read("EF")
     
     def _set_sfr_io_portEF_data(self, value):
         self._PLATCH["EF"] = value
-        self._interconnect.emit_port(self, "EF", self._port_read("EF"), 1)
+        self._interconnect.emit_port(self, "EF", self._port_read("EF"))
 
     def _get_sfr_audio_ch0_ctrl(self):
         return self._AUDIO_CH0_CTRL

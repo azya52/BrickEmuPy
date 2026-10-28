@@ -44,7 +44,7 @@ class CON_V3_IR:
 
         self._prev_pin_state = 0
 
-        self._interconnect.emit_port(self, self._receiver_port, self._receiver_mask, 0)
+        self._interconnect.emit_pin(self, self._receiver_port, self._receiver_mask, 0)
 
     def clock(self, cycles):
         self._tx_space_cycles_counter += cycles
@@ -52,12 +52,12 @@ class CON_V3_IR:
         if (self._rx_step != RX_IDLE):
             self._rx_burst_cycles_counter += cycles
             if (self._rx_burst_cycles_counter >= 0):
-                self._interconnect.emit_port(self, self._receiver_port, self._receiver_mask, 1)
+                self._interconnect.emit_pin(self, self._receiver_port, self._receiver_mask, 1)
                 self._rx_space_cycles_counter += cycles
                 if (self._rx_step == RX_STOP):
                     self._rx_step = RX_IDLE
                 elif (self._rx_space_cycles_counter >= 0):
-                    self._interconnect.emit_port(self, self._receiver_port, self._receiver_mask, 0)
+                    self._interconnect.emit_pin(self, self._receiver_port, self._receiver_mask, 0)
                     if (self._rx_bit_count == 8):
                         self._rx_bit_count = 0
                         if (self._rx_byte_queue):
@@ -79,14 +79,14 @@ class CON_V3_IR:
     def serial_rx_handler(self, data):
         self._rx_byte_queue.extend(data)
         if (self._rx_step == RX_IDLE and len(self._rx_byte_queue) > RX_BUFFER_SIZE):
-            self._interconnect.emit_port(self, self._receiver_port, self._receiver_mask, 0)
+            self._interconnect.emit_pin(self, self._receiver_port, self._receiver_mask, 0)
             self._rx_byte = self._rx_byte_queue.pop(0)
             self._rx_bit_count = 0
             self._rx_burst_cycles_counter = -BURST_AGC_CYCLES
             self._rx_space_cycles_counter = -SPACE_AGC_CYCLES
             self._rx_step = RX_TRANSMIT
 
-    def port_handler(self, port, mask, value):
+    def port_handler(self, port, mask):
         if (port == self._transmitter_port):
             if (self._prev_pin_state != mask):
                 self._prev_pin_state = mask

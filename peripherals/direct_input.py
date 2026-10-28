@@ -7,6 +7,6 @@ class DirectInput:
     def input_handler(self, key, pressed):
         if (key in self._config):
             if (pressed):
-                self._interconnect.emit_port(self, self._config[key]["port"], self._config[key]["mask"], self._config[key]["level"])
+                self._interconnect.emit_pin(self, self._config[key]["port"], self._config[key]["mask"], self._config[key]["level"])
             else:
-                self._interconnect.emit_port(self, self._config[key]["port"], self._config[key]["mask"], -1)
+                self._interconnect.emit_pin(self, self._config[key]["port"], self._config[key]["mask"], -1)
