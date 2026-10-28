@@ -555,7 +555,7 @@ class GPL191X():
             if (level >= 0):
                 self._port_input[port][level] |= mask
             
-            if ((port == "CD") and (mask & 0x02)):
+            if ((port == "CD")):
                 if ((prev_port & 0x02) > (self._port_read(port) & 0x02)):
                     self._IREQ |= SFR_INT_CTRL_EXT
                 self._update_timers_div()
@@ -643,6 +643,12 @@ class GPL191X():
                     self._TM0_div = (SUB_CLOCK // 64) * (SFR_TIMEBASE_H_TBL[time_base_h])
                 elif (srcB == SFR_TIMER_CTRL_CNT0_SRCB_CLK128):
                     self._TM0_div = (SUB_CLOCK // 128)
+                elif (srcB == SFR_TIMER_CTRL_CNT0_SRCB_VDD):
+                    self._TM0 += 1
+                    if (self._TM0 > 0xFFFF):
+                        self._TM0 = self._TM0_PRELOAD
+                        self._IREQ |= SFR_INT_CTRL_TIMER0
+                        self._WAKEUPREQ |= SFR_WAKEUP_CTRL_TIMER0 & self._WAKEUP_CTRL
 
         else:
             if (self._TIMER_CTRL & SFR_TIMER_CTRL_TM0_TIMER1):
@@ -711,7 +717,7 @@ class GPL191X():
             exec_cycles = self._execute[opcode](self) * self._CPU_DIV
             self._instr_counter += 1
             self._timers_clock(exec_cycles)
-            if ((not self._IF) and (self._IREQ & self._INT_CTRL)):
+            if ((not self._IF) and (self._IREQ & self._INT_CTRL) and opcode != 0x58):
                 self._IRQ()
         else:
             exec_cycles = self._sub_clock_div
@@ -794,7 +800,7 @@ class GPL191X():
         return self._BANK
     
     def _set_sfr_bank_sel(self, value):
-        self._BANK = (value & 0x03)
+        self._BANK = (value & 0x07)
 
     def _get_sfr_wakeup_ctrl(self):
         return self._WAKEUPREQ

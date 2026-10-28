@@ -255,7 +255,7 @@ class GPL191Xdasm():
                 vector = 0x7FFE - i * 2
                 if (vector > 0):
                     addr = (rom[vector % self._rom_size] | (rom[(vector + 1) % self._rom_size] << 8))
-                    if (addr != 0xFFFF):
+                    if (0 < addr < 0xFFFF):
                         roots.append((addr & 0x7FFF) % self._rom_size)
             
             if (self._roots):
