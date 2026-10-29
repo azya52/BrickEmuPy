@@ -239,7 +239,7 @@ class BrickWidget(QtWidgets.QGraphicsView):
                     group.addToGroup(segment_shadow)
 
                     self.scene().addItem(group)
-                    self._segments.append([ramByte, ramBit, group, -1])
+                    self._segments.append([ramByte, ramBit, group, 0])
 
         self._svg_outputs = {}
         mutableElements = self._config.get("peripherals", {}).get("svg_output", {})
@@ -273,18 +273,16 @@ class BrickWidget(QtWidgets.QGraphicsView):
                 self.scene().addWidget(btn)
 
     def _renderVRAM(self, RAM):
-        k = 1 - self._motionBlur
+        step = (1 - self._motionBlur) ** 2
         ghostSegments = self._ghostSegments
         ramSize = len(RAM)
         for seg in self._segments:
-            nibble, bit, segment, opacity = seg
-            if nibble < ramSize:
-                target = ((RAM[nibble] >> bit) & 0x1) + ghostSegments
+            index, bit, segment, opacity = seg
+            if index < ramSize:
+                target = (RAM[index] >> bit) & 0x1
                 if (opacity != target):
-                    opacity += k * (target - opacity)
-                    if abs(opacity - target) < 1e-3:
-                        opacity = target
-                    segment.setOpacity(opacity)
+                    opacity += max(-step, min(step, target - opacity))
+                    segment.setOpacity(opacity * opacity * (3 - 2 * opacity) + ghostSegments)
                     seg[-1] = opacity
             else:
                 seg[-1] = 0
@@ -313,6 +311,7 @@ class BrickWidget(QtWidgets.QGraphicsView):
                 self._shadow = 0
 
         for seg in self._segments:
+            seg[-1] = 0.5
             segmentItem = seg[2].childItems()[0]
             shadowItem = seg[2].childItems()[1]
             if (self._shadow):
