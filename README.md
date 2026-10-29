@@ -34,6 +34,7 @@ Handheld LCD games emulator in Python with PyQt6.
   * Digimon Ver. 3J (distributed without ROM)
   * Digimon Ver. 4J (distributed without ROM)
   * D-Power Digivice EU 1.01, 2001 (SPL61X) (distributed without ROM)
+  * D-Tector Digivice US 2.00, 2002 (SPL191X) (distributed without ROM)
   * Nikko virtual pet
   * Pocket Pikachu (distributed without ROM)
   * Mickey Deluxe Virtual Game virtual pet (HTGT43N0)
