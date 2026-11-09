@@ -3,7 +3,7 @@
 	"credits": "The PCB for reverse engineering was obtained with the help of t.me/oksiniah",
 	"core": "EM73000",
 	"face_path": "./assets/HitorikkoChicken.svg",
-	"clock": 500000,
+	"clock": 480000,
 
 	"buttons": {
 		"btnA": {
@@ -54,12 +54,10 @@
 	"mask_options": {
 		"rom_path": "./assets/HitorikkoChicken.bin",
 		"port_pullup": {
-			"P0": 15,
-			"P7": 15
+			"P0": 15
 		},
 		"port_wakeup": {
-			"P0": 15,
-			"P8": 0
+			"P0": 15
 		}
 	}
 }

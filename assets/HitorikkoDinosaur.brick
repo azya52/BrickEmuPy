@@ -1,0 +1,63 @@
+{
+	"id": "c065277e-5d60-491a-9069-ca7394516db2",
+	"credits": "The PCB for reverse engineering was obtained with the help of t.me/oksiniah",
+	"core": "EM73000",
+	"face_path": "./assets/HitorikkoDinosaur.svg",
+	"clock": 480000,
+
+	"buttons": {
+		"btnA": {
+			"hot_keys": [49]
+		},
+		"btnB": {
+			"hot_keys": [50]
+		},
+		"btnC": {
+			"hot_keys": [51]
+		},
+		"btnD": {
+			"hot_keys": [52]
+		}
+	},
+
+	"display": {
+		"motion_blur": 0.6,
+		"ghost_segments": 0.02,
+		"shadow": 1
+	},
+	
+	"peripherals": {
+		"direct_input": {
+			"btnA": {
+				"port": "P0",
+				"mask": 0,
+				"level": 0
+			},
+			"btnB": {
+				"port": "P0",
+				"mask": 1,
+				"level": 0
+			},
+			"btnC": {
+				"port": "P0",
+				"mask": 2,
+				"level": 0
+			},
+			"btnD": {
+				"port": "P0",
+				"mask": 3,
+				"level": 0
+			}
+		}
+	},
+
+	"mask_options": {
+		"rom_path": "./assets/HitorikkoDinosaur.bin",
+		"port_pullup": {
+			"P0": 15
+		},
+		"port_wakeup": {
+			"P0": 15
+		}
+	}
+}
