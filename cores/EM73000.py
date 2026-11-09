@@ -72,12 +72,15 @@ class EM73000():
         self._interconnect = interconnect
         self._interconnect.register_pin_device(self)
         
-        self._P0_pullup_mask = mask['port_pullup']['P0']
-        self._P7_pullup_mask = mask['port_pullup']['P7']
-        self._P8_pullup_mask = 0xF
-    
-        self._P0_wakeup_mask = mask['port_wakeup']['P0']
-        self._P8_wakeup_mask = mask['port_wakeup']['P8']
+        self._pullup = {
+            **{"P0": 0, "P7": 0, "P8": 0xF},
+            **mask['port_pullup']
+        }
+
+        self._wakeup = {
+            **{"P0": 0, "P8": 0},
+            **mask['port_wakeup']
+        }
 
         self._reset()
 
@@ -243,12 +246,12 @@ class EM73000():
         
         self._RAM = [0] * RAM_SIZE
 
-        self._P0 = self._P0_pullup_mask
+        self._P0 = self._pullup['P0']
         self._P4 = 0xF
         self._P5 = 0x0
         self._P6 = 0x0
-        self._P7 = self._P7_pullup_mask
-        self._P8 = self._P8_pullup_mask
+        self._P7 = self._pullup['P7']
+        self._P8 = self._pullup['P8']
         self._P9 = 0x0
         self._P16 = 0x0
         self._P23 = 0xF
@@ -264,6 +267,8 @@ class EM73000():
         self._time_base_counter = 0
 
         self._ram_bank = 0
+
+        self._rti_stack = False
 
     def reset(self):
         self._reset()
@@ -318,6 +323,7 @@ class EM73000():
         self._P23 = value
 
     def _set_io_P24(self, value):
+        self._sound.set_freq_div(((value << 4) | self._P23) + 1)
         self._P24 = value
 
     def _set_io_P25(self, value):
@@ -335,7 +341,7 @@ class EM73000():
         self._timerB_counter = 0
 
     def _set_io_P30(self, value):
-        self._sound.set_basic_freq_div(4 << ((value & P30_BFREQ) >> 2))
+        self._sound.set_basic_freq_div(1 << ((value & P30_BFREQ) >> 2))
         self._sound.set_mode(value & P30_SMODE)
         self._P30 = value
 
@@ -427,14 +433,14 @@ class EM73000():
         if (port == 'P0'):
             prev_P0 = self._P0
             self._P0 = (~pin_mask & self._P0) | (level << pin)
-            if ((self._P0_wakeup_mask & prev_P0 & pin_mask) and ~(self._P0 & pin_mask)):
+            if ((self._wakeup[port] & prev_P0 & pin_mask) and ~(self._P0 & pin_mask)):
                 self._P16 &= ~P16_SE
         elif (port == 'P7'):
             self._P7 = (~pin_mask & self._P7) | (level << pin)
         elif (port == 'P8'):
             prev_P8 = self._P8
             self._P8 = (~pin_mask & self._P8) | (level << pin)
-            if ((self._P8_wakeup_mask & prev_P8 & pin_mask) and ~(self._P8 & pin_mask)):
+            if ((self._wakeup[port] & prev_P8 & pin_mask) and ~(self._P8 & pin_mask)):
                 self._P16 &= ~P16_SE
             if ((prev_P8 & pin_mask) and ~(self._P8 & pin_mask)):
                 self._IL |= ((pin == 0) << INT1_ID) | ((pin == 2) << INT0_ID)
@@ -443,16 +449,18 @@ class EM73000():
         pin_mask = (1 << pin)
         if (port == 'P0'):
             prev_P0 = self._P0
-            self._P0 = self._P0 & ~pin_mask | self._P0_pullup_mask & pin_mask
-            if ((self._P0_wakeup_mask & prev_P0 & pin_mask) and ~(self._P0 & pin_mask)):
+            self._P0 = self._P0 & ~pin_mask | self._pullup[port] & pin_mask
+            if ((self._wakeup[port] & prev_P0 & pin_mask) and ~(self._P0 & pin_mask)):
                 self._P16 &= ~P16_SE
         elif (port == 'P7'):
-            self._P7 = self._P7 & ~pin_mask | self._P7_pullup_mask & pin_mask
+            self._P7 = self._P7 & ~pin_mask | self._pullup[port] & pin_mask
         elif (port == 'P8'):
             prev_P8 = self._P8
-            self._P8 = self._P8 & ~pin_mask | self._P8_pullup_mask & pin_mask
-            if ((self._P8_wakeup_mask & prev_P8 & pin_mask) and ~(self._P8 & pin_mask)):
+            self._P8 = self._P8 & ~pin_mask | self._pullup[port] & pin_mask
+            if ((self._wakeup[port] & prev_P8 & pin_mask) and ~(self._P8 & pin_mask)):
                 self._P16 &= ~P16_SE
+        elif (port == 'RES'):
+            self._reset()
 
     def pc(self):
         return self._PC & 0x1FFF
@@ -506,6 +514,7 @@ class EM73000():
                 self._SF = 1
                 self._EI = 0
                 self._IL &= ~(0x20 >> id)
+                self._rti_stack = True
                 return
             
     def clock(self):       
@@ -525,7 +534,8 @@ class EM73000():
     def _write_ram(self, i, value):
         i &= 0xFF
         if (i < 0xF4):
-            self._RAM[self._ram_bank + i] = value
+            if (self._ram_bank + i < RAM_SIZE):
+                self._RAM[self._ram_bank + i] = value
         elif (i == 0xF4):
             self._TIMERA = (self._TIMERA & 0xFF0) | value
         elif (i == 0xF5):
@@ -547,33 +557,35 @@ class EM73000():
         elif (i == 0xFF):
             self._SP = value
         else:
-            self._RAM[self._ram_bank + i] = value
+            if (self._ram_bank + i < RAM_SIZE):
+                self._RAM[self._ram_bank + i] = value
         
     def _read_ram(self, i):
         i &= 0xFF
-        if (i < 0xF4):
+        if (i >= 0xF4):
+            if (i == 0xF4):
+                return self._TIMERA & 0x00F
+            elif (i == 0xF5):
+                return (self._TIMERA >> 4) & 0x00F
+            elif (i == 0xF6):
+                return (self._TIMERA >> 8) & 0x00F
+            elif (i == 0xF8):
+                return self._TIMERB & 0x00F
+            elif (i == 0xF9):
+                return (self._TIMERB >> 4) & 0x00F
+            elif (i == 0xFA):
+                return (self._TIMERB >> 8) & 0x00F
+            elif (i == 0xFC):
+                return self._DP & 0x00F
+            elif (i == 0xFD):
+                return (self._DP >> 4) & 0x00F
+            elif (i == 0xFE):
+                return (self._DP >> 8) & 0x00F
+            elif (i == 0xFF):
+                return self._SP
+        if (self._ram_bank + i < RAM_SIZE):
             return self._RAM[self._ram_bank + i]
-        elif (i == 0xF4):
-            return self._TIMERA & 0x00F
-        elif (i == 0xF5):
-            return (self._TIMERA >> 4) & 0x00F
-        elif (i == 0xF6):
-            return (self._TIMERA >> 8) & 0x00F
-        elif (i == 0xF8):
-            return self._TIMERB & 0x00F
-        elif (i == 0xF9):
-            return (self._TIMERB >> 4) & 0x00F
-        elif (i == 0xFA):
-            return (self._TIMERB >> 8) & 0x00F
-        elif (i == 0xFC):
-            return self._DP & 0x00F
-        elif (i == 0xFD):
-            return (self._DP >> 4) & 0x00F
-        elif (i == 0xFE):
-            return (self._DP >> 8) & 0x00F
-        elif (i == 0xFF):
-            return self._SP
-        return self._RAM[self._ram_bank + i]
+        return 0
     
     def _sbr_a(self, opcode):
         #00aa aaaa If SF=1 then PC¬PC12-6.a5-0 1 1 - - 1 else null
@@ -587,7 +599,7 @@ class EM73000():
         #0100 0aaa aaaa aaaa STACK[SP]¬PC, 2 2 - - - SP¬SP -1, PC¬a
         pc = self._PC + 2
         sp = STACK_OFFSET + (self._SP << 2)
-        self._RAM[sp] = pc >> 12
+        self._RAM[sp] = (pc >> 12) & 0x1
         self._RAM[sp + 1] = (pc >> 8) & 0xF
         self._RAM[sp + 2] = (pc >> 4) & 0xF
         self._RAM[sp + 3] = (pc) & 0xF
@@ -653,9 +665,11 @@ class EM73000():
         self._SP = (self._SP + 1) & 0xF
         sp = STACK_OFFSET + (self._SP << 2)
         self._PC = ((self._RAM[sp] & 0x1) << 12) | (self._RAM[sp + 1] << 8) | (self._RAM[sp + 2] << 4) | self._RAM[sp + 3]
-        self._CF = (self._RAM[sp] & 0x8) > 0
-        self._ZF = (self._RAM[sp] & 0x4) > 0
-        self._SF = (self._RAM[sp] & 0x2) > 0
+        if (self._rti_stack):
+            self._rti_stack = False
+            self._CF = (self._RAM[sp] & 0x8) > 0
+            self._ZF = (self._RAM[sp] & 0x4) > 0
+            self._SF = (self._RAM[sp] & 0x2) > 0
         self._EI = 1
         return 16
         
@@ -1342,7 +1356,7 @@ class EM73000():
         #1110 nnnn STACK[SP]¬PC, 1 2 - - - SP¬SP - 1, PC¬a, a = 8n + 6 (n =1~15),0086h (n = 0)
         pc = self._PC + 1
         sp = STACK_OFFSET + (self._SP << 2)
-        self._RAM[sp] = pc >> 12
+        self._RAM[sp] = (pc >> 12) & 0x1
         self._RAM[sp + 1] = (pc >> 8) & 0xF
         self._RAM[sp + 2] = (pc >> 4) & 0xF
         self._RAM[sp + 3] = (pc) & 0xF

@@ -489,61 +489,73 @@ class EM73000dasm():
 
     def _addl_k(self, pc, opcode, rom):
         #0110 1110 0001 kkkk LR¬LR+k 2 2 - Z C'
+        opcode = opcode << 8 | rom.get_byte(pc + 1)
         k = rom.get_byte(pc + 1) & 0x0F
         return (pc + 2,), (2, opcode, "addl " + self._nibblebase % k)
 
     def _cmpl_k(self, pc, opcode, rom):
         #0110 1110 0011 kkkk k-LR 2 2 - Z C
+        opcode = opcode << 8 | rom.get_byte(pc + 1)
         k = rom.get_byte(pc + 1) & 0x0F
         return (pc + 2,), (2, opcode, "cmpl " + self._nibblebase % k)
 
     def _ora_k(self, pc, opcode, rom):
         #0110 1110 0100 kkkk Acc¬Acc k 2 2 - Z Z'
+        opcode = opcode << 8 | rom.get_byte(pc + 1)
         k = rom.get_byte(pc + 1) & 0x0F
         return (pc + 2,), (2, opcode, "ora " + self._nibblebase % k)
 
     def _adda_k(self, pc, opcode, rom):
         #0110 1110 0101 kkkk Acc¬Acc+k 2 2 - Z C'
+        opcode = opcode << 8 | rom.get_byte(pc + 1)
         k = rom.get_byte(pc + 1) & 0x0F
         return (pc + 2,), (2, opcode, "adda " + self._nibblebase % k)
 
     def _anda_k(self, pc, opcode, rom):
         #0110 1110 0110 kkkk Acc¬Acc&k 2 2 - Z Z'
+        opcode = opcode << 8 | rom.get_byte(pc + 1)
         k = rom.get_byte(pc + 1) & 0x0F
         return (pc + 2,), (2, opcode, "anda " + self._nibblebase % k)
 
     def _suba_k(self, pc, opcode, rom):
         #0110 1110 0111 kkkk Acc¬k-Acc 2 2 - Z C
+        opcode = opcode << 8 | rom.get_byte(pc + 1)
         k = rom.get_byte(pc + 1) & 0x0F
         return (pc + 2,), (2, opcode, "suba " + self._nibblebase % k)
 
     def _addh_k(self, pc, opcode, rom):
         #0110 1110 1001 kkkk HR¬HR+k 2 2 - Z C'
+        opcode = opcode << 8 | rom.get_byte(pc + 1)
         k = rom.get_byte(pc + 1) & 0x0F
         return (pc + 2,), (2, opcode, "addh " + self._nibblebase % k)
 
     def _cmph_k(self, pc, opcode, rom):
         #0110 1110 1011 kkkk k - HR 2 2 - Z C
+        opcode = opcode << 8 | rom.get_byte(pc + 1)
         k = rom.get_byte(pc + 1) & 0x0F
         return (pc + 2,), (2, opcode, "cmph " + self._nibblebase % k)
 
     def _orm_k(self, pc, opcode, rom):
         #0110 1110 1100 kkkk RAM[HL]¬RAM[HL] k 2 2 - Z Z'
+        opcode = opcode << 8 | rom.get_byte(pc + 1)
         k = rom.get_byte(pc + 1) & 0x0F
         return (pc + 2,), (2, opcode, "orm " + self._nibblebase % k)
 
     def _addm_k(self, pc, opcode, rom):
         #0110 1110 1101 kkkk RAM[HL]¬RAM[HL] +k 2 2 - Z C'
+        opcode = opcode << 8 | rom.get_byte(pc + 1)
         k = rom.get_byte(pc + 1) & 0x0F
         return (pc + 2,), (2, opcode, "addm " + self._nibblebase % k)
 
     def _andm_k(self, pc, opcode, rom):
         #0110 1110 1110 kkkk RAM[HL]¬RAM[HL]&k 2 2 - Z Z'
+        opcode = opcode << 8 | rom.get_byte(pc + 1)
         k = rom.get_byte(pc + 1) & 0x0F
         return (pc + 2,), (2, opcode, "andm " + self._nibblebase % k)
 
     def _subm_k(self, pc, opcode, rom):
         #0110 1110 1111 kkkk RAM[HL]¬k - RAM[HL] 2 2 - Z C
+        opcode = opcode << 8 | rom.get_byte(pc + 1)
         k = rom.get_byte(pc + 1) & 0x0F
         return (pc + 2,), (2, opcode, "subm " + self._nibblebase % k)
 
@@ -554,21 +566,25 @@ class EM73000dasm():
 
     def _ina_p(self, pc, opcode, rom):
         #0110 1111 0100 pppp Acc¬PORT[p] 2 2 - Z Z'
+        opcode = opcode << 8 | rom.get_byte(pc + 1)
         p = rom.get_byte(pc + 1) & 0x0F
         return (pc + 2,), (2, opcode, "ina PORT[" + self._portbase % p + "]")
     
     def _inm_p(self, pc, opcode, rom):
         #0110 1111 1100 pppp RAM[HL]¬PORT[p] 2 2 - - Z'
+        opcode = opcode << 8 | rom.get_byte(pc + 1)
         p = rom.get_byte(pc + 1) & 0x0F
         return (pc + 2,), (2, opcode, "inm PORT[" + self._portbase % p + "]")
 
     def _outa_p(self, pc, opcode, rom):
         #0110 1111 000p pppp PORT[p]¬Acc 2 2 - - 1
+        opcode = opcode << 8 | rom.get_byte(pc + 1)
         p = rom.get_byte(pc + 1) & 0x1F
         return (pc + 2,), (2, opcode, "outa PORT[" + self._portbase % p + "]")
 
     def _outm_p(self, pc, opcode, rom):
         #0110 1111 100p pppp PORT[p]¬RAM[HL] 2 2 - - 1
+        opcode = opcode << 8 | rom.get_byte(pc + 1)
         p = rom.get_byte(pc + 1) & 0x1F
         return (pc + 2,), (2, opcode, "outm PORT[" + self._portbase % p + "]")
 

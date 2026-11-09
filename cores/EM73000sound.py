@@ -6,6 +6,8 @@ MODE_TONE_RANDOM = 3
 SQUARENESS_FACTOR = 5
 
 CHANNEL = 0
+
+BASIC_FREQ = 240000
     
 class EM73000sound():
     def __init__(self, clock, interconnect):
@@ -17,7 +19,7 @@ class EM73000sound():
 
     def update(self):
         if (self._mode != MODE_DISABLE and (self._freq_div > 1)):
-            freq = self._system_clock / self._basic_freq_div / self._freq_div / 2
+            freq = BASIC_FREQ / self._basic_freq_div / self._freq_div / 2
             self._interconnect.emit_audio(CHANNEL, (freq, self._mode != MODE_TONE, SQUARENESS_FACTOR, 0))
         else:
             self._interconnect.emit_audio(CHANNEL, None)
