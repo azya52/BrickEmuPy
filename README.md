@@ -44,6 +44,8 @@ Handheld LCD games emulator in Python with PyQt6.
   * Big Cat 9-in-1 (SPLB20)
   * Super Gyaoppi 9-in-1, 1997 (SPLB20)
   * Hitorikko Chicken, 1997 (EM73362)
+  * Hitorikko Dinosaur, 1997 (EM73362)
+  * Mini Pets 8-in-1 (EM73362)
 * Other LCD Games
   * Epoch Chibi Pachi Alien Fever
   * Formel 1 (Hartung Spiele Berlin/Epoch)
