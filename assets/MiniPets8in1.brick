@@ -1,0 +1,62 @@
+{
+	"id": "18f3846f-0e88-445b-8db1-09a7fcf37f01",
+	"core": "EM73000",
+	"face_path": "./assets/MiniPets8in1.svg",
+	"clock": 455000,
+
+	"buttons": {
+		"btnA": {
+			"hot_keys": [49]
+		},
+		"btnB": {
+			"hot_keys": [50]
+		},
+		"btnC": {
+			"hot_keys": [51]
+		},
+		"btnReset": {
+			"hot_keys": [82]
+		}
+	},
+
+	"display": {
+		"motion_blur": 0.6,
+		"ghost_segments": 0.02,
+		"shadow": 1
+	},
+	
+	"peripherals": {
+		"direct_input": {
+			"btnA": {
+				"port": "P0",
+				"mask": 0,
+				"level": 0
+			},
+			"btnB": {
+				"port": "P0",
+				"mask": 1,
+				"level": 0
+			},
+			"btnC": {
+				"port": "P0",
+				"mask": 2,
+				"level": 0
+			},
+			"btnReset": {
+				"port": "RES",
+				"mask": 0,
+				"level": 0
+			}
+		}
+	},
+
+	"mask_options": {
+		"rom_path": "./assets/MiniPets8in1.bin",
+		"port_pullup": {
+			"P0": 15
+		},
+		"port_wakeup": {
+			"P0": 15
+		}
+	}
+}
