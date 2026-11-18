@@ -7,6 +7,7 @@ Handheld LCD games emulator in Python with PyQt6.
 * Brick Games
   * Brick Game E-23 PLUS MARK II 96 in 1 (HT-943D0) (An [article](https://habr.com/ru/articles/773040/) describing the reverse engineering.)
   * Brick Game E-88 8 in 1 (HT-943E5)
+  * Brick Game E-S88 8 in 1 (EM73)
   * Brick Game E-33 2 in 1 (SC6383)
   * Block Game & Echo Key GA888 (Tetris Jr. clone) (HT-943I0)
   * Radio Shack Stack Challenge (C6246D2E)
