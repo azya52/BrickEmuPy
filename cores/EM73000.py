@@ -45,6 +45,7 @@ P16_WM = 8
 P27_LDC = 0xC
 P27_LDCL = 4
 P27_LDCH = 8
+P27_LCD_EN = 0xC
 P28_IPSA = 3
 P28_IPSAL = 1
 P28_IPSAH = 2
@@ -316,7 +317,8 @@ class EM73000():
     def _set_io_P16(self, value):
         self._P16 = value
         if (value & P16_SE):
-            self._time_base_counter = 0
+            self._time_base_counter = TIME_BASE_DIV[self._P25]
+            self._P27 = 0
 
     def _set_io_P23(self, value):
         self._sound.set_freq_div(((self._P24 << 4) | value) + 1)
@@ -327,6 +329,7 @@ class EM73000():
         self._P24 = value
 
     def _set_io_P25(self, value):
+        self._time_base_counter = TIME_BASE_DIV[value]
         self._P25 = value
 
     def _set_io_P27(self, value):
@@ -334,11 +337,11 @@ class EM73000():
 
     def _set_io_P28(self, value):
         self._P28 = value
-        self._timerA_counter = 0
+        self._timerA_counter = TIMER_DIV[value & P28_IPSA]
 
     def _set_io_P29(self, value):
         self._P29 = value
-        self._timerB_counter = 0
+        self._timerB_counter = TIMER_DIV[value & P29_IPSB]
 
     def _set_io_P30(self, value):
         self._sound.set_basic_freq_div(1 << ((value & P30_BFREQ) >> 2))
@@ -433,16 +436,16 @@ class EM73000():
         if (port == 'P0'):
             prev_P0 = self._P0
             self._P0 = (~pin_mask & self._P0) | (level << pin)
-            if ((self._wakeup[port] & prev_P0 & pin_mask) and ~(self._P0 & pin_mask)):
+            if ((self._wakeup[port] & prev_P0 & pin_mask) and not(self._P0 & pin_mask)):
                 self._P16 &= ~P16_SE
         elif (port == 'P7'):
             self._P7 = (~pin_mask & self._P7) | (level << pin)
         elif (port == 'P8'):
             prev_P8 = self._P8
             self._P8 = (~pin_mask & self._P8) | (level << pin)
-            if ((self._wakeup[port] & prev_P8 & pin_mask) and ~(self._P8 & pin_mask)):
+            if ((self._wakeup[port] & prev_P8 & pin_mask) and not(self._P8 & pin_mask)):
                 self._P16 &= ~P16_SE
-            if ((prev_P8 & pin_mask) and ~(self._P8 & pin_mask)):
+            if ((prev_P8 & pin_mask) and not(self._P8 & pin_mask)):
                 self._IL |= ((pin == 0) << INT1_ID) | ((pin == 2) << INT0_ID)
 
     def _pin_release(self, port, pin):
@@ -450,15 +453,17 @@ class EM73000():
         if (port == 'P0'):
             prev_P0 = self._P0
             self._P0 = self._P0 & ~pin_mask | self._pullup[port] & pin_mask
-            if ((self._wakeup[port] & prev_P0 & pin_mask) and ~(self._P0 & pin_mask)):
+            if ((self._wakeup[port] & prev_P0 & pin_mask) and not(self._P0 & pin_mask)):
                 self._P16 &= ~P16_SE
         elif (port == 'P7'):
             self._P7 = self._P7 & ~pin_mask | self._pullup[port] & pin_mask
         elif (port == 'P8'):
             prev_P8 = self._P8
             self._P8 = self._P8 & ~pin_mask | self._pullup[port] & pin_mask
-            if ((self._wakeup[port] & prev_P8 & pin_mask) and ~(self._P8 & pin_mask)):
+            if ((self._wakeup[port] & prev_P8 & pin_mask) and not(self._P8 & pin_mask)):
                 self._P16 &= ~P16_SE
+            if ((prev_P8 & pin_mask) and not(self._P8 & pin_mask)):
+                self._IL |= ((pin == 0) << INT1_ID) | ((pin == 2) << INT0_ID)
         elif (port == 'RES'):
             self._reset()
 
@@ -466,7 +471,7 @@ class EM73000():
         return self._PC & 0x1FFF
     
     def get_VRAM(self):
-        if (not (self._P16 & P16_SE)):
+        if ((self._P27 & P27_LDC) == P27_LCD_EN):
             return tuple(self._RAM)
         else:
             return EMPTY_VRAM
@@ -518,10 +523,10 @@ class EM73000():
                 return
             
     def clock(self):       
-        if self._EI:
-            self._interrupt()
-
         if (not (self._P16 & P16_SE)):
+            if self._EI:
+                self._interrupt()
+
             opcode = self._ROM.get_byte(self._PC)
             exec_cycles = self._execute[opcode](self, opcode)
             self._instr_counter += 1
@@ -529,7 +534,6 @@ class EM73000():
             return exec_cycles
 
         return WARMUP_TIME[self._P16 & P16_SWWT]
-
 
     def _write_ram(self, i, value):
         i &= 0xFF
