@@ -1,0 +1,87 @@
+{
+	"id": "4cc62eb6-1174-41c3-bdbc-f1b951f0850e",
+	"core": "EM73000",
+	"face_path": "./assets/ES88_8in1.svg",
+	"clock": 4000000,
+
+	"buttons": {
+		"btnStart": {
+			"hot_keys": [49]
+		},
+		"btnOnOff": {
+			"hot_keys": [50]
+		},
+		"btnMute": {
+			"hot_keys": [51]
+		},
+		"btnLeft": {
+			"hot_keys": [65, 16777234]
+		},
+		"btnDown": {
+			"hot_keys": [83, 16777237]
+		},
+		"btnRight": {
+			"hot_keys": [68, 16777236]
+		},
+		"btnRotate": {
+			"hot_keys": [32, 16777235, 16777220]
+		}
+	},
+
+	"display": {
+		"motion_blur": 0.6,
+		"ghost_segments": 0.02,
+		"shadow": 1
+	},
+	
+	"peripherals": {
+		"direct_input": {
+			"btnStart": {
+				"port": "P0",
+				"mask": 2,
+				"level": 0
+			},
+			"btnOnOff": {
+				"port": "P0",
+				"mask": 0,
+				"level": 0
+			},
+			"btnMute": {
+				"port": "P0",
+				"mask": 1,
+				"level": 0
+			},
+			"btnLeft": {
+				"port": "P8",
+				"mask": 2,
+				"level": 0
+			},
+			"btnDown": {
+				"port": "P8",
+				"mask": 3,
+				"level": 0
+			},
+			"btnRight": {
+				"port": "P8",
+				"mask": 1,
+				"level": 0
+			},
+			"btnRotate": {
+				"port": "P0",
+				"mask": 3,
+				"level": 0
+			}
+		}
+	},
+
+	"mask_options": {
+		"rom_path": "./assets/ES88_8in1.bin",
+		"port_pullup": {
+			"P0": 15,
+			"P8": 15
+		},
+		"port_wakeup": {
+			"P0": 1
+		}
+	}
+}
