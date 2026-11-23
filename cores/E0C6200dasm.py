@@ -210,7 +210,7 @@ class E0C6200dasm():
         return "cp YH, " + self._nibbase % (opcode & 0x00F)
 
     def _cp_yl_i(self, pc, opcode):
-        return "adc YL, " + self._nibbase % (opcode & 0x00F)
+        return "cp YL, " + self._nibbase % (opcode & 0x00F)
 
     def _add_r_q(self, pc, opcode):
         r = opcode >> 2 & 0x3
@@ -429,7 +429,7 @@ class E0C6200dasm():
 
     def _dec_mn(self, pc, opcode):
         n = opcode & 0x00F
-        return "inc M(" + self._nibbase % n + ")"
+        return "dec M(" + self._nibbase % n + ")"
    
     def _ld_mn_a(self, pc, opcode):
         n = opcode & 0x00F  

@@ -1187,7 +1187,7 @@ class E0C6200():
         self.set_mem(self._SP - 2 & 0xFF, self._PC + 1 >> 4 & 0x0F)
         self._SP = self._SP - 3 & 0xFF
         self.set_mem(self._SP, self._PC + 1 & 0x0F)
-        self._PC = (self._NPC & 0x1F00) | (opcode & 0x0FF)
+        self._PC = (self._PC & 0x1000) | (self._NPC & 0x0F00) | (opcode & 0x0FF)
 
         return 7    
 
@@ -1197,7 +1197,7 @@ class E0C6200():
         self.set_mem(self._SP - 2 & 0xFF, self._PC + 1 >> 4 & 0x0F)
         self._SP = self._SP - 3 & 0xFF
         self.set_mem(self._SP, self._PC + 1 & 0x0F)
-        self._PC = self._NPC = (self._NPC & 0x1000) | (opcode & 0x0FF)
+        self._PC = self._NPC = (self._PC & 0x1000) | (opcode & 0x0FF)
 
         return 7
 
