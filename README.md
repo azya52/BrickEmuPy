@@ -39,7 +39,9 @@ Handheld LCD games emulator in Python with PyQt6.
   * Nikko virtual pet
   * Pocket Pikachu (distributed without ROM)
   * Mickey Deluxe Virtual Game virtual pet (HTGT43N0)
-  * Apollo 2 in 1 virtual pet
+  * Apollo 2 in 1 virtual pet (SPLB20)
+  * Apollo Prince & Princess (SPLB20)
+  * Apollo 8 in 1 virtual pet (SPLB20)
   * Elfin Twins GM-021
   * Pocket Puppy (KS57C21308)
   * Big Cat 9-in-1 (SPLB20)
