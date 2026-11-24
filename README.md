@@ -19,6 +19,7 @@ Handheld LCD games emulator in Python with PyQt6.
   * McDonald's Chicken Nugget, 2023 (SPL81408) (distributed without ROM)
 * Virtual Pets
   * Tamagotchi P1 (distributed without ROM)
+  * Tamagotchi P1 Japanese (distributed without ROM)
   * Tamagotchi P2 (distributed without ROM)
   * Tamagotchi Mothra (distributed without ROM)
   * Tamagotchi Angel (distributed without ROM)
