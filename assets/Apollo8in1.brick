@@ -1,0 +1,61 @@
+{
+	"id": "33f92a0e-4ef8-4532-a2f7-f2e2ae066f9c",
+	"credits": "Device for reverse engineering provided by t.me/oksiniah.",
+	"core": "SPLB20",
+	"face_path": "./assets/Apollo8in1.svg",
+	"clock": 360000,
+	
+	"buttons": {
+		"btnMode": {
+			"hot_keys": [49]
+		},
+		"btnLeft": {
+			"hot_keys": [50]
+		},
+		"btnRight": {
+			"hot_keys": [51]
+		},
+		"btnEnter": {
+			"hot_keys": [52]
+		}
+	},
+
+	"display": {
+		"motion_blur": 0.6,
+		"ghost_segments": 0.02,
+		"shadow": 3
+	},
+	
+	"peripherals": {
+		"direct_input": {
+			"btnMode": {
+				"port": "PA",
+				"mask": 6,
+				"level": 0
+			},
+			"btnLeft": {
+				"port": "PA",
+				"mask": 8,
+				"level": 0
+			},
+			"btnRight": {
+				"port": "PA",
+				"mask": 16,
+				"level": 0
+			},
+			"btnEnter": {
+				"port": "PA",
+				"mask": 32,
+				"level": 0
+			}
+		}
+	},
+
+	"mask_options": {
+		"rom_path": "./assets/Apollo8in1.bin",
+		"non_crystal_mode": 0,
+		"port_pullup": {
+			"PA": 255
+		}
+	}
+}
